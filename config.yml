@@ -1,0 +1,5 @@
+db:
+  host: localhost
+  name: saso
+  user: vagrant
+  pass: ~
