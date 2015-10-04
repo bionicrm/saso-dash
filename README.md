@@ -1,3 +1,3 @@
 # Dash
 
-WebSocket server for Saso.
+A WebSocket server for Saso.
