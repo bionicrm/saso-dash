@@ -54,6 +54,7 @@ public class DashDatabase implements Database
             final Properties info = new Properties();
 
             info.setProperty("user", user);
+            //info.setProperty("ssl", "true");
 
             if (! password.isEmpty()) {
                 info.setProperty("password", password);
