@@ -3,11 +3,11 @@ package io.saso.dash.server;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.oio.OioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.saso.dash.config.Config;
@@ -31,14 +31,13 @@ public class DashServer implements Server
     @Override
     public void start()
     {
-        final EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        final EventLoopGroup workerGroup = new NioEventLoopGroup();
+        final EventLoopGroup oioEventLoopGroup = new OioEventLoopGroup();
 
         try {
             final ServerBootstrap b = new ServerBootstrap();
 
-            b.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
+            b.group(oioEventLoopGroup)
+                    .channel(OioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(serverInitializer);
 
@@ -52,8 +51,7 @@ public class DashServer implements Server
             logger.error(e.getMessage(), e);
         }
         finally {
-            workerGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
+            oioEventLoopGroup.shutdownGracefully();
         }
     }
 }

@@ -19,7 +19,7 @@ public class DashServerInitializer extends ServerInitializer
     }
 
     @Override
-    protected void initChannel(SocketChannel ch) throws Exception
+    protected void initChannel(SocketChannel ch)
     {
         final ChannelPipeline pipeline = ch.pipeline();
 

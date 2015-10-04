@@ -12,7 +12,5 @@ public class AuthModule extends AbstractModule
     protected void configure()
     {
         bind(Authenticator.class).to(DashAuthenticator.class);
-
-        bind(LiveToken.class).to(DashLiveToken.class);
     }
 }

@@ -8,28 +8,31 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
 import io.saso.dash.auth.Authenticator;
-import io.saso.dash.auth.LiveToken;
+import io.saso.dash.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 
 public class DashServerHandler extends ServerHandler
 {
     private static final Logger logger = LogManager.getLogger();
 
+    private final String url;
     private final Authenticator authenticator;
 
     private WebSocketServerHandshaker handshaker;
 
     @Inject
-    public DashServerHandler(Authenticator authenticator)
+    public DashServerHandler(Authenticator authenticator, Config config)
     {
         this.authenticator = authenticator;
+
+        url = config.getString("server.url");
+
+        logger.trace("DashServerHandler::new");
     }
 
     @Override
@@ -45,6 +48,12 @@ public class DashServerHandler extends ServerHandler
     }
 
     @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) {
+        logger.trace("remote={} DashServerHandler#handlerRemoved",
+                ctx.channel().remoteAddress());
+    }
+
+    @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
     {
         logger.error(cause.getMessage(), cause);
@@ -54,80 +63,45 @@ public class DashServerHandler extends ServerHandler
     private void handleHttpRequest(ChannelHandlerContext ctx,
                                    FullHttpRequest req)
     {
-        // bad request
+        logger.trace("remote={} DashServerHandler#handleHttpRequest",
+                ctx.channel().remoteAddress());
+
+        // if bad request
         if (! req.decoderResult().isSuccess()) {
-            sendError(ctx, req, HttpResponseStatus.BAD_REQUEST);
+            sendResponse(ctx, req, HttpResponseStatus.BAD_REQUEST);
         }
-        // only GET allowed
+        // if not GET
         else if (req.method() != HttpMethod.GET) {
-            sendError(ctx, req, HttpResponseStatus.FORBIDDEN);
+            sendResponse(ctx, req, HttpResponseStatus.FORBIDDEN);
         }
-        // handshake
+        // handshake...
         else {
-            final List<String> cookies =
-                    req.headers().getAllAndConvert(HttpHeaderNames.COOKIE);
-            final Iterator<String> itr = cookies.iterator();
-            String liveTokenCookieEncoded = "";
+            final Optional<String> liveToken =
+                    getCookieValue(req.headers(), "live_token");
 
-            while (itr.hasNext()) {
-                final String s = itr.next();
+            liveToken.ifPresent(s -> {
+                logger.debug("remote={} live_token=\"{}\"",
+                        ctx.channel().remoteAddress(), s);
 
-                if (s.startsWith("live_token=")) {
-                    liveTokenCookieEncoded = s;
-                    break;
+                if (authenticator.isTokenValid(s)) {
+                    final WebSocketServerHandshakerFactory wsFactory =
+                            new WebSocketServerHandshakerFactory(
+                                    url, null, true);
+
+                    handshaker = wsFactory.newHandshaker(req);
+
+                    if (handshaker == null) {
+                        WebSocketServerHandshakerFactory
+                                .sendUnsupportedVersionResponse(ctx.channel());
+                    }
+                    else {
+                        handshaker.handshake(ctx.channel(), req);
+                    }
                 }
-            }
+            });
 
-            if (liveTokenCookieEncoded.isEmpty()) {
-                sendError(ctx, req, HttpResponseStatus.FORBIDDEN);
-            }
-            else
-            {
-                final String liveToken;
-
-                try {
-                    liveToken = URLDecoder.decode(
-                            ServerCookieDecoder.decode(
-                                    liveTokenCookieEncoded).toString(),
-                            "UTF-8");
-                }
-                catch (UnsupportedEncodingException e) {
-                    logger.error(e.getMessage(), e);
-                    sendError(ctx, req, HttpResponseStatus.FORBIDDEN);
-                    return;
-                }
-
-                logger.debug("liveToken = {}", liveToken);
-
-                final String liveTokenValue =
-                        liveToken.substring(
-                                "[live_token=".length(),
-                                liveToken.length() - 1);
-
-                logger.debug("liveTokenValue = {}", liveTokenValue);
-
-                final Optional<LiveToken> dbLiveToken =
-                        authenticator.getLiveToken(liveTokenValue);
-
-                if (! dbLiveToken.isPresent()) {
-                    sendError(ctx, req, HttpResponseStatus.FORBIDDEN);
-                }
-
-                // TODO: do something with dbLiveToken
-
-                final WebSocketServerHandshakerFactory wsFactory =
-                        new WebSocketServerHandshakerFactory(
-                                getWebSocketLocation(req), null, true);
-
-                handshaker = wsFactory.newHandshaker(req);
-
-                if (handshaker == null) {
-                    WebSocketServerHandshakerFactory
-                            .sendUnsupportedVersionResponse(ctx.channel());
-                }
-                else {
-                    handshaker.handshake(ctx.channel(), req);
-                }
+            if (! liveToken.isPresent()) {
+                sendResponse(ctx, req, HttpResponseStatus.FORBIDDEN);
             }
         }
     }
@@ -137,17 +111,15 @@ public class DashServerHandler extends ServerHandler
     {
         final boolean notOk = res.status().code() != 200;
 
-        // generate error page if status isn't OK
         if (notOk) {
-            final ByteBuf buf = Unpooled.copiedBuffer(res.status().toString(),
-                    CharsetUtil.UTF_8);
+            final ByteBuf buf = Unpooled.copiedBuffer(
+                    res.status().toString(), CharsetUtil.UTF_8);
 
             res.content().writeBytes(buf);
             buf.release();
             HttpHeaderUtil.setContentLength(res, res.content().readableBytes());
         }
 
-        // send res and close connection if needed
         final ChannelFuture f = ctx.channel().writeAndFlush(res);
 
         if (! HttpHeaderUtil.isKeepAlive(req) || notOk) {
@@ -171,22 +143,38 @@ public class DashServerHandler extends ServerHandler
                     + " frame types not supported");
         }
         else {
-            // TODO: send off to handlers
-            String request = ((TextWebSocketFrame) frame).text();
-            logger.debug("{} received {}", ctx.channel(), request);
-            ctx.channel().writeAndFlush(new TextWebSocketFrame(request.toUpperCase()));
+            final String received = ((TextWebSocketFrame) frame).text();
+
+            logger.trace("remote={} frame=\"{}\"",
+                    ctx.channel().remoteAddress(), received);
+            ctx.channel().writeAndFlush(new TextWebSocketFrame());
         }
     }
 
-    private void sendError(ChannelHandlerContext ctx, FullHttpRequest req,
-                           HttpResponseStatus status)
+    private void sendResponse(ChannelHandlerContext ctx, FullHttpRequest req,
+                              HttpResponseStatus status)
     {
         sendHttpResponse(ctx, req, new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, HttpResponseStatus.FORBIDDEN));
+                HttpVersion.HTTP_1_1, status));
     }
 
-    private String getWebSocketLocation(FullHttpRequest req)
-    {
-        return "ws://ws.saso.dev";
+    private Optional<String> getCookieValue(HttpHeaders headers, String name) {
+        for (String s : headers.getAllAndConvert(HttpHeaderNames.COOKIE)) {
+            // decode header string
+            final Cookie cookie = ClientCookieDecoder.decode(s);
+
+            if (cookie.name().equals(name)) {
+                try {
+                    // URL decode cookie value
+                    return Optional.of(
+                            URLDecoder.decode(cookie.value(), "UTF-8"));
+                }
+                catch (UnsupportedEncodingException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 }
