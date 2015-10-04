@@ -69,6 +69,27 @@ public class DashServerHandler extends ServerHandler
         }
     }
 
+    private void sendHttpResponse(ChannelHandlerContext ctx,
+                                  FullHttpRequest req, FullHttpResponse res)
+    {
+        // generate error page if status isn't OK
+        if (res.status().code() != 200) {
+            final ByteBuf buf = Unpooled.copiedBuffer(res.status().toString(),
+                    CharsetUtil.UTF_8);
+
+            res.content().writeBytes(buf);
+            buf.release();
+            HttpHeaderUtil.setContentLength(res, res.content().readableBytes());
+        }
+
+        // send res and close connection if needed
+        final ChannelFuture f = ctx.channel().writeAndFlush(res);
+
+        if (! HttpHeaderUtil.isKeepAlive(req) || res.status().code() != 200) {
+            f.addListener(ChannelFutureListener.CLOSE);
+        }
+    }
+
     private void handleWebSocketFrame(ChannelHandlerContext ctx,
                                       WebSocketFrame frame)
     {
@@ -89,27 +110,6 @@ public class DashServerHandler extends ServerHandler
             String request = ((TextWebSocketFrame) frame).text();
             logger.debug("{} received {}", ctx.channel(), request);
             ctx.channel().writeAndFlush(new TextWebSocketFrame(request.toUpperCase()));
-        }
-    }
-
-    private void sendHttpResponse(ChannelHandlerContext ctx,
-                                  FullHttpRequest req, FullHttpResponse res)
-    {
-        // generate error page if status isn't OK
-        if (res.status().code() != 200) {
-            final ByteBuf buf = Unpooled.copiedBuffer(res.status().toString(),
-                    CharsetUtil.UTF_8);
-
-            res.content().writeBytes(buf);
-            buf.release();
-            HttpHeaderUtil.setContentLength(res, res.content().readableBytes());
-        }
-
-        // send res and close connection if needed
-        final ChannelFuture f = ctx.channel().writeAndFlush(res);
-
-        if (! HttpHeaderUtil.isKeepAlive(req) || res.status().code() != 200) {
-            f.addListener(ChannelFutureListener.CLOSE);
         }
     }
 

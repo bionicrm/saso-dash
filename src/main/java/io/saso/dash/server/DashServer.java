@@ -4,11 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.saso.dash.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,15 +18,14 @@ public class DashServer implements Server
 {
     private static final Logger logger = LogManager.getLogger();
 
-    private final int port;
     private final ServerInitializer serverInitializer;
+    private final Config config;
 
     @Inject
-    public DashServer(@Named("port") int port,
-                      ServerInitializer serverInitializer)
+    public DashServer(ServerInitializer serverInitializer, Config config)
     {
-        this.port = port;
         this.serverInitializer = serverInitializer;
+        this.config = config;
     }
 
     @Override
@@ -41,9 +42,11 @@ public class DashServer implements Server
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(serverInitializer);
 
-            final Channel ch = b.bind(port).sync().channel();
+            final ChannelFuture chFuture = b.bind(
+                    config.getString("server.addr", "127.0.0.1"),
+                    config.getInteger("server.port", 7692));
 
-            ch.closeFuture().sync();
+            chFuture.sync().channel().closeFuture().sync();
         }
         catch (InterruptedException e) {
             logger.error(e.getMessage(), e);

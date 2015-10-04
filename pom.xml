@@ -69,11 +69,11 @@
             <version>2.4</version>
         </dependency>
 
-        <!-- YamlBeans -->
+        <!-- SnakeYAML -->
         <dependency>
-            <groupId>com.esotericsoftware.yamlbeans</groupId>
-            <artifactId>yamlbeans</artifactId>
-            <version>1.09</version>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.16</version>
         </dependency>
     </dependencies>
 

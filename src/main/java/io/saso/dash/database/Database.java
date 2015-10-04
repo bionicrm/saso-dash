@@ -1,6 +1,8 @@
 package io.saso.dash.database;
 
+import java.sql.Connection;
+
 public interface Database
 {
-    void initialize();
+    Connection getConnection();
 }
