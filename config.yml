@@ -1,5 +1,5 @@
 server:
-  address: 0.0.0.0
+  address: ~
   port:    7692
 
 db:
@@ -7,4 +7,4 @@ db:
   port:     ~
   database: app
   user:     vagrant
-  password: ~
+  password: vagrant

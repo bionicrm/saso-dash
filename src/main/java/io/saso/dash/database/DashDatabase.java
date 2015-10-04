@@ -48,7 +48,7 @@ public class DashDatabase implements Database
             final String database = config.getString("db.database", "app");
             final String user     = config.getString("db.user", "user");
             final String password = config.getString("db.password", "");
-            
+
             final String url = String.format(
                     "jdbc:postgresql://%s:%d/%s", host, port, database);
             final Properties info = new Properties();
@@ -60,6 +60,8 @@ public class DashDatabase implements Database
             }
 
             connection = Optional.of(DriverManager.getConnection(url, info));
+
+            logger.debug("Connected to DB @ {}", url);
         }
         catch (ClassNotFoundException e) {
             logger.error(e.getMessage(), e);
