@@ -7,10 +7,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Singleton
@@ -54,7 +51,7 @@ public class DashConfig implements Config
         return (T) subMap.getOrDefault(keyParts.get(lastIndex), def);
     }
 
-    private void initialize()
+    private synchronized void initialize()
     {
         if (map.isPresent()) return;
 
@@ -72,6 +69,26 @@ public class DashConfig implements Config
         // noinspection unchecked
         map = Optional.of((Map<String, Object>) o);
 
+        purgeMapOfNulls(map.get());
         logger.debug("Loaded config: {}", map.get());
+    }
+
+    private void purgeMapOfNulls(Map<String, Object> map)
+    {
+        final Iterator<Map.Entry<String, Object>> itr =
+                map.entrySet().iterator();
+
+        while (itr.hasNext()) {
+            final Map.Entry<String, Object> entry = itr.next();
+            final Object value = entry.getValue();
+
+            if (value instanceof Map) {
+                // noinspection unchecked
+                purgeMapOfNulls((Map<String, Object>) value);
+            }
+            else if (value == null) {
+                itr.remove();
+            }
+        }
     }
 }

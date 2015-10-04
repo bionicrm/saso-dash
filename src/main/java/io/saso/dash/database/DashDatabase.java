@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.Properties;
 
 @Singleton
 public class DashDatabase implements Database
@@ -34,25 +35,33 @@ public class DashDatabase implements Database
         return connection.get();
     }
 
-    private void initialize()
+    private synchronized void initialize()
     {
         if (connection.isPresent()) return;
 
         try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            // load driver
+            Class.forName("org.postgresql.Driver");
 
+            final String host     = config.getString("db.host", "127.0.0.1");
+            final int port        = config.getInteger("db.port", 5432);
+            final String database = config.getString("db.database", "app");
+            final String user     = config.getString("db.user", "user");
+            final String password = config.getString("db.password", "");
+            
             final String url = String.format(
-                    "jdbc:mysql://%s:%d/%s?user=%s&password=%s",
-                    config.getString("db.host", "localhost"),
-                    config.getInteger("db.port", 3306),
-                    config.getString("db.name", "db"),
-                    config.getString("db.user", "root"),
-                    config.getString("db.pass", ""));
-            final Connection conn = DriverManager.getConnection(url);
+                    "jdbc:postgresql://%s:%d/%s", host, port, database);
+            final Properties info = new Properties();
 
-            this.connection = Optional.of(conn);
+            info.setProperty("user", user);
+
+            if (! password.isEmpty()) {
+                info.setProperty("password", password);
+            }
+
+            connection = Optional.of(DriverManager.getConnection(url, info));
         }
-        catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        catch (ClassNotFoundException e) {
             logger.error(e.getMessage(), e);
         }
         catch (SQLException e) {
