@@ -43,7 +43,7 @@ public class DashServer implements Server
                     .childHandler(serverInitializer);
 
             final ChannelFuture chFuture = b.bind(
-                    config.getString("server.addr", "127.0.0.1"),
+                    config.getString("server.address", "127.0.0.1"),
                     config.getInteger("server.port", 7692));
 
             chFuture.sync().channel().closeFuture().sync();
