@@ -1,6 +1,8 @@
 package io.saso.dash.auth;
 
+import java.util.Optional;
+
 public interface Authenticator
 {
-    boolean isTokenValid(String token);
+    Optional<LiveToken> findValidLiveToken(String token);
 }

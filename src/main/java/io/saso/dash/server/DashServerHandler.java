@@ -8,6 +8,9 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
 import io.saso.dash.auth.Authenticator;
+import io.saso.dash.auth.LiveToken;
+import io.saso.dash.client.Client;
+import io.saso.dash.client.ClientFactory;
 import io.saso.dash.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,13 +25,17 @@ public class DashServerHandler extends ServerHandler
 
     private final String url;
     private final Authenticator authenticator;
+    private final ClientFactory clientFactory;
 
+    private Client client;
     private WebSocketServerHandshaker handshaker;
 
     @Inject
-    public DashServerHandler(Authenticator authenticator, Config config)
+    public DashServerHandler(Authenticator authenticator, Config config,
+                             ClientFactory clientFactory)
     {
         this.authenticator = authenticator;
+        this.clientFactory = clientFactory;
 
         url = config.getString("server.url");
 
@@ -51,6 +58,7 @@ public class DashServerHandler extends ServerHandler
     public void handlerRemoved(ChannelHandlerContext ctx) {
         logger.trace("remote={} DashServerHandler#handlerRemoved",
                 ctx.channel().remoteAddress());
+        client.onClose();
     }
 
     @Override
@@ -68,11 +76,11 @@ public class DashServerHandler extends ServerHandler
 
         // if bad request
         if (! req.decoderResult().isSuccess()) {
-            sendResponse(ctx, req, HttpResponseStatus.BAD_REQUEST);
+            sendStatusResponse(ctx, req, HttpResponseStatus.BAD_REQUEST);
         }
         // if not GET
         else if (req.method() != HttpMethod.GET) {
-            sendResponse(ctx, req, HttpResponseStatus.FORBIDDEN);
+            sendStatusResponse(ctx, req, HttpResponseStatus.METHOD_NOT_ALLOWED);
         }
         // handshake...
         else {
@@ -83,7 +91,10 @@ public class DashServerHandler extends ServerHandler
                 logger.debug("remote={} live_token=\"{}\"",
                         ctx.channel().remoteAddress(), s);
 
-                if (authenticator.isTokenValid(s)) {
+                final Optional<LiveToken> liveTokenEntity =
+                        authenticator.findValidLiveToken(s);
+
+                liveTokenEntity.ifPresent(e -> {
                     final WebSocketServerHandshakerFactory wsFactory =
                             new WebSocketServerHandshakerFactory(
                                     url, null, true);
@@ -96,12 +107,20 @@ public class DashServerHandler extends ServerHandler
                     }
                     else {
                         handshaker.handshake(ctx.channel(), req);
+
+                        client = clientFactory.createClient(ctx, e);
                     }
+                });
+
+                if (! liveTokenEntity.isPresent()) {
+                    logger.debug(
+                            "remote={} authenticator.isTokenValid -> false",
+                            ctx.channel().remoteAddress());
                 }
             });
 
             if (! liveToken.isPresent()) {
-                sendResponse(ctx, req, HttpResponseStatus.FORBIDDEN);
+                sendStatusResponse(ctx, req, HttpResponseStatus.FORBIDDEN);
             }
         }
     }
@@ -147,12 +166,14 @@ public class DashServerHandler extends ServerHandler
 
             logger.trace("remote={} frame=\"{}\"",
                     ctx.channel().remoteAddress(), received);
-            ctx.channel().writeAndFlush(new TextWebSocketFrame());
+            client.onFrame(received);
+            /*ctx.channel().writeAndFlush(new TextWebSocketFrame());*/
         }
     }
 
-    private void sendResponse(ChannelHandlerContext ctx, FullHttpRequest req,
-                              HttpResponseStatus status)
+    private void sendStatusResponse(ChannelHandlerContext ctx,
+                                    FullHttpRequest req,
+                                    HttpResponseStatus status)
     {
         sendHttpResponse(ctx, req, new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1, status));

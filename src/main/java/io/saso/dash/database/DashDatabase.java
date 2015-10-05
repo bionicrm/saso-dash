@@ -45,8 +45,8 @@ public class DashDatabase implements Database
 
             final String host     = config.getString("db.host", "127.0.0.1");
             final int port        = config.getInteger("db.port", 5432);
-            final String database = config.getString("db.database", "app");
-            final String user     = config.getString("db.user", "user");
+            final String database = config.getString("db.database", "postgres");
+            final String user     = config.getString("db.user", "postgres");
             final String password = config.getString("db.password", "");
 
             final String url = String.format(
@@ -62,7 +62,7 @@ public class DashDatabase implements Database
 
             connection = Optional.of(DriverManager.getConnection(url, info));
 
-            logger.debug("Connected to DB @ {}", url);
+            logger.info("Connected to DB @ {}", url);
         }
         catch (ClassNotFoundException e) {
             logger.error(e.getMessage(), e);

@@ -43,7 +43,7 @@ public class DashServer implements Server
 
             final ChannelFuture chFuture = b.bind(
                     config.getString("server.address", "127.0.0.1"),
-                    config.getInteger("server.port", 7692));
+                    config.getInteger("server.port", 80));
 
             chFuture.sync().channel().closeFuture().sync();
         }

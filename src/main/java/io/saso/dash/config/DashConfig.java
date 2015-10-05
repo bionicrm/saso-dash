@@ -41,7 +41,7 @@ public class DashConfig implements Config
                 Pattern.quote(".")));
 
         int lastIndex = keyParts.size() - 1;
-        Map subMap = this.map.get();
+        Map subMap = map.get();
 
         for (String part : keyParts.subList(0, lastIndex)) {
             subMap = ((Map) subMap.get(part));
@@ -70,7 +70,7 @@ public class DashConfig implements Config
         map = Optional.of((Map<String, Object>) o);
 
         purgeMapOfNulls(map.get());
-        logger.debug("Loaded config: {}", map.get());
+        logger.info("Loaded config: {}", map.get());
     }
 
     private void purgeMapOfNulls(Map<String, Object> map)

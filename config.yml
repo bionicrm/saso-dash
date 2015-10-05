@@ -1,7 +1,7 @@
 server:
-  url:     ws://ws.saso.dev/
-  address: ~
-  port:    7692
+  url:      ws://ws.saso.dev/
+  address:  ~
+  port:     7692
 
 db:
   host:     saso.dev
@@ -9,3 +9,8 @@ db:
   database: app
   user:     vagrant
   password: vagrant
+
+redis:
+  host:     saso.dev
+  port:     ~
+  password: ~
