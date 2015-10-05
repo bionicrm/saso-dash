@@ -1,16 +1,12 @@
 package io.saso.dash.server;
 
 import com.google.inject.Inject;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
-import io.saso.dash.auth.Authenticator;
-import io.saso.dash.auth.LiveToken;
-import io.saso.dash.client.Client;
-import io.saso.dash.client.ClientFactory;
 import io.saso.dash.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,41 +20,32 @@ public class DashServerHandler extends ServerHandler
     private static final Logger logger = LogManager.getLogger();
 
     private final String url;
-    private final Authenticator authenticator;
-    private final ClientFactory clientFactory;
 
-    private Client client;
-    private WebSocketServerHandshaker handshaker;
+    private Optional<WebSocketServerHandshaker> handshaker = Optional.empty();
 
     @Inject
-    public DashServerHandler(Authenticator authenticator, Config config,
-                             ClientFactory clientFactory)
+    public DashServerHandler(Config config)
     {
-        this.authenticator = authenticator;
-        this.clientFactory = clientFactory;
-
-        url = config.getString("server.url");
+        url = config.getString("server.url", "ws://127.0.0.1");
 
         logger.trace("DashServerHandler::new");
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, Object msg)
+    protected void messageReceived(ChannelHandlerContext ctx, Object msg)
     {
         if (msg instanceof FullHttpRequest) {
-            handleHttpRequest(ctx, (FullHttpRequest) msg);
+            onFullHttpRequest(ctx, (FullHttpRequest) msg);
         }
-        else if (msg instanceof WebSocketFrame)
-        {
-            handleWebSocketFrame(ctx, (WebSocketFrame) msg);
+        else if (msg instanceof WebSocketFrame) {
+            onWebSocketFrame(ctx, (WebSocketFrame) msg);
         }
     }
 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) {
-        logger.trace("remote={} DashServerHandler#handlerRemoved",
+        logger.trace("DashServerHandler#handlerRemoved: remote={}",
                 ctx.channel().remoteAddress());
-        client.onClose();
     }
 
     @Override
@@ -68,115 +55,59 @@ public class DashServerHandler extends ServerHandler
         ctx.close();
     }
 
-    private void handleHttpRequest(ChannelHandlerContext ctx,
-                                   FullHttpRequest req)
+    private void onFullHttpRequest(ChannelHandlerContext ctx,
+                                   FullHttpRequest msg)
     {
-        logger.trace("remote={} DashServerHandler#handleHttpRequest",
-                ctx.channel().remoteAddress());
-
-        // if bad request
-        if (! req.decoderResult().isSuccess()) {
-            sendStatusResponse(ctx, req, HttpResponseStatus.BAD_REQUEST);
+        if (msg.decoderResult().isFailure()) {
+            respond(ctx, HttpResponseStatus.BAD_REQUEST);
         }
-        // if not GET
-        else if (req.method() != HttpMethod.GET) {
-            sendStatusResponse(ctx, req, HttpResponseStatus.METHOD_NOT_ALLOWED);
-        }
-        // handshake...
         else {
-            final Optional<String> liveToken =
-                    getCookieValue(req.headers(), "live_token");
+            // TODO: validate live_token
 
-            liveToken.ifPresent(s -> {
-                logger.debug("remote={} live_token=\"{}\"",
-                        ctx.channel().remoteAddress(), s);
+            final WebSocketServerHandshakerFactory wsFactory =
+                    new WebSocketServerHandshakerFactory(url, null, false);
 
-                final Optional<LiveToken> liveTokenEntity =
-                        authenticator.findValidLiveToken(s);
+            handshaker = Optional.ofNullable(wsFactory.newHandshaker(msg));
 
-                liveTokenEntity.ifPresent(e -> {
-                    final WebSocketServerHandshakerFactory wsFactory =
-                            new WebSocketServerHandshakerFactory(
-                                    url, null, true);
+            handshaker.ifPresent(handshaker ->
+                    handshaker.handshake(ctx.channel(), msg));
 
-                    handshaker = wsFactory.newHandshaker(req);
-
-                    if (handshaker == null) {
-                        WebSocketServerHandshakerFactory
-                                .sendUnsupportedVersionResponse(ctx.channel());
-                    }
-                    else {
-                        handshaker.handshake(ctx.channel(), req);
-
-                        client = clientFactory.createClient(ctx, e);
-                    }
-                });
-
-                if (! liveTokenEntity.isPresent()) {
-                    logger.debug(
-                            "remote={} authenticator.isTokenValid -> false",
-                            ctx.channel().remoteAddress());
-                }
-            });
-
-            if (! liveToken.isPresent()) {
-                sendStatusResponse(ctx, req, HttpResponseStatus.FORBIDDEN);
+            if (! handshaker.isPresent()) {
+                WebSocketServerHandshakerFactory
+                        .sendUnsupportedVersionResponse(ctx.channel());
             }
         }
     }
 
-    private void sendHttpResponse(ChannelHandlerContext ctx,
-                                  FullHttpRequest req, FullHttpResponse res)
+    private void onWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame msg)
     {
-        final boolean notOk = res.status().code() != 200;
-
-        if (notOk) {
-            final ByteBuf buf = Unpooled.copiedBuffer(
-                    res.status().toString(), CharsetUtil.UTF_8);
-
-            res.content().writeBytes(buf);
-            buf.release();
-            HttpHeaderUtil.setContentLength(res, res.content().readableBytes());
+        if (msg instanceof CloseWebSocketFrame) {
+            handshaker.get().close(ctx.channel(),
+                    (CloseWebSocketFrame) msg.retain());
         }
+        else if (msg instanceof PingWebSocketFrame) {
+            ctx.channel().write(new PongWebSocketFrame(msg.content().retain()));
+        }
+        else if (msg instanceof TextWebSocketFrame) {
+            final String text = ((TextWebSocketFrame) msg).text();
 
-        final ChannelFuture f = ctx.channel().writeAndFlush(res);
+            logger.trace(
+                    "DashServerHandler#onWebSocketFrame: remote={} text=\"{}\"",
+                    ctx.channel().remoteAddress(), text);
 
-        if (! HttpHeaderUtil.isKeepAlive(req) || notOk) {
-            f.addListener(ChannelFutureListener.CLOSE);
+            // TODO: off to handlers...
+            ctx.channel().writeAndFlush(new TextWebSocketFrame("hello world"));
         }
     }
 
-    private void handleWebSocketFrame(ChannelHandlerContext ctx,
-                                      WebSocketFrame frame)
+    private void respond(ChannelHandlerContext ctx, HttpResponseStatus status)
     {
-        if (frame instanceof CloseWebSocketFrame) {
-            handshaker.close(ctx.channel(),
-                    (CloseWebSocketFrame) frame.retain());
-        }
-        else if (frame instanceof PingWebSocketFrame) {
-            ctx.channel().write(new PongWebSocketFrame(
-                    frame.content().retain()));
-        }
-        else if (! (frame instanceof TextWebSocketFrame)) {
-            throw new UnsupportedOperationException(frame.getClass().getName()
-                    + " frame types not supported");
-        }
-        else {
-            final String received = ((TextWebSocketFrame) frame).text();
+        final FullHttpResponse response = new DefaultFullHttpResponse(
+                HttpVersion.HTTP_1_1,
+                status,
+                Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8));
 
-            logger.trace("remote={} frame=\"{}\"",
-                    ctx.channel().remoteAddress(), received);
-            client.onFrame(received);
-            /*ctx.channel().writeAndFlush(new TextWebSocketFrame());*/
-        }
-    }
-
-    private void sendStatusResponse(ChannelHandlerContext ctx,
-                                    FullHttpRequest req,
-                                    HttpResponseStatus status)
-    {
-        sendHttpResponse(ctx, req, new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, status));
+        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
 
     private Optional<String> getCookieValue(HttpHeaders headers, String name) {

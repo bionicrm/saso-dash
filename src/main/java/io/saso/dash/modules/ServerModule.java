@@ -9,7 +9,7 @@ public class ServerModule extends AbstractModule
     protected void configure()
     {
         bind(Server.class).to(DashServer.class);
-        bind(ServerHandler.class).to(DashServerHandler.class);
         bind(ServerInitializer.class).to(DashServerInitializer.class);
+        bind(ServerHandler.class).to(DashServerHandler.class);
     }
 }
