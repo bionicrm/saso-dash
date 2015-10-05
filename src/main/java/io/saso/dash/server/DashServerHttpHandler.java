@@ -75,10 +75,10 @@ public class DashServerHttpHandler extends ServerHttpHandler
 
     private void respond(ChannelHandlerContext ctx, HttpResponseStatus status)
     {
-        final FullHttpResponse response = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1,
-                status,
-                Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8));
+        final FullHttpResponse response =
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
+                        Unpooled.copiedBuffer(status.toString(),
+                                CharsetUtil.UTF_8));
 
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
