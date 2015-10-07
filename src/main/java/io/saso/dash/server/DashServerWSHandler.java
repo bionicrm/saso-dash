@@ -35,7 +35,7 @@ public class DashServerWSHandler extends ServerWSHandler
             logger.trace("{} => {}", ctx.channel().remoteAddress(), text);
 
             // TODO: off to handlers...
-            
+
             ctx.channel().writeAndFlush(new TextWebSocketFrame("test"));
         }
     }

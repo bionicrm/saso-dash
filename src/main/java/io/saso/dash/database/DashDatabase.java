@@ -27,6 +27,16 @@ public class DashDatabase implements Database
         this.config = config;
     }
 
+    static {
+        // load driver
+        try {
+            Class.forName("org.postgresql.Driver");
+        }
+        catch (ClassNotFoundException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
     @Override
     public Connection getConnection()
     {
@@ -40,9 +50,6 @@ public class DashDatabase implements Database
         if (connection.isPresent()) return;
 
         try {
-            // load driver
-            Class.forName("org.postgresql.Driver");
-
             final String host     = config.getString("db.host", "127.0.0.1");
             final int port        = config.getInteger("db.port", 5432);
             final String database = config.getString("db.database", "postgres");
@@ -63,9 +70,6 @@ public class DashDatabase implements Database
             connection = Optional.of(DriverManager.getConnection(url, info));
 
             logger.info("Connected to DB @ {}", url);
-        }
-        catch (ClassNotFoundException e) {
-            logger.error(e.getMessage(), e);
         }
         catch (SQLException e) {
             logger.error("SQLException: {}", e.getMessage());
