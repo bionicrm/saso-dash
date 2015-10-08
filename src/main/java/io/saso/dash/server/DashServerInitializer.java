@@ -11,17 +11,12 @@ import org.apache.logging.log4j.Logger;
 
 public class DashServerInitializer extends ServerInitializer
 {
-    private static final Logger logger = LogManager.getLogger();
-
-    private final String url;
     private final Provider<ServerHttpHandler> handlerProvider;
 
     @Inject
-    public DashServerInitializer(Config config,
-            Provider<ServerHttpHandler> handlerProvider)
+    public DashServerInitializer(Provider<ServerHttpHandler> handlerProvider)
     {
         this.handlerProvider = handlerProvider;
-        url = config.getString("server.url", "ws://127.0.0.1");
     }
 
     @Override

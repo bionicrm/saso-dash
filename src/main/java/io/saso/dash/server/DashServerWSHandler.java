@@ -25,11 +25,15 @@ public class DashServerWSHandler extends ServerWSHandler
     {
         if (msg instanceof CloseWebSocketFrame) {
             handshaker.close(ctx.channel(), (CloseWebSocketFrame) msg.retain());
+            return;
         }
-        else if (msg instanceof PingWebSocketFrame) {
+
+        if (msg instanceof PingWebSocketFrame) {
             ctx.channel().write(new PongWebSocketFrame(msg.content().retain()));
+            return;
         }
-        else if (msg instanceof TextWebSocketFrame) {
+
+        if (msg instanceof TextWebSocketFrame) {
             final String text = ((TextWebSocketFrame) msg).text();
 
             logger.trace("{} => {}", ctx.channel().remoteAddress(), text);

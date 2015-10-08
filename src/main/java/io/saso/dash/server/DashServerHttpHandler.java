@@ -9,6 +9,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.util.CharsetUtil;
+import io.saso.dash.auth.LiveToken;
 import io.saso.dash.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +42,46 @@ public class DashServerHttpHandler extends ServerHttpHandler
         }
 
         // TODO: validate live_token
+
+        // old live_token validation:
+        /*final Optional<String> liveToken =
+                getCookieValue(req.headers(), "live_token");
+
+        liveToken.ifPresent(s -> {
+            logger.debug("remote={} live_token=\"{}\"",
+                    ctx.channel().remoteAddress(), s);
+
+            final Optional<LiveToken> liveTokenEntity =
+                    authenticator.findValidLiveToken(s);
+
+            liveTokenEntity.ifPresent(e -> {
+                final WebSocketServerHandshakerFactory wsFactory =
+                        new WebSocketServerHandshakerFactory(
+                                url, null, true);
+
+                handshaker = wsFactory.newHandshaker(req);
+
+                if (handshaker == null) {
+                    WebSocketServerHandshakerFactory
+                            .sendUnsupportedVersionResponse(ctx.channel());
+                }
+                else {
+                    handshaker.handshake(ctx.channel(), req);
+
+                    client = clientFactory.createClient(ctx, e);
+                }
+            });
+
+            if (! liveTokenEntity.isPresent()) {
+                logger.debug(
+                        "remote={} authenticator.isTokenValid -> false",
+                        ctx.channel().remoteAddress());
+            }
+        });
+
+        if (! liveToken.isPresent()) {
+            sendStatusResponse(ctx, req, HttpResponseStatus.FORBIDDEN);
+        }*/
 
         final WebSocketServerHandshakerFactory wsFactory =
                 new WebSocketServerHandshakerFactory(url, null, false);
