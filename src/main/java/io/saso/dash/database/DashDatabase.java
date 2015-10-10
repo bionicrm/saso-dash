@@ -50,7 +50,7 @@ public class DashDatabase implements Database
         initialize();
 
         try {
-            logger.debug("Retrieving DB connection from connection pool");
+            logger.info("Retrieving DB connection from connection pool");
 
             return DriverManager.getConnection(
                     DBCP_CONNECT + DBCP_POOL_NAME);
@@ -83,7 +83,7 @@ public class DashDatabase implements Database
     {
         if (initialized) return;
 
-        logger.debug("Initializing DB connection pool...");
+        logger.info("Initializing DB connection pool...");
 
         final String host     = config.getString("db.host", "127.0.0.1");
         final int port        = config.getInteger("db.port", 5432);
@@ -116,7 +116,8 @@ public class DashDatabase implements Database
         }
 
         driver.registerPool(DBCP_POOL_NAME, connectionPool);
-        logger.debug("Initialized DB connection pool");
+
+        logger.info("Initialized DB connection pool");
 
         initialized = true;
     }

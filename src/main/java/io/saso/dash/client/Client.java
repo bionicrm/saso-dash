@@ -4,9 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 public interface Client
 {
-    void onFrame(String msg);
+    void onFrame(ChannelHandlerContext ctx, String msg);
 
-    void onClose();
-
-    ChannelHandlerContext getContext();
+    void onClose(ChannelHandlerContext ctx);
 }

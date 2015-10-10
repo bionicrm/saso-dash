@@ -38,7 +38,7 @@ public class DashAuthenticator implements Authenticator
             statement = db.prepareStatement(sql);
 
             statement.setString(1, token);
-            logger.debug("Execute on DB: {}", sql);
+            logger.info("Execute on DB: {}", sql);
 
             resultSet = statement.executeQuery();
 

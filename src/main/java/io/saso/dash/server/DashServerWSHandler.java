@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.*;
+import io.saso.dash.client.Client;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,11 +13,14 @@ public class DashServerWSHandler extends ServerWSHandler
     private static final Logger logger = LogManager.getLogger();
 
     private final WebSocketServerHandshaker handshaker;
+    private final Client client;
 
     @Inject
-    public DashServerWSHandler(@Assisted WebSocketServerHandshaker handshaker)
+    public DashServerWSHandler(@Assisted WebSocketServerHandshaker handshaker,
+                               @Assisted Client client)
     {
         this.handshaker = handshaker;
+        this.client = client;
     }
 
     @Override
@@ -24,6 +28,7 @@ public class DashServerWSHandler extends ServerWSHandler
                                    WebSocketFrame msg)
     {
         if (msg instanceof CloseWebSocketFrame) {
+            client.onClose(ctx);
             handshaker.close(ctx.channel(), (CloseWebSocketFrame) msg.retain());
         }
         else if (msg instanceof PingWebSocketFrame) {
@@ -32,11 +37,7 @@ public class DashServerWSHandler extends ServerWSHandler
         else if (msg instanceof TextWebSocketFrame) {
             final String text = ((TextWebSocketFrame) msg).text();
 
-            logger.trace("{} => {}", ctx.channel().remoteAddress(), text);
-
-            // TODO: off to handlers...
-
-            ctx.channel().writeAndFlush(new TextWebSocketFrame("test"));
+            client.onFrame(ctx, text);
         }
     }
 
