@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Singleton
 public class DashDatabase implements Database
@@ -24,9 +24,10 @@ public class DashDatabase implements Database
     private static final Logger logger = LogManager.getLogger();
 
     private final Config config;
+    private final ThreadLocal<Connection> threadConnection =
+            new ThreadLocal<>();
 
     private boolean initialized;
-    private boolean shutdown;
 
     @Inject
     public DashDatabase(Config config)
@@ -41,53 +42,52 @@ public class DashDatabase implements Database
             Class.forName("org.postgresql.Driver");
         }
         catch (ClassNotFoundException e) {
-            logger.error(e.getMessage(), e);
+            LoggingUtil.logThrowable(e);
         }
     }
 
     @Override
-    public Connection getConnection()
+    public Connection getConnection() throws SQLException
     {
         initialize();
 
-        try {
-            logger.info("Retrieving DB connection from connection pool");
+        final Optional<Connection> conn =
+                Optional.ofNullable(threadConnection.get());
 
-            return DriverManager.getConnection(
-                    DBCP_CONNECT + DBCP_POOL_NAME);
-        }
-        catch (SQLException e) {
-            LoggingUtil.logSQLException(e, logger);
+        if (! conn.isPresent()) {
+            final Connection newConn =
+                    DriverManager.getConnection(DBCP_CONNECT + DBCP_POOL_NAME);
+
+            threadConnection.set(newConn);
+            return newConn;
         }
 
-        throw new NoSuchElementException(
-                "Unable to retrieve DB connection from connection pool");
+        return conn.get();
     }
 
     @Override
-    public void shutdown()
+    public void closeConnection() throws SQLException
     {
-        throwIfShutdown();
+        final Optional<Connection> conn =
+                Optional.ofNullable(threadConnection.get());
 
-        final PoolingDriver poolingDriver;
-
-        try {
-            poolingDriver =
-                    (PoolingDriver) DriverManager.getDriver(DBCP_CONNECT);
-
-            poolingDriver.closePool(DBCP_POOL_NAME);
+        if (conn.isPresent()) {
+            conn.get().close();
+            threadConnection.remove();
         }
-        catch (SQLException e) {
-            LoggingUtil.logSQLException(e, logger);
-        }
-
-        shutdown = true;
     }
 
-    private synchronized void initialize()
+    @Override
+    public void closePool() throws SQLException
     {
-        throwIfShutdown();
+        final PoolingDriver poolingDriver =
+                (PoolingDriver) DriverManager.getDriver(DBCP_CONNECT);
 
+        poolingDriver.closePool(DBCP_POOL_NAME);
+    }
+
+    private synchronized void initialize() throws SQLException
+    {
         if (initialized) return;
 
         logger.info("Initializing DB connection pool...");
@@ -112,27 +112,13 @@ public class DashDatabase implements Database
 
         poolableConnectionFactory.setPool(connectionPool);
 
-        final PoolingDriver driver;
-
-        try {
-            driver = (PoolingDriver) DriverManager.getDriver(DBCP_CONNECT);
-        }
-        catch (SQLException e) {
-            LoggingUtil.logSQLException(e, logger);
-            return;
-        }
+        final PoolingDriver driver =
+                (PoolingDriver) DriverManager.getDriver(DBCP_CONNECT);
 
         driver.registerPool(DBCP_POOL_NAME, connectionPool);
 
         logger.info("Initialized DB connection pool");
 
         initialized = true;
-    }
-
-    private void throwIfShutdown()
-    {
-        if (shutdown) {
-            throw new IllegalStateException("DB connection pool is shutdown");
-        }
     }
 }

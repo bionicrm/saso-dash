@@ -1,5 +1,6 @@
 package io.saso.dash.util;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.ResultSet;
@@ -10,16 +11,20 @@ import java.util.Map;
 
 public final class LoggingUtil
 {
+    private static final Logger logger = LogManager.getLogger();
+
     private LoggingUtil() { /* empty */ }
 
-    public static void logSQLException(SQLException e, Logger logger)
+    public static void logThrowable(Throwable e)
     {
-        logger.error("SQLException: {}", e.getMessage());
-        logger.error("SQLState: {}", e.getSQLState());
-        logger.error("VendorError: {}", e.getErrorCode());
+        if (e instanceof SQLException) {
+            logSQLException((SQLException) e);
+        }
+
+        logger.error(e.getMessage(), e);
     }
 
-    public static void logResultSet(ResultSet resultSet, Logger logger)
+    public static void logResultSet(ResultSet resultSet)
     {
         final Map<String, String> entries = new HashMap<>();
         final ResultSetMetaData metaData;
@@ -39,7 +44,14 @@ public final class LoggingUtil
                     resultSet.getMetaData().getTableName(1), entries);
         }
         catch (SQLException e) {
-            logSQLException(e, logger);
+            logSQLException(e);
         }
+    }
+
+    private static void logSQLException(SQLException e)
+    {
+        logger.error("SQLException: {}", e.getMessage());
+        logger.error("SQLState: {}", e.getSQLState());
+        logger.error("VendorError: {}", e.getErrorCode());
     }
 }

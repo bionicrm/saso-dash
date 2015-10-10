@@ -41,6 +41,13 @@
             <version>4.0</version>
         </dependency>
 
+        <!-- Guice Throwing Providers -->
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-throwingproviders</artifactId>
+            <version>4.0</version>
+        </dependency>
+
         <!-- Netty -->
         <dependency>
             <groupId>io.netty</groupId>

@@ -10,8 +10,6 @@ import java.sql.Timestamp;
 
 public class DashLiveToken implements LiveToken
 {
-    private static final Logger logger = LogManager.getLogger();
-
     private int       id;
     private int       userId;
     private String    token;
@@ -21,25 +19,17 @@ public class DashLiveToken implements LiveToken
     private Timestamp updatedAt;
 
     @Override
-    public boolean fillFromResultSet(ResultSet resultSet)
+    public void fillFromResultSet(ResultSet resultSet) throws SQLException
     {
-        try {
-            id = resultSet.getInt("id");
-            userId = resultSet.getInt("user_id");
-            token = resultSet.getString("token");
-            ip = resultSet.getString("ip");
-            expiresAt = resultSet.getTimestamp("expires_at");
-            createdAt = resultSet.getTimestamp("created_at");
-            updatedAt = resultSet.getTimestamp("updated_at");
-        }
-        catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-            return false;
-        }
+        id        = resultSet.getInt("id");
+        userId    = resultSet.getInt("user_id");
+        token     = resultSet.getString("token");
+        ip        = resultSet.getString("ip");
+        expiresAt = resultSet.getTimestamp("expires_at");
+        createdAt = resultSet.getTimestamp("created_at");
+        updatedAt = resultSet.getTimestamp("updated_at");
 
-        LoggingUtil.logResultSet(resultSet, logger);
-
-        return true;
+        LoggingUtil.logResultSet(resultSet);
     }
 
     @Override

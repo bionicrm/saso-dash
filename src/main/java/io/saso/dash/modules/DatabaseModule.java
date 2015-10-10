@@ -1,16 +1,14 @@
 package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.name.Names;
+import com.google.inject.throwingproviders.CheckedProvides;
+import com.google.inject.throwingproviders.ThrowingProviderBinder;
 import io.saso.dash.auth.DashLiveToken;
 import io.saso.dash.auth.LiveToken;
-import io.saso.dash.database.DB;
-import io.saso.dash.database.DashDatabase;
-import io.saso.dash.database.Database;
-import io.saso.dash.server.*;
+import io.saso.dash.database.*;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class DatabaseModule extends AbstractModule
 {
@@ -18,13 +16,7 @@ public class DatabaseModule extends AbstractModule
     protected void configure()
     {
         bind(Database.class).to(DashDatabase.class);
-
+        bind(DatabaseExecutor.class).to(DashDatabaseExecutor.class);
         bind(LiveToken.class).to(DashLiveToken.class);
-    }
-
-    @Provides @DB
-    Connection providesDBConnection(Database database)
-    {
-        return database.getConnection();
     }
 }

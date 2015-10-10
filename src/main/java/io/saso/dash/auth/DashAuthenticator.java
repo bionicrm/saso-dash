@@ -2,75 +2,83 @@ package io.saso.dash.auth;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import io.saso.dash.database.DB;
-import io.saso.dash.util.LoggingUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.saso.dash.database.DatabaseExecutor;
 
 import java.sql.*;
+import java.time.Instant;
 import java.util.Optional;
 
 public class DashAuthenticator implements Authenticator
 {
-    private static final Logger logger = LogManager.getLogger();
-
-    private final Connection db;
+    private final Provider<DatabaseExecutor> dbExecutorProvider;
     private final Provider<LiveToken> liveTokenProvider;
 
     @Inject
-    public DashAuthenticator(@DB Connection db,
+    public DashAuthenticator(Provider<DatabaseExecutor> dbExecutorProvider,
                              Provider<LiveToken> liveTokenProvider)
     {
-        this.db = db;
+        this.dbExecutorProvider = dbExecutorProvider;
         this.liveTokenProvider = liveTokenProvider;
     }
 
     @Override
-    public Optional<LiveToken> findValidLiveToken(String token)
+    public Optional<LiveToken> findLiveToken(String token)
+            throws SQLException
     {
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
+        final String sql =
+                "SELECT * FROM live_tokens WHERE token = ? LIMIT 1";
 
-        try {
-            final String sql =
-                    "SELECT * FROM live_tokens WHERE token = ? LIMIT 1";
+        final DatabaseExecutor dbExecutor = dbExecutorProvider.get();
+        final Optional<LiveToken> liveToken;
 
-            statement = db.prepareStatement(sql);
-
-            statement.setString(1, token);
-            logger.info("Execute on DB: {}", sql);
-
-            resultSet = statement.executeQuery();
-
-            // check existence
-            if (resultSet.next()) {
-                final LiveToken liveToken = liveTokenProvider.get();
-                final boolean fillSuccess =
-                        liveToken.fillFromResultSet(resultSet);
-                final long expiresAtTime = liveToken.getExpiresAt().getTime();
-                final long currentTime = System.currentTimeMillis();
-
-                // check for fill success and not expired
-                if (fillSuccess && currentTime < expiresAtTime) {
-                    return Optional.of(liveToken);
-                }
-            }
+        try (final ResultSet resultSet = dbExecutor.execute(sql, token)) {
+            liveToken = createLiveToken(resultSet);
         }
-        catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-        }
-        finally {
-            try {
-                if (resultSet != null) statement.close();
-                if (statement != null) statement.close();
 
-                db.close();
-            }
-            catch (SQLException e) {
-                LoggingUtil.logSQLException(e, logger);
+        dbExecutor.close();
+        return liveToken;
+    }
+
+    /**
+     * Creates a LiveToken from {@code resultSet}. Returns an empty Optional if
+     * the LiveToken was invalid or not found.
+     *
+     * @param resultSet the ResultSet to create the LiveToken from
+     *
+     * @return an Optional of a LiveToken
+     *
+     * @throws SQLException
+     *
+     * @see #isLiveTokenValid(LiveToken)
+     */
+    private Optional<LiveToken> createLiveToken(ResultSet resultSet)
+            throws SQLException
+    {
+        // if a row exists...
+        if (resultSet.next()) {
+            final LiveToken liveToken = liveTokenProvider.get();
+
+            // fill liveToken's fields with resultSet
+            liveToken.fillFromResultSet(resultSet);
+
+            // check validity of liveToken
+            if (isLiveTokenValid(liveToken)) {
+                return Optional.of(liveToken);
             }
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Gets if {@code liveToken} is valid. That is, it has not expired.
+     *
+     * @param liveToken the LiveToken to validate
+     *
+     * @return if {@code liveToken} is valid
+     */
+    private boolean isLiveTokenValid(LiveToken liveToken)
+    {
+        return liveToken.getExpiresAt().after(Timestamp.from(Instant.now()));
     }
 }

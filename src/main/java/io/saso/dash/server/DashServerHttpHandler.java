@@ -1,6 +1,7 @@
 package io.saso.dash.server;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,22 +15,17 @@ import io.saso.dash.auth.LiveToken;
 import io.saso.dash.client.Client;
 import io.saso.dash.client.ClientFactory;
 import io.saso.dash.config.Config;
-import io.saso.dash.database.DB;
+import io.saso.dash.util.LoggingUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
 public class DashServerHttpHandler extends ServerHttpHandler
 {
-    private static final Logger logger = LogManager.getLogger();
-
     private final Authenticator authenticator;
     private final ClientFactory clientFactory;
     private final ServerFactory serverFactory;
@@ -48,7 +44,7 @@ public class DashServerHttpHandler extends ServerHttpHandler
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx,
-                                   FullHttpRequest msg)
+                                   FullHttpRequest msg) throws Exception
     {
         // check request validity
         if (msg.decoderResult().isFailure()) {
@@ -94,12 +90,13 @@ public class DashServerHttpHandler extends ServerHttpHandler
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
     {
-        logger.error(cause.getMessage(), cause);
+        LoggingUtil.logThrowable(cause);
         ctx.close();
     }
 
     private Optional<Client> authenticate(ChannelHandlerContext ctx,
                                           FullHttpRequest req)
+            throws Exception
     {
         final Optional<String> liveTokenHeader =
                 getCookieValue(req.headers(), "live_token");
@@ -108,7 +105,7 @@ public class DashServerHttpHandler extends ServerHttpHandler
             final String s = liveTokenHeader.get();
 
             final Optional<LiveToken> liveTokenEntity =
-                    authenticator.findValidLiveToken(s);
+                    authenticator.findLiveToken(s);
 
             if (liveTokenEntity.isPresent()) {
                 final LiveToken e = liveTokenEntity.get();
@@ -144,20 +141,16 @@ public class DashServerHttpHandler extends ServerHttpHandler
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
 
-    private Optional<String> getCookieValue(HttpHeaders headers, String name) {
+    private Optional<String> getCookieValue(HttpHeaders headers, String name)
+            throws UnsupportedEncodingException
+    {
         for (String s : headers.getAllAndConvert(HttpHeaderNames.COOKIE)) {
             // decode header string
             final Cookie cookie = ClientCookieDecoder.decode(s);
 
             if (cookie.name().equals(name)) {
-                try {
-                    // URL decode cookie value
-                    return Optional.of(
-                            URLDecoder.decode(cookie.value(), "UTF-8"));
-                }
-                catch (UnsupportedEncodingException e) {
-                    logger.error(e.getMessage(), e);
-                }
+                // URL decode cookie value
+                return Optional.of(URLDecoder.decode(cookie.value(), "UTF-8"));
             }
         }
 
