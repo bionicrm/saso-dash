@@ -2,14 +2,14 @@ package io.saso.dash.database;
 
 import com.google.inject.Inject;
 
-import java.sql.*;
-import java.util.Optional;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 
 public class DashDatabaseExecutor implements DatabaseExecutor
 {
     private final Database db;
-
-    private Optional<Connection> lastConn = Optional.empty();
 
     @Inject
     public DashDatabaseExecutor(Database db)
@@ -20,10 +20,8 @@ public class DashDatabaseExecutor implements DatabaseExecutor
     @Override
     public ResultSet execute(String sql, Object... args) throws SQLException
     {
-        lastConn = Optional.of(db.getConnection());
-
         final PreparedStatement statement =
-                lastConn.get().prepareStatement(sql);
+                db.getConnection().prepareStatement(sql);
 
         // set statement parameters based on type
         for (int i = 0; i < args.length; i++) {
@@ -52,13 +50,5 @@ public class DashDatabaseExecutor implements DatabaseExecutor
         }
 
         return statement.executeQuery();
-    }
-
-    @Override
-    public void close() throws SQLException
-    {
-        if (lastConn.isPresent()) {
-            db.closeConnection();
-        }
     }
 }

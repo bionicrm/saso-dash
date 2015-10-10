@@ -35,7 +35,6 @@ public class DashAuthenticator implements Authenticator
             liveToken = createLiveToken(resultSet);
         }
 
-        dbExecutor.close();
         return liveToken;
     }
 
@@ -47,9 +46,9 @@ public class DashAuthenticator implements Authenticator
      *
      * @return an Optional of a LiveToken
      *
-     * @throws SQLException
-     *
      * @see #isLiveTokenValid(LiveToken)
+     *
+     * @throws SQLException
      */
     private Optional<LiveToken> createLiveToken(ResultSet resultSet)
             throws SQLException

@@ -15,6 +15,7 @@ import io.saso.dash.auth.LiveToken;
 import io.saso.dash.client.Client;
 import io.saso.dash.client.ClientFactory;
 import io.saso.dash.config.Config;
+import io.saso.dash.database.Database;
 import io.saso.dash.util.LoggingUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,16 +29,18 @@ public class DashServerHttpHandler extends ServerHttpHandler
 {
     private final Authenticator authenticator;
     private final ClientFactory clientFactory;
+    private final Database db;
     private final ServerFactory serverFactory;
     private final String url;
 
     @Inject
     public DashServerHttpHandler(Authenticator authenticator,
-                                 ClientFactory clientFactory,
+                                 ClientFactory clientFactory, Database db,
                                  ServerFactory serverFactory, Config config)
     {
         this.authenticator = authenticator;
         this.clientFactory = clientFactory;
+        this.db = db;
         this.serverFactory = serverFactory;
         url = config.getString("server.url", "ws://127.0.0.1");
     }
@@ -68,8 +71,10 @@ public class DashServerHttpHandler extends ServerHttpHandler
 
         handshaker.ifPresent(h -> {
             // register onClose for client
-            ctx.channel().closeFuture().addListener(future ->
-                    client.get().onClose(ctx));
+            ctx.channel().closeFuture().addListener(future -> {
+                client.get().onClose(ctx);
+                db.closeConnection();
+            });
 
             final ChannelPipeline pipeline = ctx.channel().pipeline();
 
