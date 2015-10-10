@@ -71,6 +71,9 @@ public class DashServerHttpHandler extends ServerHttpHandler
                 Optional.ofNullable(wsFactory.newHandshaker(msg));
 
         handshaker.ifPresent(h -> {
+            // register onClose for client
+            ctx.channel().closeFuture().addListener(future ->
+                    client.get().onClose(ctx));
 
             final ChannelPipeline pipeline = ctx.channel().pipeline();
 

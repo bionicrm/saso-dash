@@ -15,8 +15,6 @@ public class DashServerWSHandler extends ServerWSHandler
     private final WebSocketServerHandshaker handshaker;
     private final Client client;
 
-    private boolean closeFutureSet;
-
     @Inject
     public DashServerWSHandler(@Assisted WebSocketServerHandshaker handshaker,
                                @Assisted Client client)
@@ -29,12 +27,6 @@ public class DashServerWSHandler extends ServerWSHandler
     public void messageReceived(ChannelHandlerContext ctx,
                                    WebSocketFrame msg)
     {
-        if (! closeFutureSet) {
-            ctx.channel().closeFuture().addListener(future ->
-                    client.onClose(ctx));
-            closeFutureSet = true;
-        }
-
         if (msg instanceof CloseWebSocketFrame) {
             handshaker.close(ctx.channel(), (CloseWebSocketFrame) msg.retain());
         }
