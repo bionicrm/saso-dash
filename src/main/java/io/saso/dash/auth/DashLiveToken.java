@@ -1,8 +1,6 @@
 package io.saso.dash.auth;
 
 import io.saso.dash.util.LoggingUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,7 +27,7 @@ public class DashLiveToken implements LiveToken
         createdAt = resultSet.getTimestamp("created_at");
         updatedAt = resultSet.getTimestamp("updated_at");
 
-        LoggingUtil.logResultSet(resultSet);
+        LoggingUtil.logResultSet(resultSet, getClass());
     }
 
     @Override

@@ -29,18 +29,16 @@ public class DashServerHttpHandler extends ServerHttpHandler
 {
     private final Authenticator authenticator;
     private final ClientFactory clientFactory;
-    private final Database db;
     private final ServerFactory serverFactory;
     private final String url;
 
     @Inject
     public DashServerHttpHandler(Authenticator authenticator,
-                                 ClientFactory clientFactory, Database db,
+                                 ClientFactory clientFactory,
                                  ServerFactory serverFactory, Config config)
     {
         this.authenticator = authenticator;
         this.clientFactory = clientFactory;
-        this.db = db;
         this.serverFactory = serverFactory;
         url = config.getString("server.url", "ws://127.0.0.1");
     }
@@ -71,10 +69,8 @@ public class DashServerHttpHandler extends ServerHttpHandler
 
         handshaker.ifPresent(h -> {
             // register onClose for client
-            ctx.channel().closeFuture().addListener(future -> {
-                client.get().onClose(ctx);
-                db.closeConnection();
-            });
+            ctx.channel().closeFuture().addListener(future ->
+                    client.get().onClose(ctx));
 
             final ChannelPipeline pipeline = ctx.channel().pipeline();
 
@@ -95,7 +91,7 @@ public class DashServerHttpHandler extends ServerHttpHandler
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
     {
-        LoggingUtil.logThrowable(cause);
+        LoggingUtil.logThrowable(cause, getClass());
         ctx.close();
     }
 

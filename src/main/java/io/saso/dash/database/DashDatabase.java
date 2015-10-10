@@ -10,10 +10,8 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Optional;
 
 @Singleton
 public class DashDatabase implements Database
@@ -24,10 +22,9 @@ public class DashDatabase implements Database
     private static final Logger logger = LogManager.getLogger();
 
     private final Config config;
-    private final ThreadLocal<Connection> threadConnection =
-            new ThreadLocal<>();
 
-    private boolean initialized;
+    private PoolingDriver poolingDriver;
+    private ObjectPool<PoolableConnection> connectionPool;
 
     @Inject
     public DashDatabase(Config config)
@@ -42,54 +39,37 @@ public class DashDatabase implements Database
             Class.forName("org.postgresql.Driver");
         }
         catch (ClassNotFoundException e) {
-            LoggingUtil.logThrowable(e);
+            LoggingUtil.logThrowable(e, DashDatabase.class);
         }
     }
 
     @Override
-    public Connection getConnection() throws SQLException
+    public PoolableConnection getConnection() throws SQLException
     {
-        initialize();
-
-        final Optional<Connection> conn =
-                Optional.ofNullable(threadConnection.get());
-
-        if (! conn.isPresent()) {
-            final Connection newConn =
-                    DriverManager.getConnection(DBCP_CONNECT + DBCP_POOL_NAME);
-
-            threadConnection.set(newConn);
-            return newConn;
+        if (connectionPool == null) {
+            initialize();
         }
 
-        return conn.get();
-    }
-
-    @Override
-    public void closeConnection() throws SQLException
-    {
-        final Optional<Connection> conn =
-                Optional.ofNullable(threadConnection.get());
-
-        if (conn.isPresent()) {
-            conn.get().close();
-            threadConnection.remove();
+        try {
+            return connectionPool.borrowObject();
+        }
+        catch (Exception e) {
+            throw new SQLException(e);
         }
     }
 
     @Override
     public void closePool() throws SQLException
     {
-        final PoolingDriver poolingDriver =
-                (PoolingDriver) DriverManager.getDriver(DBCP_CONNECT);
+        if (poolingDriver == null) {
+            throw new IllegalStateException("No pool to close");
+        }
 
         poolingDriver.closePool(DBCP_POOL_NAME);
     }
 
     private synchronized void initialize() throws SQLException
     {
-        if (initialized) return;
-
         logger.info("Initializing DB connection pool...");
 
         final String host     = config.getString("db.host", "127.0.0.1");
@@ -107,18 +87,12 @@ public class DashDatabase implements Database
         final PoolableConnectionFactory poolableConnectionFactory =
                 new PoolableConnectionFactory(connectionFactory, null);
 
-        final ObjectPool<PoolableConnection> connectionPool =
-                new GenericObjectPool<>(poolableConnectionFactory);
+        connectionPool = new GenericObjectPool<>(poolableConnectionFactory);
+        poolingDriver = (PoolingDriver) DriverManager.getDriver(DBCP_CONNECT);
 
         poolableConnectionFactory.setPool(connectionPool);
-
-        final PoolingDriver driver =
-                (PoolingDriver) DriverManager.getDriver(DBCP_CONNECT);
-
-        driver.registerPool(DBCP_POOL_NAME, connectionPool);
+        poolingDriver.registerPool(DBCP_POOL_NAME, connectionPool);
 
         logger.info("Initialized DB connection pool");
-
-        initialized = true;
     }
 }

@@ -2,7 +2,7 @@ package io.saso.dash.auth;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import io.saso.dash.database.DatabaseExecutor;
+import io.saso.dash.database.Database;
 
 import java.sql.*;
 import java.time.Instant;
@@ -10,14 +10,13 @@ import java.util.Optional;
 
 public class DashAuthenticator implements Authenticator
 {
-    private final Provider<DatabaseExecutor> dbExecutorProvider;
+    private final Database db;
     private final Provider<LiveToken> liveTokenProvider;
 
     @Inject
-    public DashAuthenticator(Provider<DatabaseExecutor> dbExecutorProvider,
-                             Provider<LiveToken> liveTokenProvider)
+    public DashAuthenticator(Database db, Provider<LiveToken> liveTokenProvider)
     {
-        this.dbExecutorProvider = dbExecutorProvider;
+        this.db = db;
         this.liveTokenProvider = liveTokenProvider;
     }
 
@@ -28,21 +27,20 @@ public class DashAuthenticator implements Authenticator
         final String sql =
                 "SELECT * FROM live_tokens WHERE token = ? LIMIT 1";
 
-        final DatabaseExecutor dbExecutor = dbExecutorProvider.get();
-        final Optional<LiveToken> liveToken;
+        try (Connection conn = db.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            // set params
+            statement.setString(1, token);
 
-        try (final ResultSet resultSet = dbExecutor.execute(sql, token)) {
-            liveToken = createLiveToken(resultSet);
+            return createLiveToken(statement.executeQuery());
         }
-
-        return liveToken;
     }
 
     /**
      * Creates a LiveToken from {@code resultSet}. Returns an empty Optional if
      * the LiveToken was invalid or not found.
      *
-     * @param resultSet the ResultSet to create the LiveToken from
+     * @param resultSet the resultSet to create the LiveToken from
      *
      * @return an Optional of a LiveToken
      *

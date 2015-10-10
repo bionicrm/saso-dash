@@ -16,7 +16,6 @@ public class DatabaseModule extends AbstractModule
     protected void configure()
     {
         bind(Database.class).to(DashDatabase.class);
-        bind(DatabaseExecutor.class).to(DashDatabaseExecutor.class);
         bind(LiveToken.class).to(DashLiveToken.class);
     }
 }
