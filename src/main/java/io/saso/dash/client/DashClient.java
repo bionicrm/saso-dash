@@ -25,12 +25,13 @@ public class DashClient implements Client
     @Override
     public void onFrame(ChannelHandlerContext ctx, String msg)
     {
-        ctx.channel().writeAndFlush(new TextWebSocketFrame("onFrame!"));
+        LogManager.getLogger().trace("#onFrame msg={}", msg);
+        ctx.channel().writeAndFlush(new TextWebSocketFrame(msg));
     }
 
     @Override
     public void onClose(ChannelHandlerContext ctx)
     {
-
+        LogManager.getLogger().trace("#onClose");
     }
 }
