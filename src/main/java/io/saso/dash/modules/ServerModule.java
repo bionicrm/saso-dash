@@ -2,7 +2,6 @@ package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.name.Names;
 import io.saso.dash.server.*;
 
 public class ServerModule extends AbstractModule

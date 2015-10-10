@@ -4,10 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.*;
-import io.saso.dash.config.Config;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
 
 public class DashServerInitializer extends ServerInitializer
 {

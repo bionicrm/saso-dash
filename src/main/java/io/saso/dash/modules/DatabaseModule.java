@@ -1,14 +1,10 @@
 package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.throwingproviders.CheckedProvides;
-import com.google.inject.throwingproviders.ThrowingProviderBinder;
 import io.saso.dash.auth.DashLiveToken;
 import io.saso.dash.auth.LiveToken;
-import io.saso.dash.database.*;
-
-import java.sql.Connection;
-import java.sql.SQLException;
+import io.saso.dash.database.DashDatabase;
+import io.saso.dash.database.Database;
 
 public class DatabaseModule extends AbstractModule
 {

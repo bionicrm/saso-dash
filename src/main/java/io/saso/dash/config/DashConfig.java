@@ -9,8 +9,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class DashConfig implements Config
@@ -19,30 +21,17 @@ public class DashConfig implements Config
 
     private static final Logger logger = LogManager.getLogger();
 
-    private Optional<Map<String, Object>> map = Optional.empty();
+    private Map<String, Object> map;
 
     @Override
-    public String getString(String key, String def)
+    public <T> T get(String key, T def)
     {
         initialize();
 
-        return getValue(key, def);
-    }
-
-    @Override
-    public Integer getInteger(String key, Integer def)
-    {
-        initialize();
-
-        return getValue(key, def);
-    }
-
-    private <T> T getValue(String key, T def)
-    {
         final List<String> keyParts = Arrays.asList(key.split("\\."));
+        final int lastIndex = keyParts.size() - 1;
 
-        int lastIndex = keyParts.size() - 1;
-        Map subMap = map.get();
+        Map subMap = map;
 
         for (String part : keyParts.subList(0, lastIndex)) {
             subMap = ((Map) subMap.get(part));
@@ -54,7 +43,7 @@ public class DashConfig implements Config
 
     private synchronized void initialize()
     {
-        if (map.isPresent()) return;
+        if (map != null) return;
 
         final Yaml yaml = new Yaml();
         final FileInputStream in;
@@ -70,13 +59,13 @@ public class DashConfig implements Config
         final Object o = yaml.load(in);
 
         // noinspection unchecked
-        map = Optional.of((Map<String, Object>) o);
+        map = (Map<String, Object>) o;
 
-        purgeMapOfNulls(map.get());
+        purgeMapOfNulls(map);
 
         try {
             logger.info("Loaded config @ {} => {}",
-                    new File(CONFIG_PATH).getCanonicalPath(), map.get());
+                    new File(CONFIG_PATH).getCanonicalPath(), map);
         }
         catch (IOException e) {
             logger.error(e.getMessage(), e);

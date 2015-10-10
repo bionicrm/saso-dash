@@ -13,9 +13,16 @@ public final class LoggingUtil
 {
     private LoggingUtil() { /* empty */ }
 
-    public static void logThrowable(Throwable e, Class loggingClass)
+    /**
+     * Logs a Throwable. If the Throwable is an instance of SQLException, extra
+     * information will be logged.
+     *
+     * @param e the Throwable to log
+     * @param clazz the class of the caller
+     */
+    public static void logThrowable(Throwable e, Class clazz)
     {
-        final Logger logger = getLoggerForClass(loggingClass);
+        final Logger logger = getLoggerForClass(clazz);
 
         if (e instanceof SQLException) {
             logSQLException((SQLException) e, logger);
@@ -24,9 +31,15 @@ public final class LoggingUtil
         logger.error(e.getMessage(), e);
     }
 
-    public static void logResultSet(ResultSet resultSet, Class loggingClass)
+    /**
+     * Logs a ResultSet.
+     *
+     * @param resultSet the ResultSet to log
+     * @param clazz the class of the caller
+     */
+    public static void logResultSet(ResultSet resultSet, Class clazz)
     {
-        final Logger logger = getLoggerForClass(loggingClass);
+        final Logger logger = getLoggerForClass(clazz);
 
         final Map<String, String> entries = new HashMap<>();
         final ResultSetMetaData metaData;
@@ -50,6 +63,12 @@ public final class LoggingUtil
         }
     }
 
+    /**
+     * Logs extra information about an SQLException.
+     *
+     * @param e the SQLException to log
+     * @param logger the logger of the caller
+     */
     private static void logSQLException(SQLException e, Logger logger)
     {
         logger.error("SQLException: {}", e.getMessage());
@@ -57,8 +76,15 @@ public final class LoggingUtil
         logger.error("VendorError: {}", e.getErrorCode());
     }
 
-    private static Logger getLoggerForClass(Class loggingClass)
+    /**
+     * Gets the logger for a class.
+     *
+     * @param clazz the class to get the logger for
+     *
+     * @return the logger
+     */
+    private static Logger getLoggerForClass(Class clazz)
     {
-        return LogManager.getLogger(loggingClass);
+        return LogManager.getLogger(clazz);
     }
 }

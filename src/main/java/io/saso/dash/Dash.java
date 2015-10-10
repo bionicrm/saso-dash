@@ -2,9 +2,6 @@ package io.saso.dash;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.netty.util.internal.logging.InternalLoggerFactory;
-import io.netty.util.internal.logging.Slf4JLoggerFactory;
-import io.saso.dash.database.Database;
 import io.saso.dash.modules.*;
 import io.saso.dash.server.Server;
 

@@ -1,23 +1,18 @@
 package io.saso.dash.server;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.oio.OioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.saso.dash.config.Config;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.saso.dash.util.LoggingUtil;
 
 public class DashServer implements Server
 {
-    private static final Logger logger = LogManager.getLogger();
-
     private final ServerInitializer serverInitializer;
     private final Config config;
 
@@ -42,13 +37,13 @@ public class DashServer implements Server
                     .childHandler(serverInitializer);
 
             final ChannelFuture chFuture = b.bind(
-                    config.getString("server.address", "127.0.0.1"),
-                    config.getInteger("server.port", 80));
+                    config.get("server.address", "127.0.0.1"),
+                    config.get("server.port", 80));
 
             chFuture.sync().channel().closeFuture().sync();
         }
         catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
+            LoggingUtil.logThrowable(e, getClass());
         }
         finally {
             oioEventLoopGroup.shutdownGracefully();

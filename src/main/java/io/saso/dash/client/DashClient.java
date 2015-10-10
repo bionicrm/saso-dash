@@ -8,8 +8,6 @@ import io.saso.dash.auth.LiveToken;
 import io.saso.dash.database.Database;
 import org.apache.logging.log4j.LogManager;
 
-import java.sql.Connection;
-
 public class DashClient implements Client
 {
     private final Database db;

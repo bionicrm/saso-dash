@@ -3,6 +3,10 @@ package io.saso.dash.auth;
 import java.sql.SQLException;
 import java.util.Optional;
 
+/**
+ * Represents an authenticator for incoming WebSocket connections that provide
+ * a {@code live_token}.
+ */
 public interface Authenticator
 {
     /**

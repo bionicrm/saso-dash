@@ -46,9 +46,7 @@ public class DashDatabase implements Database
     @Override
     public PoolableConnection getConnection() throws SQLException
     {
-        if (connectionPool == null) {
-            initialize();
-        }
+        initialize();
 
         try {
             return connectionPool.borrowObject();
@@ -62,7 +60,7 @@ public class DashDatabase implements Database
     public void closePool() throws SQLException
     {
         if (poolingDriver == null) {
-            throw new IllegalStateException("No pool to close");
+            throw new IllegalStateException("No pool initialized");
         }
 
         poolingDriver.closePool(DBCP_POOL_NAME);
@@ -70,13 +68,15 @@ public class DashDatabase implements Database
 
     private synchronized void initialize() throws SQLException
     {
+        if (connectionPool != null) return;
+
         logger.info("Initializing DB connection pool...");
 
-        final String host     = config.getString("db.host", "127.0.0.1");
-        final int port        = config.getInteger("db.port", 5432);
-        final String database = config.getString("db.database", "postgres");
-        final String user     = config.getString("db.user", "postgres");
-        final String password = config.getString("db.password", null);
+        final String host     = config.get("db.host", "127.0.0.1");
+        final int port        = config.get("db.port", 5432);
+        final String database = config.get("db.database", "postgres");
+        final String user     = config.get("db.user", "postgres");
+        final String password = config.get("db.password", "");
 
         final String url = String.format(
                 "jdbc:postgresql://%s:%d/%s", host, port, database);
