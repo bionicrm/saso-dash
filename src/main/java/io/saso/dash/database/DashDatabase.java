@@ -26,6 +26,7 @@ public class DashDatabase implements Database
     private final Config config;
 
     private boolean initialized;
+    private boolean shutdown;
 
     @Inject
     public DashDatabase(Config config)
@@ -66,6 +67,8 @@ public class DashDatabase implements Database
     @Override
     public void shutdown()
     {
+        throwIfShutdown();
+
         final PoolingDriver poolingDriver;
 
         try {
@@ -77,10 +80,14 @@ public class DashDatabase implements Database
         catch (SQLException e) {
             LoggingUtil.logSQLException(e, logger);
         }
+
+        shutdown = true;
     }
 
     private synchronized void initialize()
     {
+        throwIfShutdown();
+
         if (initialized) return;
 
         logger.info("Initializing DB connection pool...");
@@ -120,5 +127,12 @@ public class DashDatabase implements Database
         logger.info("Initialized DB connection pool");
 
         initialized = true;
+    }
+
+    private void throwIfShutdown()
+    {
+        if (shutdown) {
+            throw new IllegalStateException("DB connection pool is shutdown");
+        }
     }
 }
