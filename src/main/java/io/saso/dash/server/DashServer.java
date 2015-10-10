@@ -37,8 +37,8 @@ public class DashServer implements Server
                     .childHandler(serverInitializer);
 
             final ChannelFuture chFuture = b.bind(
-                    config.get("server.address", "127.0.0.1"),
-                    config.get("server.port", 80));
+                    config.get("server.bind.host", "127.0.0.1"),
+                    config.get("server.bind.port", 80));
 
             chFuture.sync().channel().closeFuture().sync();
         }
