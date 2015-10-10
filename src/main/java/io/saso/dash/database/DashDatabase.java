@@ -3,6 +3,7 @@ package io.saso.dash.database;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.saso.dash.config.Config;
+import io.saso.dash.util.LoggingUtil;
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -49,17 +50,17 @@ public class DashDatabase implements Database
         initialize();
 
         try {
-            logger.debug("Retrieving connection from connection pool");
+            logger.debug("Retrieving DB connection from connection pool");
 
             return DriverManager.getConnection(
                     DBCP_CONNECT + DBCP_POOL_NAME);
         }
         catch (SQLException e) {
-            logSQLException(e);
+            LoggingUtil.logSQLException(e, logger);
         }
 
         throw new NoSuchElementException(
-                "Unable to retrieve connection from connection pool");
+                "Unable to retrieve DB connection from connection pool");
     }
 
     @Override
@@ -74,7 +75,7 @@ public class DashDatabase implements Database
             poolingDriver.closePool(DBCP_POOL_NAME);
         }
         catch (SQLException e) {
-            logSQLException(e);
+            LoggingUtil.logSQLException(e, logger);
         }
     }
 
@@ -82,7 +83,7 @@ public class DashDatabase implements Database
     {
         if (initialized) return;
 
-        logger.debug("Initializing database connection pool...");
+        logger.debug("Initializing DB connection pool...");
 
         final String host     = config.getString("db.host", "127.0.0.1");
         final int port        = config.getInteger("db.port", 5432);
@@ -110,20 +111,13 @@ public class DashDatabase implements Database
             driver = (PoolingDriver) DriverManager.getDriver(DBCP_CONNECT);
         }
         catch (SQLException e) {
-            logSQLException(e);
+            LoggingUtil.logSQLException(e, logger);
             return;
         }
 
         driver.registerPool(DBCP_POOL_NAME, connectionPool);
-        logger.debug("Initialized database connection pool");
+        logger.debug("Initialized DB connection pool");
 
         initialized = true;
-    }
-
-    private void logSQLException(SQLException e)
-    {
-        logger.error("SQLException: {}", e.getMessage());
-        logger.error("SQLState: {}", e.getSQLState());
-        logger.error("VendorError: {}", e.getErrorCode());
     }
 }

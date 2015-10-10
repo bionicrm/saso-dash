@@ -3,6 +3,7 @@ package io.saso.dash.auth;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import io.saso.dash.database.DB;
+import io.saso.dash.util.LoggingUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,15 +28,19 @@ public class DashAuthenticator implements Authenticator
     @Override
     public Optional<LiveToken> findValidLiveToken(String token)
     {
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+
         try {
             final String sql =
                     "SELECT * FROM live_tokens WHERE token = ? LIMIT 1";
-            final PreparedStatement statement = db.prepareStatement(sql);
+
+            statement = db.prepareStatement(sql);
 
             statement.setString(1, token);
-            logger.debug("Execute: {}", sql);
+            logger.debug("Execute on DB: {}", sql);
 
-            final ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
 
             // check existence
             if (resultSet.next()) {
@@ -53,6 +58,17 @@ public class DashAuthenticator implements Authenticator
         }
         catch (SQLException e) {
             logger.error(e.getMessage(), e);
+        }
+        finally {
+            try {
+                if (resultSet != null) statement.close();
+                if (statement != null) statement.close();
+
+                db.close();
+            }
+            catch (SQLException e) {
+                LoggingUtil.logSQLException(e, logger);
+            }
         }
 
         return Optional.empty();

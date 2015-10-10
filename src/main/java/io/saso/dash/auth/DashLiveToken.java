@@ -1,5 +1,6 @@
 package io.saso.dash.auth;
 
+import io.saso.dash.util.LoggingUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,17 +31,13 @@ public class DashLiveToken implements LiveToken
             expiresAt = resultSet.getTimestamp("expires_at");
             createdAt = resultSet.getTimestamp("created_at");
             updatedAt = resultSet.getTimestamp("updated_at");
-
-            resultSet.close();
         }
         catch (SQLException e) {
             logger.error(e.getMessage(), e);
             return false;
         }
 
-        logger.debug("Got from DB: id={} user_id={} token={} ip={} " +
-                        "expires_at={} created_at={} updated_at={}",
-                id, userId, token, ip, expiresAt, createdAt, updatedAt);
+        LoggingUtil.logResultSet(resultSet, logger);
 
         return true;
     }

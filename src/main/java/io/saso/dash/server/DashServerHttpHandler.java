@@ -9,6 +9,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.util.CharsetUtil;
+import io.saso.dash.auth.Authenticator;
 import io.saso.dash.auth.LiveToken;
 import io.saso.dash.config.Config;
 import io.saso.dash.database.DB;
@@ -27,16 +28,15 @@ public class DashServerHttpHandler extends ServerHttpHandler
 {
     private static final Logger logger = LogManager.getLogger();
 
+    private final Authenticator authenticator;
     private final ServerFactory serverFactory;
     private final String url;
 
-    // TODO: remove testing
-    @Inject @DB
-    private Connection db;
-
     @Inject
-    public DashServerHttpHandler(ServerFactory serverFactory, Config config)
+    public DashServerHttpHandler(Authenticator authenticator,
+                                 ServerFactory serverFactory, Config config)
     {
+        this.authenticator = authenticator;
         this.serverFactory = serverFactory;
         url = config.getString("server.url", "ws://127.0.0.1");
     }
@@ -45,68 +45,17 @@ public class DashServerHttpHandler extends ServerHttpHandler
     protected void messageReceived(ChannelHandlerContext ctx,
                                    FullHttpRequest msg)
     {
+        // check request validity
         if (msg.decoderResult().isFailure()) {
             respond(ctx, HttpResponseStatus.BAD_REQUEST);
             return;
         }
 
-        // TODO: remove testing
-        try {
-            PreparedStatement st = db.prepareStatement("SELECT * FROM live_tokens WHERE id = ?");
-            st.setInt(1, 1);
-
-            ResultSet res = st.executeQuery();
-            res.next();
-            logger.trace(res.getString("token"));
-            res.close();
-            st.close();
-            db.close();
+        // authenticate; if failure, send 403
+        if (! authenticate(ctx, msg)) {
+            respond(ctx, HttpResponseStatus.FORBIDDEN);
+            return;
         }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        // TODO: validate live_token
-
-        // old live_token validation:
-        /*final Optional<String> liveToken =
-                getCookieValue(req.headers(), "live_token");
-
-        liveToken.ifPresent(s -> {
-            logger.debug("remote={} live_token=\"{}\"",
-                    ctx.channel().remoteAddress(), s);
-
-            final Optional<LiveToken> liveTokenEntity =
-                    authenticator.findValidLiveToken(s);
-
-            liveTokenEntity.ifPresent(e -> {
-                final WebSocketServerHandshakerFactory wsFactory =
-                        new WebSocketServerHandshakerFactory(
-                                url, null, true);
-
-                handshaker = wsFactory.newHandshaker(req);
-
-                if (handshaker == null) {
-                    WebSocketServerHandshakerFactory
-                            .sendUnsupportedVersionResponse(ctx.channel());
-                }
-                else {
-                    handshaker.handshake(ctx.channel(), req);
-
-                    client = clientFactory.createClient(ctx, e);
-                }
-            });
-
-            if (! liveTokenEntity.isPresent()) {
-                logger.debug(
-                        "remote={} authenticator.isTokenValid -> false",
-                        ctx.channel().remoteAddress());
-            }
-        });
-
-        if (! liveToken.isPresent()) {
-            sendStatusResponse(ctx, req, HttpResponseStatus.FORBIDDEN);
-        }*/
 
         final WebSocketServerHandshakerFactory wsFactory =
                 new WebSocketServerHandshakerFactory(url, null, false);
@@ -118,7 +67,6 @@ public class DashServerHttpHandler extends ServerHttpHandler
             final ChannelPipeline pipeline = ctx.channel().pipeline();
 
             // set up ws pipeline
-            pipeline.remove("httpaggregator");
             pipeline.remove("httphandler");
             pipeline.addLast(new WebSocketServerCompressionHandler());
             pipeline.addLast(serverFactory.createWSHandler(h));
@@ -137,6 +85,35 @@ public class DashServerHttpHandler extends ServerHttpHandler
     {
         logger.error(cause.getMessage(), cause);
         ctx.close();
+    }
+
+    private boolean authenticate(ChannelHandlerContext ctx, FullHttpRequest req)
+    {
+        final Optional<String> liveToken =
+                getCookieValue(req.headers(), "live_token");
+
+        liveToken.ifPresent(s -> {
+            final Optional<LiveToken> liveTokenEntity =
+                    authenticator.findValidLiveToken(s);
+
+            liveTokenEntity.ifPresent(e -> {
+                final WebSocketServerHandshakerFactory wsFactory =
+                        new WebSocketServerHandshakerFactory(url, null, true);
+
+                final WebSocketServerHandshaker handshaker =
+                        wsFactory.newHandshaker(req);
+
+                if (handshaker == null) {
+                    WebSocketServerHandshakerFactory
+                            .sendUnsupportedVersionResponse(ctx.channel());
+                }
+                else {
+                    handshaker.handshake(ctx.channel(), req);
+                }
+            });
+        });
+
+        return liveToken.isPresent();
     }
 
     private void respond(ChannelHandlerContext ctx, HttpResponseStatus status)
