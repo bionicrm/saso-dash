@@ -23,7 +23,7 @@ public class DatabaseModule extends AbstractModule
     }
 
     @Provides @DB
-    Connection provideDBConnection(Database database)
+    Connection providesDBConnection(Database database)
     {
         return database.getConnection();
     }

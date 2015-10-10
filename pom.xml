@@ -62,6 +62,13 @@
             <version>9.4-1203-jdbc42</version>
         </dependency>
 
+        <!-- Apache Commons DBCP -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+
         <!-- Log4j SLF4J Binding -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

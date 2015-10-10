@@ -11,11 +11,16 @@ import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketSe
 import io.netty.util.CharsetUtil;
 import io.saso.dash.auth.LiveToken;
 import io.saso.dash.config.Config;
+import io.saso.dash.database.DB;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Optional;
 
 public class DashServerHttpHandler extends ServerHttpHandler
@@ -24,6 +29,10 @@ public class DashServerHttpHandler extends ServerHttpHandler
 
     private final ServerFactory serverFactory;
     private final String url;
+
+    // TODO: remove testing
+    @Inject @DB
+    private Connection db;
 
     @Inject
     public DashServerHttpHandler(ServerFactory serverFactory, Config config)
@@ -39,6 +48,22 @@ public class DashServerHttpHandler extends ServerHttpHandler
         if (msg.decoderResult().isFailure()) {
             respond(ctx, HttpResponseStatus.BAD_REQUEST);
             return;
+        }
+
+        // TODO: remove testing
+        try {
+            PreparedStatement st = db.prepareStatement("SELECT * FROM live_tokens WHERE id = ?");
+            st.setInt(1, 1);
+
+            ResultSet res = st.executeQuery();
+            res.next();
+            logger.trace(res.getString("token"));
+            res.close();
+            st.close();
+            db.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
         }
 
         // TODO: validate live_token

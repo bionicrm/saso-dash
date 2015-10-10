@@ -5,8 +5,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -37,8 +39,7 @@ public class DashConfig implements Config
 
     private <T> T getValue(String key, T def)
     {
-        final List<String> keyParts = Arrays.asList(key.split(
-                Pattern.quote(".")));
+        final List<String> keyParts = Arrays.asList(key.split("\\."));
 
         int lastIndex = keyParts.size() - 1;
         Map subMap = map.get();
@@ -56,21 +57,30 @@ public class DashConfig implements Config
         if (map.isPresent()) return;
 
         final Yaml yaml = new Yaml();
-        final Object o;
+        final FileInputStream in;
 
         try {
-            o = yaml.load(new FileInputStream(CONFIG_PATH));
+            in = new FileInputStream(CONFIG_PATH);
         }
         catch (FileNotFoundException e) {
             logger.error(e.getMessage(), e);
             return;
         }
 
+        final Object o = yaml.load(in);
+
         // noinspection unchecked
         map = Optional.of((Map<String, Object>) o);
 
         purgeMapOfNulls(map.get());
-        logger.info("Loaded config: {}", map.get());
+
+        try {
+            logger.info("Loaded config @ {} => {}",
+                    new File(CONFIG_PATH).getCanonicalPath(), map.get());
+        }
+        catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     private void purgeMapOfNulls(Map<String, Object> map)
