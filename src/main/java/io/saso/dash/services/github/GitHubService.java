@@ -13,10 +13,12 @@ import io.saso.dash.services.Service;
 import io.saso.dash.templating.Templater;
 import io.saso.dash.util.LoggingUtil;
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
 import org.kohsuke.github.*;
 
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.concurrent.TimeUnit;
 
 public class GitHubService implements Service
 {
@@ -48,6 +50,8 @@ public class GitHubService implements Service
     @Override
     public void poll() throws Exception
     {
+        final long startPoll = System.nanoTime();
+
         final GHNotificationStream notifs = gitHub.listNotifications();
 
         notifs.read(true);
@@ -121,6 +125,12 @@ public class GitHubService implements Service
         }
 
         ctx.channel().flush();
+
+        final long endPoll = System.nanoTime();
+
+        LogManager.getLogger().trace("Took {}ms to complete GitHub poll",
+                TimeUnit.MILLISECONDS.convert(endPoll - startPoll,
+                        TimeUnit.NANOSECONDS));
 
         // TODO
     }
