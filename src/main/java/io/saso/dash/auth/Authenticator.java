@@ -1,5 +1,7 @@
 package io.saso.dash.auth;
 
+import io.saso.dash.database.entities.LiveToken;
+
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -19,5 +21,5 @@ public interface Authenticator
      *
      * @throws SQLException
      */
-    Optional<LiveToken> findLiveToken(String token) throws SQLException;
+    Optional<LiveToken> findLiveToken(String token) throws Exception;
 }

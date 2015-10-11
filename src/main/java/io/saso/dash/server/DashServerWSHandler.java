@@ -1,32 +1,20 @@
 package io.saso.dash.server;
 
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.*;
-import io.saso.dash.client.Client;
+import io.saso.dash.util.LoggingUtil;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class DashServerWSHandler extends ServerWSHandler
 {
-    private static final Logger logger = LogManager.getLogger();
-
-    private final WebSocketServerHandshaker handshaker;
-    private final Client client;
-
-    @Inject
-    public DashServerWSHandler(@Assisted WebSocketServerHandshaker handshaker,
-                               @Assisted Client client)
-    {
-        this.handshaker = handshaker;
-        this.client = client;
-    }
+    private WebSocketServerHandshaker handshaker;
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx,
-                                   WebSocketFrame msg)
+    public void messageReceived(ChannelHandlerContext ctx, WebSocketFrame msg)
+            throws Exception
     {
+        LogManager.getLogger().entry(ctx, msg);
+
         if (msg instanceof CloseWebSocketFrame) {
             handshaker.close(ctx.channel(), (CloseWebSocketFrame) msg.retain());
         }
@@ -34,16 +22,22 @@ public class DashServerWSHandler extends ServerWSHandler
             ctx.channel().write(new PongWebSocketFrame(msg.content().retain()));
         }
         else if (msg instanceof TextWebSocketFrame) {
-            final String text = ((TextWebSocketFrame) msg).text();
+            final String text = ((TextWebSocketFrame) msg.retain()).text();
 
-            client.onFrame(ctx, text);
+            // TODO: handle messages?
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
     {
-        logger.error(cause.getMessage(), cause);
+        LoggingUtil.logThrowable(cause, getClass());
         ctx.close();
+    }
+
+    @Override
+    public void setHandshaker(WebSocketServerHandshaker handshaker)
+    {
+        this.handshaker = handshaker;
     }
 }

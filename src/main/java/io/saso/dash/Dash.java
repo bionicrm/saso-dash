@@ -11,7 +11,6 @@ public class Dash
     {
         final Injector injector = Guice.createInjector(
                 new AuthModule(),
-                new ClientModule(),
                 new ConfigModule(),
                 new DatabaseModule(),
                 new ServerModule(),

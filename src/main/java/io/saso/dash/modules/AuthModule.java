@@ -1,8 +1,7 @@
 package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
-import io.saso.dash.auth.Authenticator;
-import io.saso.dash.auth.DashAuthenticator;
+import io.saso.dash.auth.*;
 
 public class AuthModule extends AbstractModule
 {

@@ -18,8 +18,7 @@ public class DashDatabase implements Database
 {
     private static final String DBCP_CONNECT = "jdbc:apache:commons:dbcp:";
     private static final String DBCP_POOL_NAME = "saso";
-
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Config config;
 
@@ -48,6 +47,9 @@ public class DashDatabase implements Database
     {
         initialize();
 
+        LOGGER.info("Borrowing connection from pool (active={} idle={})",
+                connectionPool.getNumActive(), connectionPool.getNumIdle());
+
         try {
             return connectionPool.borrowObject();
         }
@@ -70,7 +72,7 @@ public class DashDatabase implements Database
     {
         if (connectionPool != null) return;
 
-        logger.info("Initializing DB connection pool...");
+        LOGGER.info("Initializing DB connection pool...");
 
         final String host     = config.get("db.host", "127.0.0.1");
         final int port        = config.get("db.port", 5432);
@@ -93,6 +95,6 @@ public class DashDatabase implements Database
         poolableConnectionFactory.setPool(connectionPool);
         poolingDriver.registerPool(DBCP_POOL_NAME, connectionPool);
 
-        logger.info("Initialized DB connection pool");
+        LOGGER.info("Initialized DB connection pool");
     }
 }

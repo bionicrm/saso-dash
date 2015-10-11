@@ -16,4 +16,18 @@ public interface DBEntity
      * @throws SQLException
      */
     void fillFromResultSet(ResultSet resultSet) throws SQLException;
+
+    /**
+     * Gets the ID.
+     *
+     * @return the ID
+     */
+    int getId();
+
+    /**
+     * Gets the name of the table that holds this entity.
+     *
+     * @return the name of the table
+     */
+    String getTableName();
 }

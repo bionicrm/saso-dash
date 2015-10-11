@@ -1,18 +1,17 @@
-package io.saso.dash.auth;
+package io.saso.dash.database.entities;
 
 import io.saso.dash.util.LoggingUtil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Optional;
 
-public class DashLiveToken implements LiveToken
+public class DashUser implements User
 {
     private int       id;
-    private int       userId;
-    private String    token;
-    private String    ip;
-    private Timestamp expiresAt;
+    private String    name;
+    private String    email;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
@@ -20,14 +19,10 @@ public class DashLiveToken implements LiveToken
     public void fillFromResultSet(ResultSet resultSet) throws SQLException
     {
         id        = resultSet.getInt("id");
-        userId    = resultSet.getInt("user_id");
-        token     = resultSet.getString("token");
-        ip        = resultSet.getString("ip");
-        expiresAt = resultSet.getTimestamp("expires_at");
+        name      = resultSet.getString("name");
+        email     = resultSet.getString("email");
         createdAt = resultSet.getTimestamp("created_at");
         updatedAt = resultSet.getTimestamp("updated_at");
-
-        LoggingUtil.logResultSet(resultSet, getClass());
     }
 
     @Override
@@ -37,27 +32,15 @@ public class DashLiveToken implements LiveToken
     }
 
     @Override
-    public int getUserId()
+    public String getName()
     {
-        return userId;
+        return name;
     }
 
     @Override
-    public String getToken()
+    public Optional<String> getEmail()
     {
-        return token;
-    }
-
-    @Override
-    public String getIp()
-    {
-        return ip;
-    }
-
-    @Override
-    public Timestamp getExpiresAt()
-    {
-        return expiresAt;
+        return Optional.ofNullable(email);
     }
 
     @Override
@@ -70,5 +53,11 @@ public class DashLiveToken implements LiveToken
     public Timestamp getUpdatedAt()
     {
         return updatedAt;
+    }
+
+    @Override
+    public String getTableName()
+    {
+        return "users";
     }
 }

@@ -1,25 +1,20 @@
-package io.saso.dash.auth;
+package io.saso.dash.database.entities;
 
-import io.saso.dash.database.DBEntity;
+import io.saso.dash.database.DBEntityWithTimestamps;
 
 import java.sql.Timestamp;
 
 /**
  * Represents a LiveToken from the "live_tokens" database.
  */
-public interface LiveToken extends DBEntity
+public interface LiveToken extends DBEntityWithTimestamps
 {
-    /**
-     * Gets the ID.
-     *
-     * @return the ID
-     */
-    int getId();
-
     /**
      * Gets the user's ID. The column has a foreign key restraint for a user.
      *
      * @return the user's ID
+     *
+     * @see User
      */
     int getUserId();
 
@@ -54,18 +49,4 @@ public interface LiveToken extends DBEntity
      * @return the expiration Timestamp
      */
     Timestamp getExpiresAt();
-
-    /**
-     * Gets the created at Timestamp.
-     *
-     * @return the created at Timestamp
-     */
-    Timestamp getCreatedAt();
-
-    /**
-     * Gets the updated at Timestamp.
-     *
-     * @return the updated at Timestamp
-     */
-    Timestamp getUpdatedAt();
 }

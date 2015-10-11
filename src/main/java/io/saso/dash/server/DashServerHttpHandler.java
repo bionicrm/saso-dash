@@ -1,6 +1,7 @@
 package io.saso.dash.server;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,11 +12,11 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.util.CharsetUtil;
 import io.saso.dash.auth.Authenticator;
-import io.saso.dash.auth.LiveToken;
-import io.saso.dash.client.Client;
-import io.saso.dash.client.ClientFactory;
+import io.saso.dash.database.entities.LiveToken;
 import io.saso.dash.config.Config;
+import io.saso.dash.services.ServiceManager;
 import io.saso.dash.util.LoggingUtil;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -24,18 +25,20 @@ import java.util.Optional;
 public class DashServerHttpHandler extends ServerHttpHandler
 {
     private final Authenticator authenticator;
-    private final ClientFactory clientFactory;
-    private final ServerFactory serverFactory;
+    private final Provider<ServerWSHandler> wsHandlerProvider;
+    private final Provider<ServiceManager> serviceManagerProvider;
     private final String url;
 
     @Inject
-    public DashServerHttpHandler(Authenticator authenticator,
-                                 ClientFactory clientFactory,
-                                 ServerFactory serverFactory, Config config)
+    public DashServerHttpHandler(
+            Authenticator authenticator,
+            Provider<ServerWSHandler> wsHandlerProvider,
+            Provider<ServiceManager> serviceManagerProvider,
+            Config config)
     {
         this.authenticator = authenticator;
-        this.clientFactory = clientFactory;
-        this.serverFactory = serverFactory;
+        this.wsHandlerProvider = wsHandlerProvider;
+        this.serviceManagerProvider = serviceManagerProvider;
         url = config.get("server.url", "ws://127.0.0.1");
     }
 
@@ -43,16 +46,18 @@ public class DashServerHttpHandler extends ServerHttpHandler
     protected void messageReceived(ChannelHandlerContext ctx,
                                    FullHttpRequest msg) throws Exception
     {
+        LogManager.getLogger().entry(ctx, msg.method());
+
         // check request validity
         if (msg.decoderResult().isFailure()) {
             respond(ctx, HttpResponseStatus.BAD_REQUEST);
             return;
         }
 
-        final Optional<Client> client = authenticate(ctx, msg);
+        final Optional<LiveToken> liveToken = authenticate(msg);
 
         // if authentication failure, send 403
-        if (! client.isPresent()) {
+        if (! liveToken.isPresent()) {
             respond(ctx, HttpResponseStatus.FORBIDDEN);
             return;
         }
@@ -60,28 +65,38 @@ public class DashServerHttpHandler extends ServerHttpHandler
         final WebSocketServerHandshakerFactory wsFactory =
                 new WebSocketServerHandshakerFactory(url, null, false);
 
-        final Optional<WebSocketServerHandshaker> handshaker =
-                Optional.ofNullable(wsFactory.newHandshaker(msg));
+        final WebSocketServerHandshaker handshaker =
+                wsFactory.newHandshaker(msg);
 
-        handshaker.ifPresent(h -> {
-            // register onClose for client
-            ctx.channel().closeFuture().addListener(future ->
-                    client.get().onClose(ctx));
-
-            final ChannelPipeline pipeline = ctx.channel().pipeline();
-
-            // set up ws pipeline
-            pipeline.remove("httphandler");
-            pipeline.addLast(new WebSocketServerCompressionHandler());
-            pipeline.addLast(serverFactory.createWSHandler(h, client.get()));
-
-            h.handshake(ctx.channel(), msg);
-        });
-
-        if (! handshaker.isPresent()) {
+        if (handshaker == null) {
             WebSocketServerHandshakerFactory
                     .sendUnsupportedVersionResponse(ctx.channel());
+            return;
         }
+
+        final ServerWSHandler wsHandler = wsHandlerProvider.get();
+        final ServiceManager serviceManager = serviceManagerProvider.get();
+        final ChannelPipeline pipeline = ctx.channel().pipeline();
+
+        // inject wsHandler
+        wsHandler.setHandshaker(handshaker);
+
+        // inject serviceManager
+        serviceManager.setContext(ctx);
+        serviceManager.setLiveToken(liveToken.get());
+
+        // set up ws pipeline
+        pipeline.remove("httphandler");
+        pipeline.addLast(new WebSocketServerCompressionHandler());
+        pipeline.addLast(wsHandler);
+
+        // handshake; callback: start ServiceManager
+        handshaker.handshake(ctx.channel(), msg).addListener(future ->
+                serviceManager.start());
+
+        // on channel close: stop ServiceManager
+        ctx.channel().closeFuture().addListener(future ->
+                serviceManager.stop());
     }
 
     @Override
@@ -93,50 +108,26 @@ public class DashServerHttpHandler extends ServerHttpHandler
 
     /**
      * Authenticates an incoming WebSocket connection with its
-     * {@code live_token} cookie value. If successful, the WebSocket handshake
-     * will be initiated. Otherwise, the request is 403'd (forbidden).
+     * {@code live_token} cookie value. Returns an empty Optional if the token
+     * is invalid (expired) or not found.
      *
-     * @param ctx the context to send responses through
      * @param req the request to authenticate
      *
-     * @return an Optional of a created client
+     * @return an Optional of a LiveToken
      *
+     * @see Authenticator#findLiveToken(String)
      * @see LiveToken#getToken()
      *
      * @throws Exception
      */
-    private Optional<Client> authenticate(ChannelHandlerContext ctx,
-                                          FullHttpRequest req)
+    private Optional<LiveToken> authenticate(FullHttpRequest req)
             throws Exception
     {
-        final Optional<String> liveTokenHeader =
+        final Optional<String> token =
                 getCookieValue(req.headers(), "live_token");
 
-        if (liveTokenHeader.isPresent()) {
-            final String s = liveTokenHeader.get();
-
-            final Optional<LiveToken> liveTokenEntity =
-                    authenticator.findLiveToken(s);
-
-            if (liveTokenEntity.isPresent()) {
-                final LiveToken e = liveTokenEntity.get();
-
-                final WebSocketServerHandshakerFactory wsFactory =
-                        new WebSocketServerHandshakerFactory(url, null, true);
-
-                final WebSocketServerHandshaker handshaker =
-                        wsFactory.newHandshaker(req);
-
-                if (handshaker == null) {
-                    WebSocketServerHandshakerFactory
-                            .sendUnsupportedVersionResponse(ctx.channel());
-                }
-                else {
-                    handshaker.handshake(ctx.channel(), req);
-                }
-
-                return Optional.of(clientFactory.createClient(e));
-            }
+        if (token.isPresent()) {
+            return authenticator.findLiveToken(token.get());
         }
 
         return Optional.empty();

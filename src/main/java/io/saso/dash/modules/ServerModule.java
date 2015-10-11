@@ -1,8 +1,14 @@
 package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import io.saso.dash.server.*;
+import io.saso.dash.server.DashServer;
+import io.saso.dash.server.DashServerHttpHandler;
+import io.saso.dash.server.DashServerInitializer;
+import io.saso.dash.server.DashServerWSHandler;
+import io.saso.dash.server.Server;
+import io.saso.dash.server.ServerHttpHandler;
+import io.saso.dash.server.ServerInitializer;
+import io.saso.dash.server.ServerWSHandler;
 
 public class ServerModule extends AbstractModule
 {
@@ -13,9 +19,6 @@ public class ServerModule extends AbstractModule
         bind(ServerInitializer.class).to(DashServerInitializer.class);
 
         bind(ServerHttpHandler.class).to(DashServerHttpHandler.class);
-
-        install(new FactoryModuleBuilder()
-                .implement(ServerWSHandler.class, DashServerWSHandler.class)
-                .build(ServerFactory.class));
+        bind(ServerWSHandler.class).to(DashServerWSHandler.class);
     }
 }

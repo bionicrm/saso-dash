@@ -16,8 +16,7 @@ import java.util.*;
 public class DashConfig implements Config
 {
     private static final String CONFIG_PATH = "config.yml";
-
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Map<String, Object> map;
 
@@ -47,7 +46,7 @@ public class DashConfig implements Config
      */
     private synchronized void initialize()
     {
-        // TODO: copy a default config if none exists
+        // TODO: copy a default config if none exists?
 
         if (map != null) return;
 
@@ -58,7 +57,10 @@ public class DashConfig implements Config
             in = new FileInputStream(CONFIG_PATH);
         }
         catch (FileNotFoundException e) {
-            LoggingUtil.logThrowable(e, getClass());
+            LOGGER.warn("No {} found, using defaults", CONFIG_PATH);
+
+            map = new HashMap<>();
+
             return;
         }
 
@@ -68,7 +70,7 @@ public class DashConfig implements Config
         map = (Map<String, Object>) o;
 
         try {
-            logger.info("Loaded config @ {} => {}",
+            LOGGER.info("Loaded config @ {} => {}",
                     new File(CONFIG_PATH).getCanonicalPath(), map);
         }
         catch (IOException e) {
