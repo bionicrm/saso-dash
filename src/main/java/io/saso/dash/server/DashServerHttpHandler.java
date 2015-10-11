@@ -12,11 +12,17 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.util.CharsetUtil;
 import io.saso.dash.auth.Authenticator;
+import io.saso.dash.database.EntityManager;
+import io.saso.dash.database.entities.DashUser;
 import io.saso.dash.database.entities.LiveToken;
 import io.saso.dash.config.Config;
+import io.saso.dash.database.entities.User;
+import io.saso.dash.redis.Redis;
+import io.saso.dash.redis.tables.RedisConnections;
 import io.saso.dash.services.ServiceManager;
 import io.saso.dash.util.LoggingUtil;
 import org.apache.logging.log4j.LogManager;
+import redis.clients.jedis.Jedis;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -24,6 +30,9 @@ import java.util.Optional;
 
 public class DashServerHttpHandler extends ServerHttpHandler
 {
+    private static final int MAX_CONCURRENT_CONNECTIONS_PER_USER = 3;
+
+    private final RedisConnections redisConnections;
     private final Authenticator authenticator;
     private final Provider<ServerWSHandler> wsHandlerProvider;
     private final Provider<ServiceManager> serviceManagerProvider;
@@ -31,11 +40,13 @@ public class DashServerHttpHandler extends ServerHttpHandler
 
     @Inject
     public DashServerHttpHandler(
+            RedisConnections redisConnections,
             Authenticator authenticator,
             Provider<ServerWSHandler> wsHandlerProvider,
             Provider<ServiceManager> serviceManagerProvider,
             Config config)
     {
+        this.redisConnections = redisConnections;
         this.authenticator = authenticator;
         this.wsHandlerProvider = wsHandlerProvider;
         this.serviceManagerProvider = serviceManagerProvider;
@@ -59,6 +70,12 @@ public class DashServerHttpHandler extends ServerHttpHandler
         // if authentication failure, send 403
         if (! liveToken.isPresent()) {
             respond(ctx, HttpResponseStatus.FORBIDDEN);
+            return;
+        }
+
+        // too many concurrent requests, send 429
+        if (! redisConnections.addIfAllowed(liveToken.get().getUserId())) {
+            respond(ctx, HttpResponseStatus.TOO_MANY_REQUESTS);
             return;
         }
 

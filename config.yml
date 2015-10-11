@@ -15,3 +15,7 @@ redis:
   host:     saso.dev
   port:     ~
   password: ~
+
+# False if templates in templates/ should be recompiled  on every request.
+# Otherwise, the server must be restarted to update changes.
+cache-templates: false

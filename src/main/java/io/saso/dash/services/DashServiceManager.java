@@ -4,15 +4,21 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.netty.channel.ChannelHandlerContext;
 import io.saso.dash.database.EntityManager;
-import io.saso.dash.database.entities.*;
+import io.saso.dash.database.entities.AuthToken;
+import io.saso.dash.database.entities.DashAuthToken;
+import io.saso.dash.database.entities.DashProvider;
+import io.saso.dash.database.entities.DashProviderUser;
+import io.saso.dash.database.entities.DashUser;
+import io.saso.dash.database.entities.LiveToken;
+import io.saso.dash.database.entities.Provider;
+import io.saso.dash.database.entities.ProviderUser;
+import io.saso.dash.database.entities.User;
+import io.saso.dash.redis.Redis;
+import io.saso.dash.redis.tables.RedisConnections;
 import io.saso.dash.util.LoggingUtil;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class DashServiceManager implements ServiceManager
 {
@@ -21,6 +27,7 @@ public class DashServiceManager implements ServiceManager
     private static final ScheduledExecutorService SCHEDULED_EXECUTOR =
             Executors.newSingleThreadScheduledExecutor();
 
+    private final RedisConnections redisConnections;
     private final EntityManager entityManager;
     private final List<Service> services = new ArrayList<>();
     private final Map<Service, ScheduledFuture> serviceSchedules =
@@ -31,10 +38,12 @@ public class DashServiceManager implements ServiceManager
 
     @Inject
     public DashServiceManager(/* TODO: use preferences */
+                              RedisConnections redisConnections,
                               EntityManager entityManager,
                               @Named("github") Service githubService,
                               @Named("google") Service googleService)
     {
+        this.redisConnections = redisConnections;
         this.entityManager = entityManager;
         services.add(githubService);
         services.add(googleService);
@@ -76,13 +85,18 @@ public class DashServiceManager implements ServiceManager
     @Override
     public void stop()
     {
-        // cancel service schedules
-        serviceSchedules.forEach((service, scheduledFuture) ->
-                scheduledFuture.cancel(true));
+        CACHED_THREAD_POOL.execute(() -> {
+            services.forEach(service -> {
+                // cancel service schedule
+                serviceSchedules.get(service).cancel(true);
 
-        // execute service stops
-        services.forEach(service -> CACHED_THREAD_POOL.execute(() ->
-                executeChecked(service::stop)));
+                // execute service stops
+                executeChecked(service::stop);
+            });
+
+            // remove connection for user
+            redisConnections.remove(liveToken.getUserId());
+        });
     }
 
     @Override

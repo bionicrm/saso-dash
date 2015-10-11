@@ -1,0 +1,27 @@
+<div class="notif-github-comment">
+    <header class="notif-header">
+        <h3>GitHub - Mention</h3>
+    </header>
+
+    <div class="notif-content">
+        <img class="notif-actor-avatar-url" src="{{ actor_avatar_url }}"/>
+        <span class="notif-actor">{{ actor }}</span>
+        <span class="notif-comment">{{ comment }}</span>
+    </div>
+
+    <div class="notif-parent">
+        <span class="notif-repo">{{ repo }}</span>
+        <span class="notif-thread">
+            {{ type }}
+            "{{ thread_title }}"
+
+            {% if thread_id is defined %}
+                #{{ thread_id }}
+            {% endif %}
+        </span>
+    </div>
+
+    <div class="notif-actions">
+        <span class="notif-time">{{ time }}</span>
+    </div>
+</div>

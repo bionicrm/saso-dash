@@ -48,6 +48,13 @@
             <version>4.0</version>
         </dependency>
 
+        <!-- Commons IO -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+
         <!-- Netty -->
         <dependency>
             <groupId>io.netty</groupId>
@@ -97,11 +104,25 @@
             <version>1.16</version>
         </dependency>
 
-        <!-- lettuce -->
+        <!-- GSON -->
         <dependency>
-            <groupId>biz.paluch.redis</groupId>
-            <artifactId>lettuce</artifactId>
-            <version>3.2.Final</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.4</version>
+        </dependency>
+
+        <!-- Jtwig -->
+        <dependency>
+            <groupId>com.lyncode</groupId>
+            <artifactId>jtwig-spring</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+
+        <!-- Jedis -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.7.2</version>
         </dependency>
 
         <!-- GitHub API -->

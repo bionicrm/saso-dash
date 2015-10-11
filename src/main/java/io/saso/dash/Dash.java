@@ -13,8 +13,10 @@ public class Dash
                 new AuthModule(),
                 new ConfigModule(),
                 new DatabaseModule(),
+                new RedisModule(),
                 new ServerModule(),
-                new ServiceModule()
+                new ServiceModule(),
+                new TemplatingModule()
         );
 
         injector.getInstance(Server.class).start();
