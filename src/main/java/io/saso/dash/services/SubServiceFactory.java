@@ -6,6 +6,6 @@ import org.kohsuke.github.GitHub;
 public interface SubServiceFactory
 {
     @Named("github-notification")
-    Pollable createGitHubNotificationSubService(Service superService,
-                                                GitHub gitHub);
+    ServicePollable createGitHubNotificationSubService(Service superService,
+                                                       GitHub gitHub);
 }

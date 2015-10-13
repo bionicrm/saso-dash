@@ -2,7 +2,7 @@ package io.saso.dash.services;
 
 import io.netty.channel.ChannelHandlerContext;
 
-public interface IService extends Pollable
+public interface ServicePollable
 {
     /**
      * Starts this service. This method may block. Typically, any new
@@ -15,14 +15,13 @@ public interface IService extends Pollable
      *
      * @throws Exception
      */
-    @Override
     void start(ChannelHandlerContext ctx, DBEntityProvider db) throws Exception;
 
     /**
      * Polls this service. This method may block. Typically, any new information
      * from within the last poll interval will be sent back to the client from
      * here. This is called every so many seconds, defined by the value of
-     * {@link #getPollInterval()}.
+     * {@link IService#getPollInterval()}.
      * <p>
      * The first time this is called is after the
      * poll interval. If polling is desired immediately after the timer is
@@ -35,7 +34,6 @@ public interface IService extends Pollable
      *
      * @throws Exception
      */
-    @Override
     void poll(ChannelHandlerContext ctx, DBEntityProvider db) throws Exception;
 
     /**
@@ -47,23 +45,5 @@ public interface IService extends Pollable
      *
      * @throws Exception
      */
-    @Override
     void stop(ChannelHandlerContext ctx, DBEntityProvider db) throws Exception;
-
-    /**
-     * Gets the number of seconds between polls. This determines how often
-     * {@link #poll(ChannelHandlerContext, DBEntityProvider)} will be called.
-     * Ideally, this method should return a constant.
-     *
-     * @return the number of seconds between polls
-     */
-    int getPollInterval();
-
-    /**
-     * Gets the name of this provider as represented in the name column of the
-     * providers table.
-     *
-     * @return the provider name
-     */
-    String getProviderName();
 }

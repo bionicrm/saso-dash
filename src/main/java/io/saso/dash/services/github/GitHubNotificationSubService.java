@@ -7,8 +7,8 @@ import com.lyncode.jtwig.JtwigModelMap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.saso.dash.services.DBEntityProvider;
-import io.saso.dash.services.Pollable;
 import io.saso.dash.services.Service;
+import io.saso.dash.services.SubServiceAdapter;
 import io.saso.dash.templating.Templater;
 import io.saso.dash.util.LoggingUtil;
 import org.apache.commons.io.IOUtils;
@@ -25,7 +25,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
 
-public class GitHubNotificationSubService implements Pollable
+public class GitHubNotificationSubService extends SubServiceAdapter
 {
     private final Templater templater;
     private final Service superService;
@@ -44,7 +44,9 @@ public class GitHubNotificationSubService implements Pollable
     @Override
     public void start(ChannelHandlerContext ctx, DBEntityProvider db)
             throws Exception
-    { /* empty */ }
+    {
+        poll(ctx, db);
+    }
 
     @Override
     public void poll(ChannelHandlerContext ctx, DBEntityProvider db)
@@ -127,15 +129,11 @@ public class GitHubNotificationSubService implements Pollable
 
         final long endPoll = System.nanoTime();
 
-        LogManager.getLogger().trace("Took {}ms to complete GitHub poll",
+        LogManager.getLogger().trace(
+                "Took {}ms to complete GitHub notification poll",
                 TimeUnit.MILLISECONDS.convert(endPoll - startPoll,
                         TimeUnit.NANOSECONDS));
     }
-
-    @Override
-    public void stop(ChannelHandlerContext ctx, DBEntityProvider db)
-            throws Exception
-    { /* empty */ }
 
     private class CommentJSON
     {

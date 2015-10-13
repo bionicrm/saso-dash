@@ -33,7 +33,8 @@ public class ServiceModule extends AbstractModule
         install(new FactoryModuleBuilder()
                 // @"github-notification" Pollable ->
                 //     GitHubNotificationSubService
-                .implement(Pollable.class, Names.named("github-notification"),
+                .implement(ServicePollable.class,
+                        Names.named("github-notification"),
                         GitHubNotificationSubService.class)
 
                 .build(SubServiceFactory.class));
