@@ -1,12 +1,11 @@
 package io.saso.dash.services;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.saso.dash.database.entities.LiveToken;
 
-public interface ServiceManager extends ContextInjectable
+public interface ServiceManager
 {
-    void start() throws Exception;
+    void start(ChannelHandlerContext ctx, LiveToken liveToken) throws Exception;
 
-    void stop() throws Exception;
-
-    void setLiveToken(LiveToken liveToken);
+    void stop(ChannelHandlerContext ctx, LiveToken liveToken) throws Exception;
 }

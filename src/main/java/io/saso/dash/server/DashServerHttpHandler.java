@@ -73,7 +73,7 @@ public class DashServerHttpHandler extends ServerHttpHandler
             return;
         }
 
-        // too many concurrent requests, send 429
+        // if too many concurrent requests, send 429
         if (! redisConnections.addIfAllowed(liveToken.get().getUserId())) {
             respond(ctx, HttpResponseStatus.TOO_MANY_REQUESTS);
             return;
@@ -98,10 +98,6 @@ public class DashServerHttpHandler extends ServerHttpHandler
         // inject wsHandler
         wsHandler.setHandshaker(handshaker);
 
-        // inject serviceManager
-        serviceManager.setContext(ctx);
-        serviceManager.setLiveToken(liveToken.get());
-
         // set up ws pipeline
         pipeline.remove("httphandler");
         pipeline.addLast(new WebSocketServerCompressionHandler());
@@ -109,11 +105,11 @@ public class DashServerHttpHandler extends ServerHttpHandler
 
         // handshake; callback: start ServiceManager
         handshaker.handshake(ctx.channel(), msg).addListener(future ->
-                serviceManager.start());
+                serviceManager.start(ctx, liveToken.get()));
 
         // on channel close: stop ServiceManager
         ctx.channel().closeFuture().addListener(future ->
-                serviceManager.stop());
+                serviceManager.stop(ctx, liveToken.get()));
     }
 
     @Override
