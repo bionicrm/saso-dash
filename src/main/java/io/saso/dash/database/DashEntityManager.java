@@ -7,10 +7,8 @@ import org.apache.logging.log4j.LogManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.Future;
 
 public class DashEntityManager implements EntityManager
 {

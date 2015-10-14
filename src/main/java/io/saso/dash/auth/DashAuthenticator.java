@@ -1,13 +1,11 @@
 package io.saso.dash.auth;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
-import io.saso.dash.database.Database;
 import io.saso.dash.database.EntityManager;
 import io.saso.dash.database.entities.DashLiveToken;
 import io.saso.dash.database.entities.LiveToken;
 
-import java.sql.*;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
 

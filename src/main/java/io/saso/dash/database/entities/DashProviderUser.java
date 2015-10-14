@@ -1,7 +1,5 @@
 package io.saso.dash.database.entities;
 
-import io.saso.dash.util.LoggingUtil;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;

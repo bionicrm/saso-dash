@@ -13,13 +13,7 @@ import io.saso.dash.templating.Templater;
 import io.saso.dash.util.LoggingUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
-import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHCommitComment;
-import org.kohsuke.github.GHIssue;
-import org.kohsuke.github.GHIssueComment;
-import org.kohsuke.github.GHNotificationStream;
-import org.kohsuke.github.GHThread;
-import org.kohsuke.github.GitHub;
+import org.kohsuke.github.*;
 
 import java.net.URL;
 import java.net.URLEncoder;

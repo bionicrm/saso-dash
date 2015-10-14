@@ -6,10 +6,6 @@ import io.saso.dash.database.DashEntityManager;
 import io.saso.dash.database.Database;
 import io.saso.dash.database.EntityManager;
 import io.saso.dash.database.entities.*;
-import io.saso.dash.database.entities.DashProviderUser;
-import io.saso.dash.database.entities.DashUser;
-import io.saso.dash.database.entities.ProviderUser;
-import io.saso.dash.database.entities.User;
 
 public class DatabaseModule extends AbstractModule
 {

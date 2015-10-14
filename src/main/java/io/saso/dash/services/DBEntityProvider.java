@@ -1,6 +1,9 @@
 package io.saso.dash.services;
 
-import io.saso.dash.database.entities.*;
+import io.saso.dash.database.entities.AuthToken;
+import io.saso.dash.database.entities.Provider;
+import io.saso.dash.database.entities.ProviderUser;
+import io.saso.dash.database.entities.User;
 
 public interface DBEntityProvider
 {

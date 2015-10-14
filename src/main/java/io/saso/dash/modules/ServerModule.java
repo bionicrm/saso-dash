@@ -1,14 +1,7 @@
 package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
-import io.saso.dash.server.DashServer;
-import io.saso.dash.server.DashServerHttpHandler;
-import io.saso.dash.server.DashServerInitializer;
-import io.saso.dash.server.DashServerWSHandler;
-import io.saso.dash.server.Server;
-import io.saso.dash.server.ServerHttpHandler;
-import io.saso.dash.server.ServerInitializer;
-import io.saso.dash.server.ServerWSHandler;
+import io.saso.dash.server.*;
 
 public class ServerModule extends AbstractModule
 {

@@ -12,17 +12,12 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.util.CharsetUtil;
 import io.saso.dash.auth.Authenticator;
-import io.saso.dash.database.EntityManager;
-import io.saso.dash.database.entities.DashUser;
-import io.saso.dash.database.entities.LiveToken;
 import io.saso.dash.config.Config;
-import io.saso.dash.database.entities.User;
-import io.saso.dash.redis.Redis;
+import io.saso.dash.database.entities.LiveToken;
 import io.saso.dash.redis.tables.RedisConnections;
 import io.saso.dash.services.ServiceManager;
 import io.saso.dash.util.LoggingUtil;
 import org.apache.logging.log4j.LogManager;
-import redis.clients.jedis.Jedis;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
