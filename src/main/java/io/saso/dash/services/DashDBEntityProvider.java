@@ -27,12 +27,6 @@ public class DashDBEntityProvider implements DBEntityProvider
     }
 
     @Override
-    public LiveToken liveToken()
-    {
-        return liveToken;
-    }
-
-    @Override
     public synchronized User user() throws Exception
     {
         if (user == null) {
@@ -91,7 +85,7 @@ public class DashDBEntityProvider implements DBEntityProvider
         final String sql = "SELECT * FROM users WHERE id = ? LIMIT 1";
 
         final Optional<User> user = entityManager.execute(DashUser.class,
-                sql, liveToken().getUserId());
+                sql, liveToken.getUserId());
 
         return user.get();
     }
@@ -114,7 +108,7 @@ public class DashDBEntityProvider implements DBEntityProvider
                 "SELECT * FROM provider_users WHERE user_id = ? AND provider_id = ? LIMIT 1";
 
         final Optional<ProviderUser> providerUser = entityManager.execute(
-                DashProviderUser.class, sql, liveToken().getUserId(),
+                DashProviderUser.class, sql, liveToken.getUserId(),
                 provider(service).getId());
 
         return providerUser.get();
