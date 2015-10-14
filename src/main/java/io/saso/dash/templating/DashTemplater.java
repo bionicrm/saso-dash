@@ -44,6 +44,12 @@ public class DashTemplater implements Templater
             }
         }
 
-        return new JtwigTemplate(contents, jConfig).output(modelMap);
+        String output = new JtwigTemplate(contents, jConfig)
+                .output(modelMap);
+
+        // replace 2 or more spaces with only 1 space
+        output = output.replaceAll("\\s{2,}", " ");
+
+        return output;
     }
 }

@@ -3,6 +3,10 @@
         <h3>GitHub - Mention</h3>
     </header>
 
+    <main class="notif-main">
+        
+    </main>
+
     <div class="notif-content">
         <img class="notif-actor-avatar-url" src="{{ actor_avatar_url }}"/>
         <span class="notif-actor">{{ actor }}</span>
@@ -15,7 +19,7 @@
             {{ type }}
             "{{ thread_title }}"
 
-            {% if thread_id is defined %}
+            {% if thread_id %}
                 #{{ thread_id }}
             {% endif %}
         </span>
