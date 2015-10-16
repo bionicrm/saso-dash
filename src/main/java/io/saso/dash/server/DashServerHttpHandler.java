@@ -2,7 +2,6 @@ package io.saso.dash.server;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import io.saso.config.Config;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,6 +12,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.util.CharsetUtil;
 import io.saso.dash.auth.Authenticator;
+import io.saso.dash.config.Config;
 import io.saso.dash.database.entities.LiveToken;
 import io.saso.dash.redis.tables.RedisConnections;
 import io.saso.dash.services.ServiceManager;

@@ -2,7 +2,7 @@ package io.saso.dash.database;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.saso.config.Config;
+import io.saso.dash.config.Config;
 import io.saso.dash.util.LoggingUtil;
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.ObjectPool;
