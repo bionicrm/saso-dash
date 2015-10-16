@@ -2,7 +2,7 @@ package io.saso.dash.server;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import io.dash.config.Config;
+import io.saso.config.Config;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;

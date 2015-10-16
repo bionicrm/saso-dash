@@ -1,4 +1,4 @@
-package io.dash.templating
+package io.saso.templating
 
 import com.lyncode.jtwig.JtwigModelMap
 

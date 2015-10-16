@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.lyncode.jtwig.JtwigModelMap;
-import io.dash.templating.Templater;
+import io.saso.templating.Templater;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.saso.dash.services.DBEntityProvider;

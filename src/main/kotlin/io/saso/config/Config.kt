@@ -1,4 +1,4 @@
-package io.dash.config
+package io.saso.config
 
 public interface Config
 {

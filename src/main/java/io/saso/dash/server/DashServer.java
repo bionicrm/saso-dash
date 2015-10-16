@@ -1,7 +1,7 @@
 package io.saso.dash.server;
 
 import com.google.inject.Inject;
-import io.dash.config.Config;
+import io.saso.config.Config;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

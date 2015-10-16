@@ -1,4 +1,4 @@
-package io.dash.config
+package io.saso.config
 
 import com.google.inject.Singleton
 import org.yaml.snakeyaml.Yaml
