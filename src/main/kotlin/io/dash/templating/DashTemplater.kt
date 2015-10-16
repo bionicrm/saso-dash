@@ -27,17 +27,13 @@ public class DashTemplater @Inject constructor(val config: Config) : Templater
             getTemplateContents(template)
         }
 
-        val output = JtwigTemplate(contents, jConfig)
+        return JtwigTemplate(contents, jConfig)
                 .output(modelMap)
                 // replace 2+ spaces with 1
                 .replace("\\s{2,}", " ")
-
-        return output
     }
 
-    private fun getTemplateContents(template: String): String
-    {
-        return IOUtils.toString(FileReader(template))
-    }
+    private fun getTemplateContents(template: String) =
+            IOUtils.toString(FileReader(template))
 
 }
