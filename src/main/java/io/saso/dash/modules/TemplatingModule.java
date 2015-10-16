@@ -1,8 +1,8 @@
 package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
-import io.saso.dash.templating.DashTemplater;
-import io.saso.dash.templating.Templater;
+import io.dash.templating.DashTemplater;
+import io.dash.templating.Templater;
 
 public class TemplatingModule extends AbstractModule
 {
