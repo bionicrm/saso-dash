@@ -21,10 +21,10 @@ public class DashTemplater @Inject constructor(val config: Config) : Templater
     {
         val contents = if (cacheTemplates) {
             templates.getOrPut(template, {
-                IOUtils.toString(FileReader(template))
+                getTemplateContents(template)
             })
         } else {
-            IOUtils.toString(FileReader(template))
+            getTemplateContents(template)
         }
 
         val output = JtwigTemplate(contents, jConfig)
@@ -33,6 +33,11 @@ public class DashTemplater @Inject constructor(val config: Config) : Templater
                 .replace("\\s{2,}", " ")
 
         return output
+    }
+
+    private fun getTemplateContents(template: String): String
+    {
+        return IOUtils.toString(FileReader(template))
     }
 
 }
