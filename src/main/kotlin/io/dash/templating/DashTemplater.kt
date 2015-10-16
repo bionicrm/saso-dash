@@ -5,7 +5,7 @@ import com.google.inject.Singleton
 import com.lyncode.jtwig.JtwigModelMap
 import com.lyncode.jtwig.JtwigTemplate
 import com.lyncode.jtwig.configuration.JtwigConfiguration
-import io.saso.dash.config.Config
+import io.dash.config.Config
 import org.apache.commons.io.IOUtils
 import java.io.FileReader
 import java.util.*

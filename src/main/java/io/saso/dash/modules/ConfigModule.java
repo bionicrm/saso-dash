@@ -1,8 +1,8 @@
 package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
-import io.saso.dash.config.Config;
-import io.saso.dash.config.DashConfig;
+import io.dash.config.Config;
+import io.dash.config.DashConfig;
 
 public class ConfigModule extends AbstractModule
 {
