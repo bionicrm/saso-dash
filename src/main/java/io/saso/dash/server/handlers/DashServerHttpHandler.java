@@ -1,4 +1,4 @@
-package io.saso.dash.server;
+package io.saso.dash.server.handlers;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

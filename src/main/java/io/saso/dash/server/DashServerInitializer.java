@@ -6,6 +6,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.saso.dash.server.handlers.ServerHttpHandler;
 
 public class DashServerInitializer extends ServerInitializer
 {

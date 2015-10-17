@@ -1,4 +1,4 @@
-package io.saso.dash.server;
+package io.saso.dash.server.handlers;
 
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;

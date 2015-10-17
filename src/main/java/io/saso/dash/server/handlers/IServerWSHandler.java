@@ -1,4 +1,4 @@
-package io.saso.dash.server;
+package io.saso.dash.server.handlers;
 
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
