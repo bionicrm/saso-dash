@@ -9,7 +9,7 @@ import java.util.Optional;
  * Represents an authenticator for incoming WebSocket connections that provide
  * a {@code live_token}.
  */
-public interface Authenticator
+public interface AuthenticatorOLD
 {
     /**
      * Finds and creates a LiveToken from the database. Returns an empty

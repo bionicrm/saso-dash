@@ -15,7 +15,6 @@ public class DashTemplater @Inject constructor(val config: Config) : Templater
 {
     private val cacheTemplates = config.get("cache-templates", false)
     private val templates: MutableMap<String, String> = HashMap()
-    private val jConfig = JtwigConfiguration()
 
     override fun render(template: String, modelMap: JtwigModelMap): String
     {
@@ -27,7 +26,7 @@ public class DashTemplater @Inject constructor(val config: Config) : Templater
             getTemplateContents(template)
         }
 
-        return JtwigTemplate(contents, jConfig)
+        return JtwigTemplate(contents, JtwigConfiguration())
                 .output(modelMap)
                 // replace 2+ spaces with 1
                 .replace("\\s{2,}", " ")

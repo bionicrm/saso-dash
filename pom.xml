@@ -34,6 +34,13 @@
             <version>0.14.451</version>
         </dependency>
 
+        <!-- Kotlin Reflection -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>0.14.451</version>
+        </dependency>
+
         <!-- Guice -->
         <dependency>
             <groupId>com.google.inject</groupId>

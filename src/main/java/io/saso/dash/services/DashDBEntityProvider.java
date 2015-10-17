@@ -4,7 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import io.saso.dash.database.DBEntity;
 import io.saso.dash.database.EntityManager;
+import io.saso.dash.database.EntityManagerOLD;
 import io.saso.dash.database.entities.*;
+import kotlin.reflect.KClass;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,10 +86,8 @@ public class DashDBEntityProvider implements DBEntityProvider
     {
         final String sql = "SELECT * FROM users WHERE id = ? LIMIT 1";
 
-        final Optional<User> user = entityManager.execute(DashUser.class,
+        return entityManager.execute(DashUser.class,
                 sql, liveToken.getUserId());
-
-        return user.get();
     }
 
     private Provider findProvider(Service service) throws Exception
@@ -95,10 +95,8 @@ public class DashDBEntityProvider implements DBEntityProvider
         final String sql =
                 "SELECT * FROM providers WHERE \"name\" = ? LIMIT 1";
 
-        final Optional<Provider> providerUser = entityManager.execute(
+        return entityManager.execute(
                 DashProvider.class, sql, service.getProviderName());
-
-        return providerUser.get();
     }
 
     private ProviderUser findProviderUser(Service service)
@@ -107,11 +105,9 @@ public class DashDBEntityProvider implements DBEntityProvider
         final String sql =
                 "SELECT * FROM provider_users WHERE user_id = ? AND provider_id = ? LIMIT 1";
 
-        final Optional<ProviderUser> providerUser = entityManager.execute(
+        return entityManager.execute(
                 DashProviderUser.class, sql, liveToken.getUserId(),
                 provider(service).getId());
-
-        return providerUser.get();
     }
 
     private AuthToken findAuthToken(Service service)
@@ -120,10 +116,8 @@ public class DashDBEntityProvider implements DBEntityProvider
         final String sql =
                 "SELECT * FROM auth_tokens WHERE id = ? LIMIT 1";
 
-        final Optional<AuthToken> authToken = entityManager.execute(
+        return entityManager.execute(
                 DashAuthToken.class, sql,
                 providerUser(service).getAuthTokenId());
-
-        return authToken.get();
     }
 }

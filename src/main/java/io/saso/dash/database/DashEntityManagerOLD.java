@@ -10,12 +10,12 @@ import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class DashEntityManager implements EntityManager
+public class DashEntityManagerOLD implements EntityManagerOLD
 {
-    private final Database db;
+    private final DatabaseOLD db;
 
     @Inject
-    public DashEntityManager(Database db)
+    public DashEntityManagerOLD(DatabaseOLD db)
     {
         this.db = db;
     }

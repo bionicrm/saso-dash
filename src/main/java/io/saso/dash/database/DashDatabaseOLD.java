@@ -14,7 +14,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Singleton
-public class DashDatabase implements Database
+public class DashDatabaseOLD implements DatabaseOLD
 {
     private static final String DBCP_CONNECT = "jdbc:apache:commons:dbcp:";
     private static final String DBCP_POOL_NAME = "saso";
@@ -26,7 +26,7 @@ public class DashDatabase implements Database
     private ObjectPool<PoolableConnection> connectionPool;
 
     @Inject
-    public DashDatabase(Config config)
+    public DashDatabaseOLD(Config config)
     {
         this.config = config;
     }
@@ -38,7 +38,7 @@ public class DashDatabase implements Database
             Class.forName("org.postgresql.Driver");
         }
         catch (ClassNotFoundException e) {
-            LoggingUtil.logThrowable(e, DashDatabase.class);
+            LoggingUtil.logThrowable(e, DashDatabaseOLD.class);
         }
     }
 

@@ -8,7 +8,7 @@ import java.sql.SQLException;
  * Represents a database. Implements a connection pool for thread-safe
  * connection reusing.
  */
-public interface Database
+public interface DatabaseOLD
 {
     /**
      * Gets a poolable database Connection. When it is finished being used,

@@ -1,7 +1,7 @@
 package io.saso.dash.auth;
 
 import com.google.inject.Inject;
-import io.saso.dash.database.EntityManager;
+import io.saso.dash.database.EntityManagerOLD;
 import io.saso.dash.database.entities.DashLiveToken;
 import io.saso.dash.database.entities.LiveToken;
 
@@ -9,12 +9,12 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
 
-public class DashAuthenticator implements Authenticator
+public class DashAuthenticatorOLD implements AuthenticatorOLD
 {
-    private final EntityManager entityManager;
+    private final EntityManagerOLD entityManager;
 
     @Inject
-    public DashAuthenticator(EntityManager entityManager)
+    public DashAuthenticatorOLD(EntityManagerOLD entityManager)
     {
         this.entityManager = entityManager;
     }

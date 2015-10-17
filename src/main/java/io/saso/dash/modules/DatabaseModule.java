@@ -1,10 +1,7 @@
 package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
-import io.saso.dash.database.DashDatabase;
-import io.saso.dash.database.DashEntityManager;
-import io.saso.dash.database.Database;
-import io.saso.dash.database.EntityManager;
+import io.saso.dash.database.*;
 import io.saso.dash.database.entities.*;
 
 public class DatabaseModule extends AbstractModule

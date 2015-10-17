@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.util.CharsetUtil;
 import io.saso.dash.auth.Authenticator;
+import io.saso.dash.auth.AuthenticatorOLD;
 import io.saso.dash.config.Config;
 import io.saso.dash.database.entities.LiveToken;
 import io.saso.dash.redis.tables.RedisConnections;
@@ -60,16 +61,16 @@ public class DashServerHttpHandler extends ServerHttpHandler
             return;
         }
 
-        final Optional<LiveToken> liveToken = authenticate(msg);
+        final LiveToken liveToken = authenticate(msg);
 
         // if authentication failure, send 403
-        if (! liveToken.isPresent()) {
+        if (liveToken == null) {
             respond(ctx, HttpResponseStatus.FORBIDDEN);
             return;
         }
 
         // if too many concurrent requests, send 429
-        if (! redisConnections.addIfAllowed(liveToken.get().getUserId())) {
+        if (! redisConnections.addIfAllowed(liveToken.getUserId())) {
             respond(ctx, HttpResponseStatus.TOO_MANY_REQUESTS);
             return;
         }
@@ -100,11 +101,11 @@ public class DashServerHttpHandler extends ServerHttpHandler
 
         // handshake; callback: start ServiceManager
         handshaker.handshake(ctx.channel(), msg).addListener(future ->
-                serviceManager.start(ctx, liveToken.get()));
+                serviceManager.start(ctx, liveToken));
 
         // on channel close: stop ServiceManager
         ctx.channel().closeFuture().addListener(future ->
-                serviceManager.stop(ctx, liveToken.get()));
+                serviceManager.stop(ctx, liveToken));
     }
 
     @Override
@@ -121,14 +122,14 @@ public class DashServerHttpHandler extends ServerHttpHandler
      *
      * @param req the request to authenticate
      *
-     * @return an Optional of a LiveToken
+     * @return a LiveToken
      *
-     * @see Authenticator#findLiveToken(String)
+     * @see AuthenticatorOLD#findLiveToken(String)
      * @see LiveToken#getToken()
      *
      * @throws Exception
      */
-    private Optional<LiveToken> authenticate(FullHttpRequest req)
+    private LiveToken authenticate(FullHttpRequest req)
             throws Exception
     {
         final Optional<String> token =
@@ -138,7 +139,7 @@ public class DashServerHttpHandler extends ServerHttpHandler
             return authenticator.findLiveToken(token.get());
         }
 
-        return Optional.empty();
+        return null;
     }
 
     /**
