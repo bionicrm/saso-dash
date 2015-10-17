@@ -7,12 +7,13 @@ import io.netty.channel.epoll.EpollServerSocketChannel
 import io.netty.handler.logging.LogLevel
 import io.netty.handler.logging.LoggingHandler
 import io.saso.dash.config.Config
+import io.saso.dash.redis.Redis
 import io.saso.dash.util.logger
 
 public class DashServer
 @Inject
-constructor(val serverInitializer: ServerInitializer,
-            val config: Config): Server
+constructor(val serverInitializer: ServerInitializer, val config: Config,
+            /* must keep to prevent lazy loading: */ val redis: Redis) : Server
 {
     override fun start()
     {

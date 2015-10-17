@@ -28,6 +28,14 @@ constructor(val config: Config): Redis
         }
     }
 
+    init
+    {
+        // flush
+        getConnection(RedisDatabase.CONCURRENT_CONNECTIONS).use({ conn ->
+            conn.flushDB()
+        })
+    }
+
     override fun getConnection(db: RedisDatabase): Jedis
     {
         val connection = pool.resource
