@@ -2,6 +2,7 @@ package io.saso.dash.database
 
 import com.google.inject.Inject
 import com.google.inject.Injector
+import io.saso.dash.util.logResultSet
 import io.saso.dash.util.logThrowable
 import io.saso.dash.util.tryResources
 import java.sql.SQLException
@@ -16,11 +17,11 @@ constructor(val db: Database, val injector: Injector): EntityManager
             entityClass: KClass<T>, sql: String, params: List<Any>):
             Optional<T>
     {
-        val entity = injector.getInstance(entityClass.java)
+        val entity = injector getInstance entityClass.java
 
         return tryResources({
             val connection = db.connection.autoClose()
-            val statement  = connection.prepareStatement(sql).autoClose()
+            val statement  = (connection prepareStatement sql).autoClose()
 
             // set params for statement
             params.forEachIndexed { i, o ->
@@ -30,7 +31,9 @@ constructor(val db: Database, val injector: Injector): EntityManager
             val resultSet = statement.executeQuery().autoClose()
 
             if (resultSet.next()) {
-                entity.fillFromResultSet(resultSet)
+                logResultSet(this@DashEntityManager, resultSet)
+
+                entity fillFromResultSet resultSet
 
                 Optional.of(entity)
             }

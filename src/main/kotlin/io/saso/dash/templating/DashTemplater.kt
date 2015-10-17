@@ -6,6 +6,7 @@ import com.lyncode.jtwig.JtwigModelMap
 import com.lyncode.jtwig.JtwigTemplate
 import com.lyncode.jtwig.configuration.JtwigConfiguration
 import io.saso.dash.config.Config
+import io.saso.dash.util.Resources
 import org.apache.commons.io.IOUtils
 import java.io.FileReader
 import java.util.*
@@ -15,6 +16,7 @@ public class DashTemplater
 @Inject
 constructor(val config: Config) : Templater
 {
+    private val trimSpacesRegex = "\\s{2,}".toRegex()
     private val cacheTemplates = config.get("cache-templates", false)
     private val templates: MutableMap<String, String> = HashMap()
 
@@ -22,19 +24,19 @@ constructor(val config: Config) : Templater
     {
         val contents = if (cacheTemplates) {
             templates.getOrPut(template, {
-                getTemplateContents(template)
+                this getTemplate template
             })
         } else {
-            getTemplateContents(template)
+            this getTemplate template
         }
 
         return JtwigTemplate(contents, JtwigConfiguration())
                 .output(modelMap)
                 // replace 2+ spaces with 1
-                .replace("\\s{2,}", " ")
+                .replace(trimSpacesRegex, " ")
     }
 
-    private fun getTemplateContents(template: String) =
-            IOUtils.toString(FileReader(template))
+    private fun getTemplate(template: String) =
+            Resources get "templates/$template.twig"
 
 }

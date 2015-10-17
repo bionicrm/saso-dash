@@ -17,15 +17,15 @@ public class DashConfig : Config
 
         tryResources({
             val input = FileInputStream(file).autoClose()
-            val map = Yaml().load(input) as Map<String, Any>
+            val map = (Yaml() load input) as Map<String, Any>
 
-            logger(this@DashConfig).info(
-                    "Loaded config @ ${file.canonicalPath} => $map")
+            logger(this@DashConfig) info
+                    "Loaded config @ ${file.canonicalPath} => $map"
 
             map
         }, { e: FileNotFoundException ->
-            logger(this@DashConfig).warn("Config @ ${file.canonicalPath} " +
-                    "not found, using defaults")
+            logger(this@DashConfig) warn
+                    "Config @ ${file.canonicalPath} not found, using defaults"
 
             emptyMap()
         })
@@ -33,18 +33,18 @@ public class DashConfig : Config
 
     override fun <T> get(key: String, default: T): T
     {
-        val parts = key.split('.')
+        val parts = key split '.'
 
         var subMap = map;
 
         parts.subList(0, parts.lastIndex).forEach {
-            val value = Optional.ofNullable(subMap.get(it))
+            val value = Optional.ofNullable(subMap get it)
 
-            subMap = value.orElse(emptyMap<String, Any>()) as Map<String, Any>
+            subMap = (value orElse emptyMap<String, Any>()) as Map<String, Any>
         }
 
         // can't use Map#getOrDefault(); if the *value* is `null`, then we'd
         // return `null`, which we don't want; we want to return [default]
-        return subMap.get(parts.last()) as T ?: default
+        return (subMap get parts.last()) as T ?: default
     }
 }

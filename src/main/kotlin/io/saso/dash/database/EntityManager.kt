@@ -9,7 +9,7 @@ public interface EntityManager
             entityClass: KClass<T>, sql: String, params: List<Any>):
             Optional<T>
 
-    fun <T : DBEntity> executeOrFail(
+    final fun <T : DBEntity> executeOrFail(
             entityClass: KClass<T>, sql: String, params: List<Any>): T =
             execute(entityClass, sql, params).get()
 }

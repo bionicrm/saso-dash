@@ -1,6 +1,8 @@
 package io.saso.dash.util
 
 import org.apache.commons.io.IOUtils
+import java.io.File
+import java.io.FileInputStream
 
 public class ResourceHolder : AutoCloseable
 {
@@ -31,15 +33,15 @@ fun <T> tryResources(toTry: ResourceHolder.() -> T): T
     }
 }
 
-fun <T, R : Throwable> tryResources(toTry: ResourceHolder.() -> T,
-                                    catch: (R) -> T): T
+fun <T, X : Throwable> tryResources(toTry: ResourceHolder.() -> T,
+                                    catch: (X) -> T): T
 {
     var holder = ResourceHolder()
 
     try {
         return holder.toTry()
     }
-    catch (e: R) {
+    catch (e: X) {
         return catch(e)
     }
     finally {
@@ -49,5 +51,12 @@ fun <T, R : Throwable> tryResources(toTry: ResourceHolder.() -> T,
 
 object Resources
 {
-    fun get(path: String) = IOUtils.toString(javaClass.getResource(path))
+    fun get(path: String): String {
+        if (path startsWith '/') {
+            return IOUtils.toString(javaClass.getResource(path))
+        }
+        else {
+            return IOUtils.toString(FileInputStream(path))
+        }
+    }
 }

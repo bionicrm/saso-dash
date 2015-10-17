@@ -21,7 +21,7 @@ constructor(val entityManager: EntityManager) : Authenticator
         val liveToken = entityManager.execute(
                 LiveToken::class, liveTokenSql, arrayListOf(token))
 
-        if (liveToken.isPresent && isLiveTokenValid(liveToken.get())) {
+        if (liveToken.isPresent && this isLiveTokenValid liveToken.get()) {
             return liveToken
         }
 

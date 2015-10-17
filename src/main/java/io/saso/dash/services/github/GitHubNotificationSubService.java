@@ -117,7 +117,7 @@ public class GitHubNotificationSubService extends SubServiceAdapter
             }
 
             ctx.channel().write(new TextWebSocketFrame(
-                    templater.render("templates/github/comment.twig",
+                    templater.render("github/comment",
                             modelMap)));
         }
 
