@@ -1,5 +1,6 @@
 package io.saso.dash
 import com.google.inject.Guice
+import io.saso.dash.events.ShutdownManager
 import io.saso.dash.modules.*
 import io.saso.dash.server.Server
 

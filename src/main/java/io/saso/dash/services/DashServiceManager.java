@@ -3,7 +3,7 @@ package io.saso.dash.services;
 import com.google.inject.Inject;
 import io.netty.channel.ChannelHandlerContext;
 import io.saso.dash.database.entities.LiveToken;
-import io.saso.dash.redis.tables.RedisConnections;
+import io.saso.dash.redis.databases.RedisConnections;
 import io.saso.dash.util.LoggingUtil;
 
 import java.util.ArrayList;

@@ -13,7 +13,7 @@ import io.netty.util.concurrent.GenericFutureListener
 import io.saso.dash.auth.Authenticator
 import io.saso.dash.config.Config
 import io.saso.dash.database.entities.LiveToken
-import io.saso.dash.redis.tables.RedisConnections
+import io.saso.dash.redis.databases.RedisConnections
 import io.saso.dash.services.ServiceManager
 import io.saso.dash.util.logThrowable
 import java.net.URLDecoder
@@ -49,7 +49,7 @@ constructor(val redisConnections: RedisConnections,
         }
 
         // if too many concurrent requests, send 429
-        if (! redisConnections.addIfAllowed(liveToken.get().userId)) {
+        if (! (redisConnections addIfAllowed liveToken.get().userId)) {
             respond(ctx, HttpResponseStatus.TOO_MANY_REQUESTS)
             return
         }
