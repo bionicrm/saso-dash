@@ -1,20 +1,36 @@
 package io.saso.dash.services;
 
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
-import io.saso.dash.database.DBEntity;
-import io.saso.dash.database.EntityManager;
-import io.saso.dash.database.EntityManagerOLD;
-import io.saso.dash.database.entities.*;
-import kotlin.reflect.KClass;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import io.saso.dash.database.entities.AuthToken;
+import io.saso.dash.database.entities.Provider;
+import io.saso.dash.database.entities.ProviderUser;
+import io.saso.dash.database.entities.User;
 
 public class DashDBEntityProviderOLD implements DBEntityProviderOLD
 {
-    private final EntityManager entityManager;
+    @Override
+    public User user() throws Exception
+    {
+        return null;
+    }
+
+    @Override
+    public Provider provider(Service service) throws Exception
+    {
+        return null;
+    }
+
+    @Override
+    public ProviderUser providerUser(Service service) throws Exception
+    {
+        return null;
+    }
+
+    @Override
+    public AuthToken authToken(Service service) throws Exception
+    {
+        return null;
+    }
+/*    private final EntityManager entityManager;
     private final LiveToken liveToken;
     private final Map<Service, DBEntity> entities = new HashMap<>();
 
@@ -116,5 +132,5 @@ public class DashDBEntityProviderOLD implements DBEntityProviderOLD
 
         return entityManager.execute(
                 AuthToken.class, sql, liveToken.getUserId(), service.getProviderName());
-    }
+    }*/
 }

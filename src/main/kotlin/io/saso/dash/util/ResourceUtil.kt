@@ -1,6 +1,5 @@
 package io.saso.dash.util
 
-import com.google.common.io.Resources
 import org.apache.commons.io.IOUtils
 
 public class ResourceHolder : AutoCloseable
@@ -48,4 +47,7 @@ fun <T, R : Throwable> tryResources(toTry: ResourceHolder.() -> T,
     }
 }
 
-fun resource(path: String) = IOUtils.toString(Resources.getResource(path))
+object Resources
+{
+    fun get(path: String) = IOUtils.toString(javaClass.getResource(path))
+}

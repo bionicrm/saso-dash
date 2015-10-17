@@ -7,7 +7,7 @@ import io.saso.dash.database.entities.User
 
 public interface DBEntityProvider
 {
-    val user: User
+    fun user(): User
 
     fun provider(service: Service): Provider
 

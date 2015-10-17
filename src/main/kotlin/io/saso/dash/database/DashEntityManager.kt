@@ -3,7 +3,6 @@ package io.saso.dash.database
 import com.google.inject.Inject
 import com.google.inject.Injector
 import io.saso.dash.util.logThrowable
-import io.saso.dash.util.logger
 import io.saso.dash.util.tryResources
 import java.sql.SQLException
 import java.util.*
@@ -22,9 +21,12 @@ public class DashEntityManager
             val connection = db.connection.autoClose()
             val statement  = connection.prepareStatement(sql).autoClose()
 
+            println(params.size())
+
             // set params for statement
             params.forEachIndexed { i, o ->
-                logger(this@DashEntityManager).debug("params[$i] = $o")
+                println(" $i. " + o.toString())
+                Thread.dumpStack()
                 statement.setObject(i + 1, o)
             }
 
