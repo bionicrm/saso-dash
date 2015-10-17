@@ -11,7 +11,9 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 @Singleton
-public class DashDatabase @Inject constructor(val config: Config) : Database
+public class DashDatabase
+@Inject
+constructor(val config: Config) : Database
 {
     object Driver {
         val url = "jdbc:apache:commons:dbcp:"

@@ -8,8 +8,9 @@ import io.saso.dash.database.entities.*
 import io.saso.dash.util.Resources
 
 public class DashDBEntityProvider
-@Inject constructor(val entityManager: EntityManager,
-                    @Assisted val liveToken: LiveToken) : DBEntityProvider
+@Inject
+constructor(val entityManager: EntityManager,
+            @Assisted val liveToken: LiveToken) : DBEntityProvider
 {
     private val serviceEntities: MutableMap<Service, DBEntity> = hashMapOf()
     private val sql by lazy {mapOf(
@@ -23,7 +24,8 @@ public class DashDBEntityProvider
     {
         val sql = sql.getOrImplicitDefault(User::class)
 
-        return entityManager.executeOrFail(User::class, sql, liveToken.userId)
+        return entityManager.executeOrFail(User::class, sql,
+                listOf(liveToken.userId))
     }
 
     override fun provider(service: Service) =
@@ -31,7 +33,7 @@ public class DashDBEntityProvider
                 val sql = sql.getOrImplicitDefault(Provider::class)
 
                 entityManager.executeOrFail(
-                        Provider::class, sql, service.providerName)
+                        Provider::class, sql, listOf(service.providerName))
             }) as Provider
 
     override fun providerUser(service: Service) =
@@ -39,7 +41,7 @@ public class DashDBEntityProvider
                 val sql = sql.getOrImplicitDefault(ProviderUser::class)
 
                 entityManager.executeOrFail(ProviderUser::class, sql,
-                        liveToken.userId, service.providerName)
+                        listOf(liveToken.userId, service.providerName))
             }) as ProviderUser
 
     override fun authToken(service: Service): AuthToken =
@@ -47,6 +49,6 @@ public class DashDBEntityProvider
                 val sql = sql.getOrImplicitDefault(AuthToken::class)
 
                 entityManager.executeOrFail(AuthToken::class, sql,
-                        liveToken.userId, service.providerName)
+                        listOf(liveToken.userId, service.providerName))
             }) as AuthToken
 }

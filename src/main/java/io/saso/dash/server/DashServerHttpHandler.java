@@ -12,7 +12,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.util.CharsetUtil;
 import io.saso.dash.auth.Authenticator;
-import io.saso.dash.auth.AuthenticatorOLD;
 import io.saso.dash.config.Config;
 import io.saso.dash.database.entities.LiveToken;
 import io.saso.dash.redis.tables.RedisConnections;
@@ -124,7 +123,6 @@ public class DashServerHttpHandler extends ServerHttpHandler
      *
      * @return a LiveToken
      *
-     * @see AuthenticatorOLD#findLiveToken(String)
      * @see LiveToken#getToken()
      *
      * @throws Exception

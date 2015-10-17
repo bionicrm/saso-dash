@@ -11,7 +11,9 @@ import java.io.FileReader
 import java.util.*
 
 @Singleton
-public class DashTemplater @Inject constructor(val config: Config) : Templater
+public class DashTemplater
+@Inject
+constructor(val config: Config) : Templater
 {
     private val cacheTemplates = config.get("cache-templates", false)
     private val templates: MutableMap<String, String> = HashMap()

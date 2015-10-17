@@ -3,7 +3,6 @@ package io.saso.dash.auth
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.saso.dash.database.EntityManager
-import io.saso.dash.database.entities.DashLiveToken
 import io.saso.dash.database.entities.LiveToken
 import io.saso.dash.util.Resources
 import java.sql.Timestamp
@@ -12,14 +11,15 @@ import java.util.*
 
 @Singleton
 public class DashAuthenticator
-@Inject constructor(val entityManager: EntityManager) : Authenticator
+@Inject
+constructor(val entityManager: EntityManager) : Authenticator
 {
     private val liveTokenSql by lazy { Resources.get("/sql/live_token.sql") }
 
     override fun findLiveToken(token: String): Optional<LiveToken>
     {
         val liveToken = entityManager.execute(
-                LiveToken::class, liveTokenSql, token)
+                LiveToken::class, liveTokenSql, arrayListOf(token))
 
         if (liveToken.isPresent && isLiveTokenValid(liveToken.get())) {
             return liveToken

@@ -6,10 +6,10 @@ import kotlin.reflect.KClass
 public interface EntityManager
 {
     fun <T : DBEntity> execute(
-            entityClass: KClass<T>, sql: String, vararg params: Any):
+            entityClass: KClass<T>, sql: String, params: List<Any>):
             Optional<T>
 
     fun <T : DBEntity> executeOrFail(
-            entityClass: KClass<T>, sql: String, vararg params: Any): T =
+            entityClass: KClass<T>, sql: String, params: List<Any>): T =
             execute(entityClass, sql, params).get()
 }

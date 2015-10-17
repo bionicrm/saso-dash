@@ -9,10 +9,11 @@ import java.util.*
 import kotlin.reflect.KClass
 
 public class DashEntityManager
-@Inject constructor(val db: Database, val injector: Injector): EntityManager
+@Inject
+constructor(val db: Database, val injector: Injector): EntityManager
 {
     override fun <T : DBEntity> execute(
-            entityClass: KClass<T>, sql: String, vararg params: Any):
+            entityClass: KClass<T>, sql: String, params: List<Any>):
             Optional<T>
     {
         val entity = injector.getInstance(entityClass.java)
@@ -21,12 +22,8 @@ public class DashEntityManager
             val connection = db.connection.autoClose()
             val statement  = connection.prepareStatement(sql).autoClose()
 
-            println(params.size())
-
             // set params for statement
             params.forEachIndexed { i, o ->
-                println(" $i. " + o.toString())
-                Thread.dumpStack()
                 statement.setObject(i + 1, o)
             }
 
