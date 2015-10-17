@@ -51,7 +51,8 @@ fun <T, X : Throwable> tryResources(toTry: ResourceHolder.() -> T,
 
 object Resources
 {
-    fun get(path: String): String {
+    fun get(path: String): String
+    {
         if (path startsWith '/') {
             return IOUtils.toString(javaClass.getResource(path))
         }
