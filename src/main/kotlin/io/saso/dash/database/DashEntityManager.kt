@@ -2,7 +2,10 @@ package io.saso.dash.database
 
 import com.google.inject.Inject
 import com.google.inject.Injector
+import io.saso.dash.util.logThrowable
+import io.saso.dash.util.logger
 import io.saso.dash.util.tryResources
+import java.sql.SQLException
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -15,12 +18,13 @@ public class DashEntityManager
     {
         val entity = injector.getInstance(entityClass.java)
 
-        return tryResources {
+        return tryResources({
             val connection = db.connection.autoClose()
             val statement  = connection.prepareStatement(sql).autoClose()
 
             // set params for statement
             params.forEachIndexed { i, o ->
+                logger(this@DashEntityManager).debug("params[$i] = $o")
                 statement.setObject(i + 1, o)
             }
 
@@ -34,7 +38,11 @@ public class DashEntityManager
             else {
                 Optional.empty()
             }
-        }
+        }, { e: SQLException ->
+            logThrowable(this@DashEntityManager, e)
+
+            Optional.empty()
+        })
     }
 
 

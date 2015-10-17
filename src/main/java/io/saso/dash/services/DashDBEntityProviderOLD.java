@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class DashDBEntityProvider implements DBEntityProvider
+public class DashDBEntityProviderOLD implements DBEntityProviderOLD
 {
     private final EntityManager entityManager;
     private final LiveToken liveToken;
@@ -21,7 +21,7 @@ public class DashDBEntityProvider implements DBEntityProvider
     private User user;
 
     @Inject
-    public DashDBEntityProvider(EntityManager entityManager,
+    public DashDBEntityProviderOLD(EntityManager entityManager,
                                 @Assisted LiveToken liveToken)
     {
         this.entityManager = entityManager;
@@ -86,8 +86,7 @@ public class DashDBEntityProvider implements DBEntityProvider
     {
         final String sql = "SELECT * FROM users WHERE id = ? LIMIT 1";
 
-        return entityManager.execute(DashUser.class,
-                sql, liveToken.getUserId());
+        return entityManager.execute(User.class, sql, liveToken.getUserId());
     }
 
     private Provider findProvider(Service service) throws Exception
@@ -96,28 +95,26 @@ public class DashDBEntityProvider implements DBEntityProvider
                 "SELECT * FROM providers WHERE \"name\" = ? LIMIT 1";
 
         return entityManager.execute(
-                DashProvider.class, sql, service.getProviderName());
+                Provider.class, sql, service.getProviderName());
     }
 
     private ProviderUser findProviderUser(Service service)
             throws Exception
     {
         final String sql =
-                "SELECT * FROM provider_users WHERE user_id = ? AND provider_id = ? LIMIT 1";
+                "SELECT * FROM provider_users WHERE user_id = ? AND provider_id = (SELECT id FROM providers WHERE \"name\" = ?) LIMIT 1";
 
         return entityManager.execute(
-                DashProviderUser.class, sql, liveToken.getUserId(),
-                provider(service).getId());
+                ProviderUser.class, sql, liveToken.getUserId(), service.getProviderName());
     }
 
     private AuthToken findAuthToken(Service service)
             throws Exception
     {
         final String sql =
-                "SELECT * FROM auth_tokens WHERE id = ? LIMIT 1";
+                "SELECT * FROM auth_tokens WHERE id = (SELECT auth_token_id FROM provider_users WHERE user_id = ? AND provider_id = (SELECT id FROM providers WHERE \"name\" = ?)) LIMIT 1";
 
         return entityManager.execute(
-                DashAuthToken.class, sql,
-                providerUser(service).getAuthTokenId());
+                AuthToken.class, sql, liveToken.getUserId(), service.getProviderName());
     }
 }

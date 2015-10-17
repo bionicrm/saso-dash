@@ -1,5 +1,8 @@
 package io.saso.dash.util
 
+import com.google.common.io.Resources
+import org.apache.commons.io.IOUtils
+
 public class ResourceHolder : AutoCloseable
 {
     val resources: MutableList<AutoCloseable> = arrayListOf()
@@ -44,3 +47,5 @@ fun <T, R : Throwable> tryResources(toTry: ResourceHolder.() -> T,
         holder.close()
     }
 }
+
+fun resource(path: String) = IOUtils.toString(Resources.getResource(path))

@@ -1,10 +1,8 @@
 package io.saso.dash.util
 
 import org.apache.logging.log4j.LogManager
-import kotlin.reflect.KClass
 
-fun logger(clazz: KClass<*>) = get(clazz.java)
+fun logger(forClass: Any) = LogManager.getLogger(forClass)
 
-fun logger(obj: Any) = get(obj.javaClass)
-
-private fun get(clazz: Class<*>) = LogManager.getLogger(clazz)
+fun logThrowable(forClass: Any, throwable: Throwable) =
+        logger(forClass).error(throwable.getMessage(), throwable)

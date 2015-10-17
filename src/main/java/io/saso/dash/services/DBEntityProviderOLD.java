@@ -5,7 +5,7 @@ import io.saso.dash.database.entities.Provider;
 import io.saso.dash.database.entities.ProviderUser;
 import io.saso.dash.database.entities.User;
 
-public interface DBEntityProvider
+public interface DBEntityProviderOLD
 {
     User user() throws Exception;
 

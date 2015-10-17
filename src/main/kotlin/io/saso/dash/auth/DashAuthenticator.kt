@@ -14,7 +14,7 @@ public class DashAuthenticator
     override fun findLiveToken(token: String): Optional<LiveToken>
     {
         val sql = "SELECT * FROM live_tokens WHERE token = ? LIMIT 1"
-        val liveToken = entityManager.execute(LiveToken::class, sql)
+        val liveToken = entityManager.execute(LiveToken::class, sql, token)
 
         if (liveToken.isPresent && isLiveTokenValid(liveToken.get())) {
             return liveToken
