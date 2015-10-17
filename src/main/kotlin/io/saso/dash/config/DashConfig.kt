@@ -7,6 +7,7 @@ import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.util.*
 
 @Singleton @Suppress("UNCHECKED_CAST")
 public class DashConfig : Config
@@ -36,15 +37,10 @@ public class DashConfig : Config
 
         var subMap = map;
 
-        parts.subList(0, parts.lastIndex).forEach partsItr@ {
-            val value = subMap.get(it)
+        parts.subList(0, parts.lastIndex).forEach {
+            val value = Optional.ofNullable(subMap.get(it))
 
-            if (value != null) {
-                subMap = value as Map<String, Any>
-            }
-            else {
-                return@partsItr
-            }
+            subMap = value.orElse(emptyMap<String, Any>()) as Map<String, Any>
         }
 
         // can't use Map#getOrDefault(); if the *value* is `null`, then we'd

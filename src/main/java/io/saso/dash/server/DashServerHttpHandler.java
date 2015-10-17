@@ -61,16 +61,16 @@ public class DashServerHttpHandler extends ServerHttpHandler
             return;
         }
 
-        final LiveToken liveToken = authenticate(msg);
+        final Optional<LiveToken> liveToken = authenticate(msg);
 
         // if authentication failure, send 403
-        if (liveToken == null) {
+        if (! liveToken.isPresent()) {
             respond(ctx, HttpResponseStatus.FORBIDDEN);
             return;
         }
 
         // if too many concurrent requests, send 429
-        if (! redisConnections.addIfAllowed(liveToken.getUserId())) {
+        if (! redisConnections.addIfAllowed(liveToken.get().getUserId())) {
             respond(ctx, HttpResponseStatus.TOO_MANY_REQUESTS);
             return;
         }
@@ -101,11 +101,11 @@ public class DashServerHttpHandler extends ServerHttpHandler
 
         // handshake; callback: start ServiceManager
         handshaker.handshake(ctx.channel(), msg).addListener(future ->
-                serviceManager.start(ctx, liveToken));
+                serviceManager.start(ctx, liveToken.get()));
 
         // on channel close: stop ServiceManager
         ctx.channel().closeFuture().addListener(future ->
-                serviceManager.stop(ctx, liveToken));
+                serviceManager.stop(ctx, liveToken.get()));
     }
 
     @Override
@@ -129,7 +129,7 @@ public class DashServerHttpHandler extends ServerHttpHandler
      *
      * @throws Exception
      */
-    private LiveToken authenticate(FullHttpRequest req)
+    private Optional<LiveToken> authenticate(FullHttpRequest req)
             throws Exception
     {
         final Optional<String> token =
@@ -139,7 +139,7 @@ public class DashServerHttpHandler extends ServerHttpHandler
             return authenticator.findLiveToken(token.get());
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**
