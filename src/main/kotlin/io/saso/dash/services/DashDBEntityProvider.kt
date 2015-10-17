@@ -12,13 +12,12 @@ public class DashDBEntityProvider
                     @Assisted val liveToken: LiveToken) : DBEntityProvider
 {
     private val serviceEntities: MutableMap<Service, DBEntity> = hashMapOf()
-
-    private val sql = mapOf(
+    private val sql by lazy {mapOf(
             User::class         to Resources.get("/sql/user.sql"),
             Provider::class     to Resources.get("/sql/provider.sql"),
             ProviderUser::class to Resources.get("/sql/provider_user.sql"),
             AuthToken::class    to Resources.get("/sql/auth_token.sql")
-    )
+    )}
 
     override fun user(): User
     {
