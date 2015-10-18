@@ -5,5 +5,6 @@ import java.util.*
 
 public interface Authenticator
 {
-    fun findLiveToken(token: String): Optional<LiveToken>
+    fun authenticate(token: String, onAuthentication: (LiveToken) -> Unit,
+                     onFailure: () -> Unit)
 }

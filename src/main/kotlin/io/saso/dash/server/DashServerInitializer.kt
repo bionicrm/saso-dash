@@ -9,7 +9,7 @@ import io.saso.dash.server.handlers.ServerHttpHandler
 
 public class DashServerInitializer
 @Inject
-constructor(val handlerProvider: Provider<ServerHttpHandler>):
+constructor(private val handlerProvider: Provider<ServerHttpHandler>) :
         ServerInitializer()
 {
     override fun initChannel(ch: SocketChannel)

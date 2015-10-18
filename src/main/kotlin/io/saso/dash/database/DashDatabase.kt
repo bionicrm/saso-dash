@@ -13,15 +13,10 @@ import java.sql.DriverManager
 @Singleton
 public class DashDatabase
 @Inject
-constructor(val config: Config) : Database
+constructor(private val config: Config) : Database
 {
-    object Driver {
-        val url = "jdbc:apache:commons:dbcp:"
-    }
-
-    object Pool {
-        val name = "saso"
-    }
+    private val driverUrl = "jdbc:apache:commons:dbcp:"
+    private val poolName = "saso"
 
     private val connectionPool by lazy {
         val host     = config.get("db.host", "127.0.0.1")
@@ -36,11 +31,11 @@ constructor(val config: Config) : Database
         val poolableConnectionFactory =
                 PoolableConnectionFactory(connectionFactory, null)
         val connectionPool = GenericObjectPool(poolableConnectionFactory)
-        val poolingDriver = DriverManager.getDriver(Driver.url)
+        val poolingDriver = DriverManager.getDriver(driverUrl)
                 as PoolingDriver
 
         poolableConnectionFactory.pool = connectionPool
-        poolingDriver.registerPool(Pool.name, connectionPool)
+        poolingDriver.registerPool(poolName, connectionPool)
 
         connectionPool
     }

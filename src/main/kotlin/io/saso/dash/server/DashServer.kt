@@ -12,8 +12,10 @@ import io.saso.dash.util.logger
 
 public class DashServer
 @Inject
-constructor(val serverInitializer: ServerInitializer, val config: Config,
-            /* must keep to prevent lazy loading: */ val redis: Redis) : Server
+constructor(private val serverInitializer: ServerInitializer,
+            private val config: Config,
+            /* must keep to prevent lazy loading: */
+            private val redis: Redis) : Server
 {
     override fun start()
     {

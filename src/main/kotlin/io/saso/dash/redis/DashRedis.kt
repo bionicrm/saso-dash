@@ -11,7 +11,7 @@ import redis.clients.jedis.Protocol
 @Singleton
 public class DashRedis
 @Inject
-constructor(val config: Config): Redis
+constructor(private val config: Config): Redis
 {
     private val pool: JedisPool by lazy {
         val poolConfig = JedisPoolConfig()

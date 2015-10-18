@@ -11,7 +11,8 @@ import kotlin.reflect.KClass
 
 public class DashEntityManager
 @Inject
-constructor(val db: Database, val injector: Injector): EntityManager
+constructor(private val db: Database, private val injector: Injector) :
+        EntityManager
 {
     override fun <T : DBEntity> execute(
             entityClass: KClass<T>, sql: String, params: List<Any>):

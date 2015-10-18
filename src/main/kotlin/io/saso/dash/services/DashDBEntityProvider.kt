@@ -11,22 +11,10 @@ import kotlin.reflect.KClass
 
 public class DashDBEntityProvider
 @Inject
-constructor(val entityManager: EntityManager,
-            @Assisted val liveToken: LiveToken) : DBEntityProvider
+constructor(private val entityManager: EntityManager,
+            @Assisted private val liveToken: LiveToken) : DBEntityProvider
 {
     private val serviceEntities: MutableMap<Service, DBEntity> = hashMapOf()
-
-    private object SQL {
-        private val contents by lazy {mapOf(
-                User::class         to Resources.get("/sql/user.sql"),
-                Provider::class     to Resources.get("/sql/provider.sql"),
-                ProviderUser::class to Resources.get("/sql/provider_user.sql"),
-                AuthToken::class    to Resources.get("/sql/auth_token.sql")
-        )}
-
-        fun get(entity: KClass<*>) =
-                contents get entity ?: throw NoSuchElementException()
-    }
 
     override fun user() =
             entityManager.executeOrFail(User::class, SQL get User::class,
@@ -51,4 +39,17 @@ constructor(val entityManager: EntityManager,
                         SQL get AuthToken::class,
                         listOf(liveToken.userId, service.providerName))
             }) as AuthToken
+
+    private companion object SQL
+    {
+        val contents by lazy {mapOf(
+                User::class         to Resources.get("/sql/user.sql"),
+                Provider::class     to Resources.get("/sql/provider.sql"),
+                ProviderUser::class to Resources.get("/sql/provider_user.sql"),
+                AuthToken::class    to Resources.get("/sql/auth_token.sql")
+        )}
+
+        fun get(entity: KClass<*>) =
+                contents get entity ?: throw NoSuchElementException()
+    }
 }

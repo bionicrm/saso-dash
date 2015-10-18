@@ -9,12 +9,9 @@ import io.saso.dash.util.logger
 @Singleton
 public class DashRedisConnections
 @Inject
-constructor(val redis: Redis) : RedisConnections
+constructor(private val redis: Redis) : RedisConnections
 {
-    private object Limits
-    {
-        val maxConcurrentConnectionsPerUser = 3
-    }
+    private val maxConcurrentConnectionsPerUser = 3
 
     override fun addIfAllowed(userId: Int): Boolean {
         val key = userId.toString()
@@ -27,7 +24,7 @@ constructor(val redis: Redis) : RedisConnections
 
             val connCount = it incr key
 
-            if (connCount > Limits.maxConcurrentConnectionsPerUser) {
+            if (connCount > maxConcurrentConnectionsPerUser) {
                 it decr key
                 return false
             }

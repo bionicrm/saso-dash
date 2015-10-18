@@ -9,7 +9,8 @@ import io.saso.dash.util.logThrowable
 public class DashServerWSHandler
 @Inject
 constructor(
-        @Assisted val handshaker: WebSocketServerHandshaker): ServerWSHandler()
+        @Assisted private val handshaker: WebSocketServerHandshaker) :
+        ServerWSHandler()
 {
     override fun messageReceived(ctx: ChannelHandlerContext,
                                  msg: WebSocketFrame)

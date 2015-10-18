@@ -12,20 +12,20 @@ import io.netty.util.CharsetUtil
 import io.netty.util.concurrent.GenericFutureListener
 import io.saso.dash.auth.Authenticator
 import io.saso.dash.config.Config
-import io.saso.dash.database.entities.LiveToken
 import io.saso.dash.redis.databases.RedisConnections
 import io.saso.dash.services.ServiceManager
+import io.saso.dash.util.ifPresent
 import io.saso.dash.util.logThrowable
 import java.net.URLDecoder
 import java.util.*
 
 public class DashServerHttpHandler
 @Inject
-constructor(val redisConnections: RedisConnections,
-            val authenticator: Authenticator,
-            val serviceManagerProvider: Provider<ServiceManager>,
-            val handlerFactory: ServerHandlerFactory,
-            val config: Config) : ServerHttpHandler()
+constructor(private val redisConnections: RedisConnections,
+            private val authenticator: Authenticator,
+            private val serviceManagerProvider: Provider<ServiceManager>,
+            private val handlerFactory: ServerHandlerFactory,
+            private val config: Config) : ServerHttpHandler()
 {
     private val url = config.get("server.url", "ws://127.0.0.1")
 
@@ -34,77 +34,66 @@ constructor(val redisConnections: RedisConnections,
     {
         val ch = ctx.channel()
 
+        fun respond(status: HttpResponseStatus) {
+            val response = DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
+                    Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8))
+
+            (ctx writeAndFlush response) addListener ChannelFutureListener.CLOSE
+        }
+
         // check request validity
         if (msg.decoderResult().isFailure) {
-            respond(ctx, HttpResponseStatus.BAD_REQUEST)
+            respond(HttpResponseStatus.BAD_REQUEST)
             return
         }
 
-        val liveToken = authenticate(msg)
+        val liveToken = getCookieValue(msg.headers(), "live_token")
 
-        // if authentication failure, send 403
-        if (! liveToken.isPresent) {
-            respond(ctx, HttpResponseStatus.FORBIDDEN)
-            return
-        }
+        liveToken.ifPresent({ liveToken ->
+            authenticator.authenticate(liveToken, { liveToken ->
+                if (! (redisConnections addIfAllowed  liveToken.userId)) {
+                    respond(HttpResponseStatus.TOO_MANY_REQUESTS)
+                }
+                else {
+                    val wsFactory =
+                            WebSocketServerHandshakerFactory(url, null, false)
+                    val handshaker =
+                            Optional.ofNullable(wsFactory.newHandshaker(msg))
 
-        // if too many concurrent requests, send 429
-        if (! (redisConnections addIfAllowed liveToken.get().userId)) {
-            respond(ctx, HttpResponseStatus.TOO_MANY_REQUESTS)
-            return
-        }
+                    handshaker.ifPresent({ handshaker ->
+                        val wsHandler =
+                                handlerFactory createServerWSHandler handshaker
+                        val serviceManager = serviceManagerProvider.get()
+                        val pipeline = ch.pipeline()
 
-        val wsFactory = WebSocketServerHandshakerFactory(url, null, false)
-        val handshaker = wsFactory.newHandshaker(msg)
+                        // set up ws pipeline
+                        pipeline remove "httphandler"
+                        pipeline addLast WebSocketServerCompressionHandler()
+                        pipeline addLast wsHandler
 
-        if (handshaker == null) {
-            WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ch)
-            return
-        }
+                        // handshake; callback: start ServiceManager
+                        handshaker.handshake(ch, msg) addListener
+                                GenericFutureListener {
+                                    serviceManager.start(ctx, liveToken)
+                                }
 
-        val wsHandler = handlerFactory createServerWSHandler handshaker
-        val serviceManager = serviceManagerProvider.get()
-        val pipeline = ch.pipeline()
-
-        // set up ws pipeline
-        pipeline remove "httphandler"
-        pipeline addLast WebSocketServerCompressionHandler()
-        pipeline addLast wsHandler
-
-        // handshake; callback: start ServiceManager
-        handshaker.handshake(ch, msg) addListener GenericFutureListener {
-            serviceManager.start(ctx, liveToken.get())
-        }
-
-        // on channel close: stop ServiceManager
-        ch.closeFuture() addListener GenericFutureListener {
-            serviceManager.stop(ctx, liveToken.get())
-        }
+                        // on channel close: stop ServiceManager
+                        ch.closeFuture() addListener GenericFutureListener {
+                            serviceManager.stop(ctx, liveToken)
+                        }
+                    }, {
+                        WebSocketServerHandshakerFactory
+                                .sendUnsupportedVersionResponse(ch)
+                    })
+                }
+            }, { respond(HttpResponseStatus.FORBIDDEN) })
+        }, { respond(HttpResponseStatus.FORBIDDEN) })
     }
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, e: Throwable)
     {
         logThrowable(this, e)
         ctx.close()
-    }
-
-    private fun authenticate(req: FullHttpRequest): Optional<LiveToken>
-    {
-        val token = getCookieValue(req.headers(), "live_token")
-
-        if (token.isPresent) {
-            return authenticator findLiveToken token.get()
-        }
-
-        return Optional.empty()
-    }
-
-    private fun respond(ctx: ChannelHandlerContext, status: HttpResponseStatus)
-    {
-        val response = DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
-                Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8))
-
-        (ctx writeAndFlush response) addListener ChannelFutureListener.CLOSE
     }
 
     private fun getCookieValue(headers: HttpHeaders,

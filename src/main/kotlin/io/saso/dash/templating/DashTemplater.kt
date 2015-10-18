@@ -14,7 +14,7 @@ import java.util.*
 @Singleton
 public class DashTemplater
 @Inject
-constructor(val config: Config) : Templater
+constructor(private val config: Config) : Templater
 {
     private val trimSpacesRegex = "\\s{2,}".toRegex()
     private val cacheTemplates = config.get("cache-templates", false)
@@ -24,10 +24,10 @@ constructor(val config: Config) : Templater
     {
         val contents = if (cacheTemplates) {
             templates.getOrPut(template, {
-                this getTemplate template
+                getTemplate(template)
             })
         } else {
-            this getTemplate template
+            getTemplate(template)
         }
 
         return JtwigTemplate(contents, JtwigConfiguration())
