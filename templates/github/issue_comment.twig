@@ -1,0 +1,31 @@
+<div class="notif-github-issue-comment">
+    <header class="notif-header">
+        <h3>
+            GitHub Comment &gt;
+            <a class="notif-repo" href="{{ repo.htmlUrl }}">
+                {{ repo.fullName }}
+            </a>
+            &gt; issue #{{ issue.number }}
+            <span class="notif-thread-title">"{{ issue.title }}"</span>
+        </h3>
+    </header>
+
+    <div class="notif-content">
+        <img class="notif-actor-avatar-url" src="{{ comment.user.avatarUrl }}"/>
+        <p class="notif-content-inner">
+            <a class="notif-actor" href="{{ comment.user.htmlUrl }}">@{{ comment.userName }}</a>:
+
+            {% spaceless %}
+                {% if comment.body|length > 100 %}
+                    {{ comment.body|slice(0, 100)|striptags }}&hellip;
+                {% else %}
+                    {{ comment.body|striptags }}
+                {% endif %}
+            {% endspaceless %}
+        </p>
+    </div>
+
+    <div class="notif-actions">
+        <span class="notif-time">{{ comment.createdAt.time }}</span>
+    </div>
+</div>

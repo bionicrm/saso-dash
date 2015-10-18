@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext
 import io.saso.dash.services.DBEntityProvider
 import io.saso.dash.services.Service
 import io.saso.dash.services.SubServiceFactory
+import io.saso.dash.util.logger
 import org.kohsuke.github.GitHub
 
 public class GitHubService
@@ -12,7 +13,7 @@ public class GitHubService
 constructor(private val subServiceFactory: SubServiceFactory) : Service()
 {
     public override val providerName = "github"
-    public override val pollInterval = 10
+    public override val pollInterval = 15
 
     override fun start(ctx: ChannelHandlerContext, db: DBEntityProvider)
     {
@@ -20,8 +21,7 @@ constructor(private val subServiceFactory: SubServiceFactory) : Service()
 
         // notification
         registerSubPollable(
-                subServiceFactory.createGitHubNotificationSubService(
-                        this, gitHub))
+                subServiceFactory.createGitHubNotificationSubService(gitHub))
 
         super.start(ctx, db)
     }
