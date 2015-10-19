@@ -5,7 +5,7 @@ import com.google.inject.Singleton
 import io.saso.dash.database.EntityManager
 import io.saso.dash.database.entities.LiveToken
 import io.saso.dash.util.Resources
-import io.saso.dash.util.threadPool
+import io.saso.dash.util.THREAD_POOL
 import java.sql.Timestamp
 import java.time.Instant
 
@@ -20,7 +20,7 @@ constructor(private val entityManager: EntityManager) : Authenticator
             token: String, onAuthentication: (LiveToken) -> Unit,
             onFailure: () -> Unit)
     {
-        threadPool.execute {
+        THREAD_POOL.execute {
             val liveToken = entityManager.execute(
                     LiveToken::class, liveTokenSql, arrayListOf(token))
 

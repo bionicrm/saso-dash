@@ -4,8 +4,8 @@ import com.google.inject.Inject
 import io.netty.channel.ChannelHandlerContext
 import io.saso.dash.database.entities.LiveToken
 import io.saso.dash.redis.databases.RedisConnections
-import io.saso.dash.util.schedulingPool
-import io.saso.dash.util.threadPool
+import io.saso.dash.util.SCHEDULING_POOL
+import io.saso.dash.util.THREAD_POOL
 import java.util.*
 
 import java.util.concurrent.*
@@ -29,7 +29,7 @@ constructor(/* TODO: use preferences */
     {
         db = serviceFactory createDBEntityProvider liveToken
 
-        threadPool.execute {
+        THREAD_POOL.execute {
             services.forEach {
                 it.start(ctx, db)
             }
@@ -38,17 +38,19 @@ constructor(/* TODO: use preferences */
         services.forEach {
             val interval = it.pollInterval.toLong()
 
-            serviceSchedules.put(it, schedulingPool.scheduleAtFixedRate({
-                threadPool.execute {
-                    it.poll(ctx, db)
-                }
-            }, interval, interval, TimeUnit.SECONDS))
+            if (interval != -1L) {
+                serviceSchedules.put(it, SCHEDULING_POOL.scheduleAtFixedRate({
+                    THREAD_POOL.execute {
+                        it.poll(ctx, db)
+                    }
+                }, interval, interval, TimeUnit.SECONDS))
+            }
         }
     }
 
     override fun stop(ctx: ChannelHandlerContext, liveToken: LiveToken)
     {
-        threadPool.execute {
+        THREAD_POOL.execute {
             services.forEach {
                 serviceSchedules.get(it)?.cancel(true)
 

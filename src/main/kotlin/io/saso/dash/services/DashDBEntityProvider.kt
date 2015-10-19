@@ -14,30 +14,35 @@ public class DashDBEntityProvider
 constructor(private val entityManager: EntityManager,
             @Assisted private val liveToken: LiveToken) : DBEntityProvider
 {
-    private val serviceEntities: MutableMap<Service, DBEntity> = hashMapOf()
+    private val serviceEntities: MutableMap<String, DBEntity> = hashMapOf()
+
+    override fun liveToken(): LiveToken
+    {
+        return liveToken
+    }
 
     override fun user() =
             entityManager.executeOrFail(User::class, SQL get User::class,
                     listOf(liveToken.userId))
 
-    override fun provider(service: Service) =
+    override fun provider(service: String) =
             serviceEntities.getOrPut(service, {
                 entityManager.executeOrFail(Provider::class,
-                        SQL get Provider::class, listOf(service.providerName))
+                        SQL get Provider::class, listOf(service))
             }) as Provider
 
-    override fun providerUser(service: Service) =
+    override fun providerUser(service: String) =
             serviceEntities.getOrPut(service, {
                 entityManager.executeOrFail(ProviderUser::class,
                         SQL get ProviderUser::class,
-                        listOf(liveToken.userId, service.providerName))
+                        listOf(liveToken.userId, service))
             }) as ProviderUser
 
-    override fun authToken(service: Service): AuthToken =
+    override fun authToken(service: String): AuthToken =
             serviceEntities.getOrPut(service, {
                 entityManager.executeOrFail(AuthToken::class,
                         SQL get AuthToken::class,
-                        listOf(liveToken.userId, service.providerName))
+                        listOf(liveToken.userId, service))
             }) as AuthToken
 
     private companion object SQL

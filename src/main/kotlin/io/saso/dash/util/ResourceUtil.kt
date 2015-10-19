@@ -4,7 +4,7 @@ import org.apache.commons.io.IOUtils
 import java.io.File
 import java.io.FileInputStream
 
-public class ResourceHolder : AutoCloseable
+class ResourceHolder : AutoCloseable
 {
     val resources: MutableList<AutoCloseable> = arrayListOf()
 

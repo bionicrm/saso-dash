@@ -13,6 +13,6 @@ public abstract class SubServiceAdapter : ServicePollable
 
     protected fun write(ctx: ChannelHandlerContext, toWrite: String)
     {
-        ctx.channel().write(TextWebSocketFrame(toWrite))
+        ctx.channel().writeAndFlush(TextWebSocketFrame(toWrite))
     }
 }

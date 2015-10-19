@@ -12,12 +12,11 @@ public class GitHubService
 @Inject
 constructor(private val subServiceFactory: SubServiceFactory) : Service()
 {
-    public override val providerName = "github"
-    public override val pollInterval = 15
+    public override val pollInterval = -1
 
     override fun start(ctx: ChannelHandlerContext, db: DBEntityProvider)
     {
-        val gitHub = GitHub.connectUsingOAuth(db.authToken(this).access)
+        val gitHub = GitHub.connectUsingOAuth(db.authToken("github").access)
 
         // notification
         registerSubPollable(

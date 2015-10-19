@@ -1,17 +1,16 @@
 package io.saso.dash.services
 
-import io.saso.dash.database.entities.AuthToken
-import io.saso.dash.database.entities.Provider
-import io.saso.dash.database.entities.ProviderUser
-import io.saso.dash.database.entities.User
+import io.saso.dash.database.entities.*
 
 public interface DBEntityProvider
 {
+    fun liveToken(): LiveToken
+
     fun user(): User
 
-    fun provider(service: Service): Provider
+    fun provider(service: String): Provider
 
-    fun providerUser(service: Service): ProviderUser
+    fun providerUser(service: String): ProviderUser
 
-    fun authToken(service: Service): AuthToken
+    fun authToken(service: String): AuthToken
 }

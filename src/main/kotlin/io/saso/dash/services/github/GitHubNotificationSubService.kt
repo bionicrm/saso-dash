@@ -1,81 +1,134 @@
 package io.saso.dash.services.github
 
+import com.google.gson.Gson
 import com.google.inject.Inject
 import com.google.inject.assistedinject.Assisted
 import com.lyncode.jtwig.JtwigModelMap
 import io.netty.channel.ChannelHandlerContext
+import io.saso.dash.redis.databases.RedisServices
 import io.saso.dash.services.DBEntityProvider
 import io.saso.dash.services.SubServiceAdapter
 import io.saso.dash.templating.Templater
+import io.saso.dash.util.THREAD_POOL
 import io.saso.dash.util.logger
-import org.kohsuke.github.GHEvent
-import org.kohsuke.github.GHEventPayload
+import org.apache.commons.io.IOUtils
+import org.kohsuke.github.GHThread
 import org.kohsuke.github.GitHub
 import org.pegdown.PegDownProcessor
-import java.time.Instant
+import java.net.URL
+import java.net.URLDecoder
 import java.util.*
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.Future
+import kotlin.properties.Delegates
 
-@Suppress("NAME_SHADOWING")
+@Suppress("NAME_SHADOWING", "UNCHECKED_CAST")
 public class GitHubNotificationSubService
 @Inject
 constructor(private val templater: Templater,
+            private val redisServices: RedisServices,
             @Assisted private val gitHub: GitHub) : SubServiceAdapter()
 {
-    // TODO: tmp
-    private val usedEvents: MutableList<Int> = ArrayList()
+    private var stopping = false;
+    private var future: Future<*> by Delegates.notNull()
 
-    override fun start(ctx: ChannelHandlerContext, db: DBEntityProvider) =
-            poll(ctx, db)
-
-    override fun poll(ctx: ChannelHandlerContext, db: DBEntityProvider)
+    override fun start(ctx: ChannelHandlerContext, db: DBEntityProvider)
     {
-        val startPoll = System.nanoTime()
+        val itr = gitHub.listNotifications()
+                .since(System.currentTimeMillis() - 60 * 60)
+                .read(true)
+                .iterator()
 
-        logger(this) debug "Rate limit update: " +
-                "limit=${gitHub.rateLimit.limit} " +
-                "left=${gitHub.rateLimit.remaining}"
+        val threadsFromRedis =
+                redisServices.get(db.liveToken().userId, "github")
 
-        logger(this) debug "Looking for events..."
+        if (threadsFromRedis.isNotEmpty()) {
+            val threadsJson = Gson().fromJson(threadsFromRedis,
+                    HashMap::class.java)
 
-        val page = gitHub.myself.listEvents().iterator()
-
-        if (page.hasNext()) {
-            page.nextPage().forEach { event ->
-                if (event.createdAt.toInstant().isBefore(
-                        Instant.now().minusSeconds(60 * 60))) {
-                    return
-                }
-
-                logger(this) debug "Event ${event.type}"
-
+            threadsJson.forEach {
+                val threadJson =
+                        Gson().fromJson(it.value.toString(),
+                                HashMap::class.java)
                 val model = JtwigModelMap()
 
-                if (event.type == GHEvent.ISSUE_COMMENT) {
-                    val specificEvent = event.getPayload(
-                            GHEventPayload.IssueComment::class.java)
-
-                    if (usedEvents contains specificEvent.comment.id) {
-                        return
-                    } else {
-                        usedEvents add specificEvent.comment.id
-                    }
-
-                    model.add("repo", event.repository)
-                    model.add("user", event.actor)
-                    model.add("comment", specificEvent.comment)
-                    model.add("issue", specificEvent.issue)
-
-                    write(ctx, templater.render("github/issue_comment", model))
+                threadJson.forEach {
+                    model.put(it.key.toString(), it.value.toString())
                 }
+
+                val rendered =
+                        templater.render(model.get("template").toString(),
+                                model)
+
+                write(ctx, rendered)
             }
         }
 
-        val ms = TimeUnit.MILLISECONDS.convert(
-                System.nanoTime() - startPoll, TimeUnit.NANOSECONDS)
+        future = THREAD_POOL submit {
+            while (! stopping) {
+                logger(this@GitHubNotificationSubService) debug
+                        "onNotification waiting..."
+                onNotification(ctx, db, itr.next())
+            }
+        }
+    }
 
-        logger(this) trace
-                "Took ${ms}ms to complete GitHub notification poll"
+    fun onNotification(ctx: ChannelHandlerContext, db: DBEntityProvider,
+                       thread: GHThread)
+    {
+        val model = JtwigModelMap()
+
+        val template = "github/" + when (thread.type) {
+            "Commit" -> {
+                model.add("commit", thread.boundCommit)
+                "commit"
+            }
+            "Issue" -> {
+                model.add("issue", thread.boundIssue)
+                "issue"
+            }
+            "PullRequest" -> {
+                model.add("pullRequest", thread.boundPullRequest)
+                "pull_request"
+            }
+            else -> return
+        }
+
+        model.add("template", template)
+
+        val access = "?access_token=" +
+                URLDecoder.decode(db.authToken("github").access, "UTF-8")
+        val commentLookup =
+                IOUtils.toString(URL(thread.lastCommentUrl + access))
+        val lastComment: HashMap<Any, Any> =
+                Gson().fromJson(commentLookup, HashMap::class.java)
+                        as HashMap<Any, Any>
+
+        // Markdown to HTML
+        lastComment.set("body", mdToHtml(lastComment.get("body").toString()))
+
+        model.add("lastComment", lastComment)
+        model.add("thread", thread)
+
+        redisServices.set(db.liveToken().userId, "github", { data ->
+            val currentJson = Gson().fromJson(data, HashMap::class.java)
+                    as HashMap<Any, Any>
+            val threadJson = Gson() toJson model
+
+            if (currentJson.putIfAbsent(thread.id, threadJson) == null) {
+                val rendered = templater.render(template, model)
+
+                write(ctx, rendered)
+            }
+
+            Gson() toJson currentJson
+        })
+    }
+
+    override fun stop(ctx: ChannelHandlerContext, db: DBEntityProvider)
+    {
+        stopping = true
+
+        future cancel true
     }
 
     private fun mdToHtml(md: String): String =

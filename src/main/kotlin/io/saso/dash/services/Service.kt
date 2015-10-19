@@ -34,8 +34,6 @@ public abstract class Service : ServicePollable
         ctx.channel().flush()
     }
 
-    abstract val providerName: String
-
     abstract val pollInterval: Int
 
     protected fun registerSubPollable(pollable: ServicePollable)
