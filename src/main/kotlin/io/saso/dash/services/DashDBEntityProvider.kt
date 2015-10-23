@@ -9,7 +9,7 @@ import io.saso.dash.util.Resources
 import java.util.*
 import kotlin.reflect.KClass
 
-public class DashDBEntityProvider
+public class DashDBEntityProviderOLD
 @Inject
 constructor(private val entityManager: EntityManager,
             @Assisted private val liveToken: LiveToken) : DBEntityProvider

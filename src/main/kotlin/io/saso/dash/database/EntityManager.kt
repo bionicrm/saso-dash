@@ -3,13 +3,13 @@ package io.saso.dash.database
 import java.util.*
 import kotlin.reflect.KClass
 
-public interface EntityManager
+public interface EntityManagerOLD
 {
     fun <T : DBEntity> execute(
-            entityClass: KClass<T>, sql: String, params: List<Any>):
+            entityClass: Class<T>, sql: String, params: List<Any>):
             Optional<T>
 
     final fun <T : DBEntity> executeOrFail(
-            entityClass: KClass<T>, sql: String, params: List<Any>): T =
+            entityClass: Class<T>, sql: String, params: List<Any>): T =
             execute(entityClass, sql, params).get()
 }

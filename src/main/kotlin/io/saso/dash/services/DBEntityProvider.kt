@@ -2,7 +2,7 @@ package io.saso.dash.services
 
 import io.saso.dash.database.entities.*
 
-public interface DBEntityProvider
+public interface DBEntityProviderOLD
 {
     fun liveToken(): LiveToken
 

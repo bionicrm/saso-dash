@@ -9,16 +9,16 @@ import java.sql.SQLException
 import java.util.*
 import kotlin.reflect.KClass
 
-public class DashEntityManager
+public class DashEntityManagerOLD
 @Inject
 constructor(private val db: Database, private val injector: Injector) :
         EntityManager
 {
     override fun <T : DBEntity> execute(
-            entityClass: KClass<T>, sql: String, params: List<Any>):
+            entityClass: Class<T>, sql: String, params: List<Any>):
             Optional<T>
     {
-        val entity = injector getInstance entityClass.java
+        val entity = injector getInstance entityClass
 
         return tryResources({
             val connection = db.connection.autoClose()

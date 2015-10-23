@@ -8,7 +8,7 @@ import io.netty.channel.ChannelHandlerContext
 import io.saso.dash.redis.databases.RedisServices
 import io.saso.dash.services.DBEntityProvider
 import io.saso.dash.services.SubServiceAdapter
-import io.saso.dash.templating.Templater
+import io.saso.dash.templating.TemplateRenderer
 import io.saso.dash.util.THREAD_POOL
 import io.saso.dash.util.logger
 import org.apache.commons.io.IOUtils
@@ -22,9 +22,9 @@ import java.util.concurrent.Future
 import kotlin.properties.Delegates
 
 @Suppress("NAME_SHADOWING", "UNCHECKED_CAST")
-public class GitHubNotificationSubService
+public class GitHubNotificationSubServiceOLD
 @Inject
-constructor(private val templater: Templater,
+constructor(private val templater: TemplateRenderer,
             private val redisServices: RedisServices,
             @Assisted private val gitHub: GitHub) : SubServiceAdapter()
 {

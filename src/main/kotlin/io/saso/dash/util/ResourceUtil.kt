@@ -1,9 +1,5 @@
 package io.saso.dash.util
 
-import org.apache.commons.io.IOUtils
-import java.io.File
-import java.io.FileInputStream
-
 class ResourceHolder : AutoCloseable
 {
     val resources: MutableList<AutoCloseable> = arrayListOf()
@@ -46,18 +42,5 @@ fun <T, X : Throwable> tryResources(toTry: ResourceHolder.() -> T,
     }
     finally {
         holder.close()
-    }
-}
-
-object Resources
-{
-    fun get(path: String): String
-    {
-        if (path startsWith '/') {
-            return IOUtils.toString(javaClass.getResource(path))
-        }
-        else {
-            return IOUtils.toString(FileInputStream(path))
-        }
     }
 }

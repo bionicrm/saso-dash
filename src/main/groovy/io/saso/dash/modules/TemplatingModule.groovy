@@ -1,14 +1,14 @@
 package io.saso.dash.modules
 
 import com.google.inject.AbstractModule
-import io.saso.dash.templating.DashTemplater
-import io.saso.dash.templating.Templater
+import io.saso.dash.templating.DashTemplateRenderer
+import io.saso.dash.templating.TemplateRenderer
 
 class TemplatingModule extends AbstractModule
 {
     @Override
     void configure()
     {
-        bind Templater to DashTemplater
+        bind TemplateRenderer to DashTemplateRenderer
     }
 }
