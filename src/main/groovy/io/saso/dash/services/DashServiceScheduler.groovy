@@ -61,9 +61,9 @@ class DashServiceScheduler implements ServiceScheduler
     {
         THREAD_POOL.execute {
             services.forEach { service ->
-                scheduledFutures[service].cancel true
-
                 service.stop ctx
+
+                scheduledFutures[service].cancel true
             }
         }
     }
