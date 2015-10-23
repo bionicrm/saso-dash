@@ -2,6 +2,8 @@ package io.saso.dash.services
 
 import com.google.inject.Inject
 import io.netty.channel.ChannelHandlerContext
+import io.saso.dash.database.EntityProvider
+import io.saso.dash.database.EntityProviderFactory
 import io.saso.dash.database.entities.LiveToken
 import io.saso.dash.redis.databases.RedisConnections
 import io.saso.dash.util.SCHEDULING_POOL
@@ -11,11 +13,11 @@ import java.util.*
 import java.util.concurrent.*
 import kotlin.properties.Delegates
 
-public class DashServiceManager
+public class DashServiceManagerOLD
 @Inject
 constructor(/* TODO: use preferences */
         private val redisConnections: RedisConnections,
-        private val serviceFactory: ServiceFactory) : ServiceManager
+        private val serviceFactory: EntityProviderFactory) : ServiceManager
 {
     private val services: List<Service> = listOf(
             serviceFactory.createGitHubService(),
@@ -23,7 +25,7 @@ constructor(/* TODO: use preferences */
     private val serviceSchedules: MutableMap<Service, ScheduledFuture<*>> =
             HashMap()
 
-    private var db: DBEntityProvider by Delegates.notNull()
+    private var db: EntityProvider by Delegates.notNull()
 
     override fun start(ctx: ChannelHandlerContext, liveToken: LiveToken)
     {
@@ -54,7 +56,7 @@ constructor(/* TODO: use preferences */
             services.forEach {
                 serviceSchedules.get(it)?.cancel(true)
 
-                it.stop(ctx, db)
+                it.stop(ctx)
             }
 
             redisConnections remove liveToken.userId

@@ -6,7 +6,7 @@ import com.google.inject.assistedinject.Assisted
 import com.lyncode.jtwig.JtwigModelMap
 import io.netty.channel.ChannelHandlerContext
 import io.saso.dash.redis.databases.RedisServices
-import io.saso.dash.services.DBEntityProvider
+import io.saso.dash.database.EntityProvider
 import io.saso.dash.services.SubServiceAdapter
 import io.saso.dash.templating.TemplateRenderer
 import io.saso.dash.util.THREAD_POOL
@@ -31,7 +31,7 @@ constructor(private val templater: TemplateRenderer,
     private var stopping = false;
     private var future: Future<*> by Delegates.notNull()
 
-    override fun start(ctx: ChannelHandlerContext, db: DBEntityProvider)
+    override fun start(ctx: ChannelHandlerContext, db: EntityProvider)
     {
         val itr = gitHub.listNotifications()
                 .since(System.currentTimeMillis() - 60 * 60)
@@ -72,7 +72,7 @@ constructor(private val templater: TemplateRenderer,
         }
     }
 
-    fun onNotification(ctx: ChannelHandlerContext, db: DBEntityProvider,
+    fun onNotification(ctx: ChannelHandlerContext, db: EntityProvider,
                        thread: GHThread)
     {
         val model = JtwigModelMap()
@@ -124,7 +124,7 @@ constructor(private val templater: TemplateRenderer,
         })
     }
 
-    override fun stop(ctx: ChannelHandlerContext, db: DBEntityProvider)
+    override fun stop(ctx: ChannelHandlerContext, db: EntityProvider)
     {
         stopping = true
 

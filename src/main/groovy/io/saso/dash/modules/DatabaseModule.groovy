@@ -1,10 +1,14 @@
 package io.saso.dash.modules
 
 import com.google.inject.AbstractModule
+import com.google.inject.assistedinject.FactoryModuleBuilder
 import io.saso.dash.database.DashDatabase
-import io.saso.dash.database.DashEntityManager
+import io.saso.dash.database.DashEntityFetcher
+import io.saso.dash.database.DashEntityProvider
 import io.saso.dash.database.Database
-import io.saso.dash.database.EntityManager
+import io.saso.dash.database.EntityFetcher
+import io.saso.dash.database.EntityProvider
+import io.saso.dash.database.EntityProviderFactory
 import io.saso.dash.database.entities.AuthToken
 import io.saso.dash.database.entities.DashAuthToken
 import io.saso.dash.database.entities.DashLiveToken
@@ -22,7 +26,10 @@ class DatabaseModule extends AbstractModule
     void configure()
     {
         bind Database to DashDatabase
-        bind EntityManager to DashEntityManager
+        bind EntityFetcher to DashEntityFetcher
+        bind EntityProvider to DashEntityProvider
+
+        install new FactoryModuleBuilder().build(EntityProviderFactory)
 
         // entities
         bind AuthToken to DashAuthToken

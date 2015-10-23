@@ -1,7 +1,7 @@
 package io.saso.dash.database
 
-interface EntityManager
+interface EntityFetcher
 {
-    def <T extends DBEntity> Optional<T> execute(
+    def <T extends DBEntity> Optional<T> fetch(
             Class<T> entityClass, String sql, Object... params)
 }

@@ -5,7 +5,7 @@ import com.google.inject.assistedinject.Assisted
 import groovy.json.JsonSlurper
 import io.netty.channel.ChannelHandlerContext
 import io.saso.dash.redis.databases.RedisServices
-import io.saso.dash.services.DBEntityProvider
+import io.saso.dash.database.EntityProvider
 import io.saso.dash.services.SubServiceAdapter
 import io.saso.dash.templating.TemplateRenderer
 import org.kohsuke.github.GitHub
@@ -32,7 +32,7 @@ class GitHubNotificationSubService extends SubServiceAdapter
     }
 
     @Override
-    void start(ChannelHandlerContext ctx, DBEntityProvider db)
+    void start(ChannelHandlerContext ctx, EntityProvider db)
     {
         final itr = gitHub.listNotifications()
                 .since(System.currentTimeMillis() - 60 * 60)

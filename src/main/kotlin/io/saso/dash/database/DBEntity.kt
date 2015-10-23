@@ -5,7 +5,7 @@ import java.sql.SQLException
 
 public interface DBEntity
 {
-    fun fillFromResultSet(resultSet: ResultSet)
+    fun fill(resultSet: ResultSet)
 
     val id: Int
 

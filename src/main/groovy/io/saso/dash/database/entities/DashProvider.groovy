@@ -10,9 +10,9 @@ class DashProvider implements Provider
     String name
 
     @Override
-    void fillFromResultSet(ResultSet resultSet)
+    void fill(ResultSet results)
     {
-        id   = resultSet.getInt 'id'
-        name = resultSet.getString 'name'
+        id   = results.getInt 'id'
+        name = results.getString 'name'
     }
 }

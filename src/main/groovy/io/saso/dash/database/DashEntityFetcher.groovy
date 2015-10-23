@@ -2,29 +2,29 @@ package io.saso.dash.database
 import com.google.inject.Inject
 import com.google.inject.Injector
 
-import static org.codehaus.groovy.runtime.IOGroovyMethods.withCloseable
+import static org.codehaus.groovy.runtime.IOGroovyMethods.withCloseable as tryAndClose
 
-class DashEntityManager implements EntityManager
+class DashEntityFetcher implements EntityFetcher
 {
     private final Database db
     private final Injector injector
 
     @Inject
-    def DashEntityManager(Database db, Injector injector)
+    def DashEntityFetcher(Database db, Injector injector)
     {
         this.db = db
         this.injector = injector
     }
 
     @Override
-    <T extends DBEntity> Optional<T> execute(Class<T> entityClass,
-                                                 String sql, Object... params)
+    <T extends DBEntity> Optional<T> fetch(
+            Class<T> entityClass, String sql, Object... params)
     {
         final entity = injector.getInstance entityClass
         final connection = db.connection
         final statement = connection.prepareStatement sql
 
-        withCloseable({ connection.close(); statement.close() },
+        tryAndClose({ connection.close(); statement.close() },
         {
             for (i in params.indices) {
                 statement.setObject i + 1, params[i]
@@ -32,14 +32,15 @@ class DashEntityManager implements EntityManager
 
             final resultSet = statement.executeQuery()
 
-            withCloseable({ resultSet.close() }, {
+            tryAndClose({ resultSet.close() },
+            {
                 if (resultSet.next()) {
-                    entity.fillFromResultSet resultSet
+                    entity.fill resultSet
 
-                    Optional.of(entity)
+                    return Optional.of(entity)
                 }
                 else {
-                    Optional.empty()
+                    return Optional.empty()
                 }
             })
         })

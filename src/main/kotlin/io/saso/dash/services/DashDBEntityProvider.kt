@@ -3,7 +3,8 @@ package io.saso.dash.services
 import com.google.inject.Inject
 import com.google.inject.assistedinject.Assisted
 import io.saso.dash.database.DBEntity
-import io.saso.dash.database.EntityManager
+import io.saso.dash.database.EntityProvider
+import io.saso.dash.database.EntityFetcher
 import io.saso.dash.database.entities.*
 import io.saso.dash.util.Resources
 import java.util.*
@@ -11,8 +12,8 @@ import kotlin.reflect.KClass
 
 public class DashDBEntityProviderOLD
 @Inject
-constructor(private val entityManager: EntityManager,
-            @Assisted private val liveToken: LiveToken) : DBEntityProvider
+constructor(private val entityManager: EntityFetcher,
+            @Assisted private val liveToken: LiveToken) : EntityProvider
 {
     private val serviceEntities: MutableMap<String, DBEntity> = hashMapOf()
 

@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 public class DashEntityManagerOLD
 @Inject
 constructor(private val db: Database, private val injector: Injector) :
-        EntityManager
+        EntityFetcher
 {
     override fun <T : DBEntity> execute(
             entityClass: Class<T>, sql: String, params: List<Any>):
@@ -34,7 +34,7 @@ constructor(private val db: Database, private val injector: Injector) :
             if (resultSet.next()) {
                 logResultSet(this@DashEntityManager, resultSet)
 
-                entity fillFromResultSet resultSet
+                entity fill resultSet
 
                 Optional.of(entity)
             }

@@ -16,14 +16,14 @@ class DashProviderUser implements ProviderUser
     Timestamp updatedAt
 
     @Override
-    void fillFromResultSet(ResultSet resultSet)
+    void fill(ResultSet results)
     {
-        id               = resultSet.getInt 'id'
-        userId           = resultSet.getInt 'user_id'
-        providerId       = resultSet.getInt 'provider_id'
-        authTokenId      = resultSet.getInt 'auth_token_id'
-        providerUniqueId = resultSet.getInt 'provider_unique_id'
-        createdAt        = resultSet.getTimestamp 'created_at'
-        updatedAt        = resultSet.getTimestamp 'updated_at'
+        id               = results.getInt 'id'
+        userId           = results.getInt 'user_id'
+        providerId       = results.getInt 'provider_id'
+        authTokenId      = results.getInt 'auth_token_id'
+        providerUniqueId = results.getInt 'provider_unique_id'
+        createdAt        = results.getTimestamp 'created_at'
+        updatedAt        = results.getTimestamp 'updated_at'
     }
 }

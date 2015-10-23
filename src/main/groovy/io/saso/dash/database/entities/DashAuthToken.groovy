@@ -15,13 +15,13 @@ class DashAuthToken implements AuthToken
     Timestamp           updatedAt
 
     @Override
-    void fillFromResultSet(ResultSet resultSet)
+    void fill(ResultSet results)
     {
-        id        = resultSet.getInt 'id'
-        access    = resultSet.getString 'access'
-        refresh   = Optional.ofNullable resultSet.getString('refresh')
-        expiresAt = Optional.ofNullable resultSet.getTimestamp('expires_at')
-        createdAt = resultSet.getTimestamp('created_at')
-        updatedAt = resultSet.getTimestamp('updated_at')
+        id        = results.getInt 'id'
+        access    = results.getString 'access'
+        refresh   = Optional.ofNullable results.getString('refresh')
+        expiresAt = Optional.ofNullable results.getTimestamp('expires_at')
+        createdAt = results.getTimestamp 'created_at'
+        updatedAt = results.getTimestamp 'updated_at'
     }
 }

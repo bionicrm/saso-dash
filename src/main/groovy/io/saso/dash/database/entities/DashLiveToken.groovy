@@ -16,14 +16,14 @@ class DashLiveToken implements LiveToken
     Timestamp updatedAt
 
     @Override
-    void fillFromResultSet(ResultSet resultSet)
+    void fill(ResultSet results)
     {
-        id        = resultSet.getInt 'id'
-        userId    = resultSet.getInt 'user_id'
-        token     = resultSet.getString 'token'
-        ip        = resultSet.getString 'ip'
-        expiresAt = resultSet.getTimestamp 'expires_at'
-        createdAt = resultSet.getTimestamp 'created_at'
-        updatedAt = resultSet.getTimestamp 'updated_at'
+        id        = results.getInt 'id'
+        userId    = results.getInt 'user_id'
+        token     = results.getString 'token'
+        ip        = results.getString 'ip'
+        expiresAt = results.getTimestamp 'expires_at'
+        createdAt = results.getTimestamp 'created_at'
+        updatedAt = results.getTimestamp 'updated_at'
     }
 }

@@ -14,12 +14,12 @@ class DashUser implements User
     Timestamp        updatedAt
 
     @Override
-    void fillFromResultSet(ResultSet resultSet)
+    void fill(ResultSet results)
     {
-        id        = resultSet.getInt 'id'
-        name      = resultSet.getString 'name'
-        email     = Optional.ofNullable resultSet.getString('email')
-        createdAt = resultSet.getTimestamp 'created_at'
-        updatedAt = resultSet.getTimestamp 'updated_at'
+        id        = results.getInt 'id'
+        name      = results.getString 'name'
+        email     = Optional.ofNullable results.getString('email')
+        createdAt = results.getTimestamp 'created_at'
+        updatedAt = results.getTimestamp 'updated_at'
     }
 }
