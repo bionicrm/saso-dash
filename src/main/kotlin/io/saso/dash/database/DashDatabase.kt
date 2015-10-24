@@ -11,7 +11,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 @Singleton
-public class DashDatabase
+public class DashDatabaseOLD
 @Inject
 constructor(private val config: Config) : Database
 {
