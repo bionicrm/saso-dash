@@ -4,7 +4,7 @@ import io.saso.dash.database.DBEntityWithTimestamps
 
 import java.sql.Timestamp
 
-interface AuthToken extends DBEntityWithTimestamps
+interface DBAuthToken extends DBEntityWithTimestamps
 {
     String getAccess()
 

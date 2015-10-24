@@ -4,13 +4,13 @@ import io.saso.dash.database.entities.*
 
 public interface DBEntityProviderOLD
 {
-    fun liveToken(): LiveToken
+    fun liveToken(): DBLiveToken
 
-    fun user(): User
+    fun user(): DBUser
 
-    fun provider(service: String): Provider
+    fun provider(service: String): DBProvider
 
-    fun providerUser(service: String): ProviderUser
+    fun providerUser(service: String): DBProviderUser
 
-    fun authToken(service: String): AuthToken
+    fun authToken(service: String): DBAuthToken
 }

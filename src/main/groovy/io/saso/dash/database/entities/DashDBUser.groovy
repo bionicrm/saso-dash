@@ -3,7 +3,7 @@ package io.saso.dash.database.entities
 import java.sql.ResultSet
 import java.sql.Timestamp
 
-class DashUser implements User
+class DashDBUser implements DBUser
 {
     final String tableName = 'users'
 

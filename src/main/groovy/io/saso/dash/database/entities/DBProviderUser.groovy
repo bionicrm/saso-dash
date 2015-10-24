@@ -2,7 +2,7 @@ package io.saso.dash.database.entities
 
 import io.saso.dash.database.DBEntityWithTimestamps
 
-interface ProviderUser extends DBEntityWithTimestamps
+interface DBProviderUser extends DBEntityWithTimestamps
 {
     int getUserId()
 

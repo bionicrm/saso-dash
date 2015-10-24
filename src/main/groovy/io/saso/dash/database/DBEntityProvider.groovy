@@ -1,27 +1,27 @@
 package io.saso.dash.database
 
-import io.saso.dash.database.entities.AuthToken
-import io.saso.dash.database.entities.LiveToken
-import io.saso.dash.database.entities.Provider
-import io.saso.dash.database.entities.ProviderUser
-import io.saso.dash.database.entities.User
+import io.saso.dash.database.entities.DBAuthToken
+import io.saso.dash.database.entities.DBLiveToken
+import io.saso.dash.database.entities.DBProvider
+import io.saso.dash.database.entities.DBProviderUser
+import io.saso.dash.database.entities.DBUser
 import io.saso.dash.services.Service
 
-interface EntityProvider
+interface DBEntityProvider
 {
     /**
      * Gets the LiveToken entity for the user.
      *
      * @return the live token
      */
-    LiveToken getLiveToken()
+    DBLiveToken getLiveToken()
 
     /**
      * Gets the User entity for the user.
      *
      * @return the user
      */
-    User getUser()
+    DBUser getUser()
 
     /**
      * Gets the Provider entity for the specified service.
@@ -30,7 +30,7 @@ interface EntityProvider
      *
      * @return the provider
      */
-    Provider getProvider(Service service)
+    DBProvider getProvider(Service service)
 
     /**
      * Gets the ProviderUser for the specified service.
@@ -39,7 +39,7 @@ interface EntityProvider
      *
      * @return the provider user
      */
-    ProviderUser getProviderUser(Service service)
+    DBProviderUser getProviderUser(Service service)
 
     /**
      * Gets the AuthToken for the specified service.
@@ -48,5 +48,5 @@ interface EntityProvider
      *
      * @return the auth token
      */
-    AuthToken getAuthToken(Service service)
+    DBAuthToken getAuthToken(Service service)
 }

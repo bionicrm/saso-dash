@@ -17,6 +17,6 @@ final class Resources
             }
         }
 
-        IOUtils.toString(stream)
+        IOUtils.toString stream
     }
 }

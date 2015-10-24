@@ -1,6 +1,6 @@
 package io.saso.dash.config
 
-public interface Config
+public interface ConfigOLD
 {
     /**
      * Gets a value from the configuration. [key] is in dot notation. The type

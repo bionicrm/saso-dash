@@ -10,7 +10,7 @@ import java.io.FileNotFoundException
 import java.util.*
 
 @Singleton @Suppress("UNCHECKED_CAST")
-public class DashConfig : Config
+public class DashConfigOLD : Config
 {
     private val map: Map<String, Any> by lazy {
         val file = File("config.yml")

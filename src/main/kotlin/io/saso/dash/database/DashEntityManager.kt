@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 public class DashEntityManagerOLD
 @Inject
 constructor(private val db: Database, private val injector: Injector) :
-        EntityFetcher
+        DBEntityFetcher
 {
     override fun <T : DBEntity> execute(
             entityClass: Class<T>, sql: String, params: List<Any>):

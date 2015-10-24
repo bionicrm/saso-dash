@@ -4,7 +4,7 @@ import io.saso.dash.database.DBEntityWithTimestamps
 
 import java.sql.Timestamp
 
-interface LiveToken extends DBEntityWithTimestamps
+interface DBLiveToken extends DBEntityWithTimestamps
 {
     int getUserId()
 

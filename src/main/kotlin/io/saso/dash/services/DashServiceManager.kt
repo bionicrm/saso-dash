@@ -2,9 +2,9 @@ package io.saso.dash.services
 
 import com.google.inject.Inject
 import io.netty.channel.ChannelHandlerContext
-import io.saso.dash.database.EntityProvider
-import io.saso.dash.database.EntityProviderFactory
-import io.saso.dash.database.entities.LiveToken
+import io.saso.dash.database.DBEntityProvider
+import io.saso.dash.database.DBEntityProviderFactory
+import io.saso.dash.database.entities.DBLiveToken
 import io.saso.dash.redis.databases.RedisConnections
 import io.saso.dash.util.SCHEDULING_POOL
 import io.saso.dash.util.THREAD_POOL
@@ -17,7 +17,7 @@ public class DashServiceManagerOLD
 @Inject
 constructor(/* TODO: use preferences */
         private val redisConnections: RedisConnections,
-        private val serviceFactory: EntityProviderFactory) : ServiceManager
+        private val serviceFactory: DBEntityProviderFactory) : ServiceManager
 {
     private val services: List<Service> = listOf(
             serviceFactory.createGitHubService(),
@@ -25,9 +25,9 @@ constructor(/* TODO: use preferences */
     private val serviceSchedules: MutableMap<Service, ScheduledFuture<*>> =
             HashMap()
 
-    private var db: EntityProvider by Delegates.notNull()
+    private var db: DBEntityProvider by Delegates.notNull()
 
-    override fun start(ctx: ChannelHandlerContext, liveToken: LiveToken)
+    override fun start(ctx: ChannelHandlerContext, liveToken: DBLiveToken)
     {
         db = serviceFactory createDBEntityProvider liveToken
 
@@ -50,7 +50,7 @@ constructor(/* TODO: use preferences */
         }
     }
 
-    override fun stop(ctx: ChannelHandlerContext, liveToken: LiveToken)
+    override fun stop(ctx: ChannelHandlerContext, liveToken: DBLiveToken)
     {
         THREAD_POOL.execute {
             services.forEach {

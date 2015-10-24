@@ -1,9 +1,9 @@
 package io.saso.dash.services
 import com.google.inject.Inject
 import io.netty.channel.ChannelHandlerContext
-import io.saso.dash.database.EntityProvider
-import io.saso.dash.database.EntityProviderFactory
-import io.saso.dash.database.entities.LiveToken
+import io.saso.dash.database.DBEntityProvider
+import io.saso.dash.database.DBEntityProviderFactory
+import io.saso.dash.database.entities.DBLiveToken
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -18,12 +18,12 @@ class DashServiceScheduler implements ServiceScheduler
     private static final ScheduledExecutorService SCHEDULER =
             Executors.newSingleThreadScheduledExecutor()
 
-    private final EntityProviderFactory entityProviderFactory
+    private final DBEntityProviderFactory entityProviderFactory
     private final Set<Service> services
     private final Map<Service, ScheduledFuture> scheduledFutures = new HashMap()
 
     @Inject
-    DashServiceScheduler(EntityProviderFactory entityProviderFactory,
+    DashServiceScheduler(DBEntityProviderFactory entityProviderFactory,
                          ServiceCreator serviceCreator)
     {
         this.entityProviderFactory = entityProviderFactory
@@ -32,9 +32,9 @@ class DashServiceScheduler implements ServiceScheduler
     }
 
     @Override
-    void schedule(ChannelHandlerContext ctx, LiveToken liveToken)
+    void schedule(ChannelHandlerContext ctx, DBLiveToken liveToken)
     {
-        final EntityProvider entityProvider =
+        final DBEntityProvider entityProvider =
                 entityProviderFactory.createDBEntityProvider liveToken
 
         THREAD_POOL.execute {
@@ -57,7 +57,7 @@ class DashServiceScheduler implements ServiceScheduler
     }
 
     @Override
-    void cancel(ChannelHandlerContext ctx, LiveToken liveToken)
+    void cancel(ChannelHandlerContext ctx, DBLiveToken liveToken)
     {
         THREAD_POOL.execute {
             services.forEach { service ->

@@ -19,7 +19,7 @@ import io.saso.dash.util.logThrowable
 import java.net.URLDecoder
 import java.util.*
 
-public class DashServerHttpHandler
+public class DashServerHttpHandlerOLD
 @Inject
 constructor(private val redisConnections: RedisConnections,
             private val authenticator: Authenticator,

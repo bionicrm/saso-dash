@@ -1,14 +1,14 @@
 package io.saso.dash.services
 
 import io.netty.channel.ChannelHandlerContext
-import io.saso.dash.database.EntityProvider
+import io.saso.dash.database.DBEntityProvider
 import java.util.concurrent.CopyOnWriteArrayList
 
-public abstract class Service : ServicePollable
+public abstract class ServiceOLD : ServicePollable
 {
     private val pollables = CopyOnWriteArrayList<ServicePollable>()
 
-    override fun start(ctx: ChannelHandlerContext, db: EntityProvider)
+    override fun start(ctx: ChannelHandlerContext, db: DBEntityProvider)
     {
         pollables.forEach {
             it.start(ctx, db)
@@ -17,7 +17,7 @@ public abstract class Service : ServicePollable
         ctx.channel().flush()
     }
 
-    override fun poll(ctx: ChannelHandlerContext, db: EntityProvider)
+    override fun poll(ctx: ChannelHandlerContext, db: DBEntityProvider)
     {
         pollables.forEach {
             it.poll(ctx, db)

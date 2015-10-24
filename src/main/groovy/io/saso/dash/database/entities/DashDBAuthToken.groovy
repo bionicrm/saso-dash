@@ -3,7 +3,7 @@ package io.saso.dash.database.entities
 import java.sql.ResultSet
 import java.sql.Timestamp
 
-class DashAuthToken implements AuthToken
+class DashDBAuthToken implements DBAuthToken
 {
     final String tableName = 'auth_tokens'
 

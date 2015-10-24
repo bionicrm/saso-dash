@@ -3,22 +3,22 @@ package io.saso.dash.modules
 import com.google.inject.AbstractModule
 import com.google.inject.assistedinject.FactoryModuleBuilder
 import io.saso.dash.database.DashDatabase
-import io.saso.dash.database.DashEntityFetcher
-import io.saso.dash.database.DashEntityProvider
+import io.saso.dash.database.DashDBEntityFetcher
+import io.saso.dash.database.DashDBEntityProvider
 import io.saso.dash.database.Database
-import io.saso.dash.database.EntityFetcher
-import io.saso.dash.database.EntityProvider
-import io.saso.dash.database.EntityProviderFactory
-import io.saso.dash.database.entities.AuthToken
-import io.saso.dash.database.entities.DashAuthToken
-import io.saso.dash.database.entities.DashLiveToken
-import io.saso.dash.database.entities.DashProvider
-import io.saso.dash.database.entities.DashProviderUser
-import io.saso.dash.database.entities.DashUser
-import io.saso.dash.database.entities.LiveToken
-import io.saso.dash.database.entities.Provider
-import io.saso.dash.database.entities.ProviderUser
-import io.saso.dash.database.entities.User
+import io.saso.dash.database.DBEntityFetcher
+import io.saso.dash.database.DBEntityProvider
+import io.saso.dash.database.DBEntityProviderFactory
+import io.saso.dash.database.entities.DBAuthToken
+import io.saso.dash.database.entities.DashDBAuthToken
+import io.saso.dash.database.entities.DashDBLiveToken
+import io.saso.dash.database.entities.DashDBProvider
+import io.saso.dash.database.entities.DashDBProviderUser
+import io.saso.dash.database.entities.DashDBUser
+import io.saso.dash.database.entities.DBLiveToken
+import io.saso.dash.database.entities.DBProvider
+import io.saso.dash.database.entities.DBProviderUser
+import io.saso.dash.database.entities.DBUser
 
 class DatabaseModule extends AbstractModule
 {
@@ -26,16 +26,16 @@ class DatabaseModule extends AbstractModule
     void configure()
     {
         bind Database to DashDatabase
-        bind EntityFetcher to DashEntityFetcher
-        bind EntityProvider to DashEntityProvider
+        bind DBEntityFetcher to DashDBEntityFetcher
+        bind DBEntityProvider to DashDBEntityProvider
 
-        install new FactoryModuleBuilder().build(EntityProviderFactory)
+        install new FactoryModuleBuilder().build(DBEntityProviderFactory)
 
         // entities
-        bind AuthToken to DashAuthToken
-        bind LiveToken to DashLiveToken
-        bind Provider to DashProvider
-        bind ProviderUser to DashProviderUser
-        bind User to DashUser
+        bind DBAuthToken to DashDBAuthToken
+        bind DBLiveToken to DashDBLiveToken
+        bind DBProvider to DashDBProvider
+        bind DBProviderUser to DashDBProviderUser
+        bind DBUser to DashDBUser
     }
 }

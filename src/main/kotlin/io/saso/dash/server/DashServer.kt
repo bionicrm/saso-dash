@@ -10,7 +10,7 @@ import io.saso.dash.config.Config
 import io.saso.dash.redis.Redis
 import io.saso.dash.util.logger
 
-public class DashServer
+public class DashServerOLD
 @Inject
 constructor(private val serverInitializer: ServerInitializer,
             private val config: Config,

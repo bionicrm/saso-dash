@@ -1,6 +1,6 @@
 package io.saso.dash.server
 
-public interface Server
+public interface ServerOLD
 {
     fun start()
 }

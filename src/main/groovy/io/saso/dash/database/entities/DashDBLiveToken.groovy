@@ -3,7 +3,7 @@ package io.saso.dash.database.entities
 import java.sql.ResultSet
 import java.sql.Timestamp
 
-class DashLiveToken implements LiveToken
+class DashDBLiveToken implements DBLiveToken
 {
     final String tableName = 'live_tokens'
 
