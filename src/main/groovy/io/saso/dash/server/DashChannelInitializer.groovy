@@ -1,5 +1,6 @@
 package io.saso.dash.server
 
+import com.google.inject.Inject
 import com.google.inject.Provider
 import com.google.inject.name.Named
 import io.netty.channel.ChannelHandler
@@ -11,10 +12,11 @@ import io.netty.handler.codec.http.HttpServerCodec
 
 class DashChannelInitializer extends ChannelInitializer<SocketChannel>
 {
-    private final Provider<Set<ChannelHandler>> httpChannelHandlersProvider
+    private final Provider<List<ChannelHandler>> httpChannelHandlersProvider
 
+    @Inject
     DashChannelInitializer(
-            @Named('http handlers') Provider<Set<ChannelHandler>>
+            @Named('http handlers') Provider<List<ChannelHandler>>
                     httpChannelHandlersProvider)
     {
         this.httpChannelHandlersProvider = httpChannelHandlersProvider

@@ -27,11 +27,11 @@ class DashConfig implements Config
     @Override
     <T> T get(String key, T defaultValue)
     {
-        final String[] parts = key.split(/./)
+        final String[] parts = key.split(/\./)
 
         Map<String, ?> subMap = configMap()
 
-        parts[0..parts.size() - 1].each {
+        parts.toList().subList(0, parts.size() - 1).each {
             subMap = subMap[it] as Map<String, ?> ?: [:]
         }
 

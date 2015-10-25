@@ -1,5 +1,6 @@
 package io.saso.dash.database
 import com.google.inject.Inject
+import com.google.inject.assistedinject.Assisted
 import io.saso.dash.database.entities.*
 import io.saso.dash.services.Service
 import io.saso.dash.util.Resources
@@ -18,7 +19,8 @@ class DashDBEntityProvider implements DBEntityProvider
     private final DBEntityFetcher entityFetcher
 
     @Inject
-    DashDBEntityProvider(DBEntityFetcher entityFetcher, DBLiveToken liveToken)
+    DashDBEntityProvider(DBEntityFetcher entityFetcher,
+                         @Assisted DBLiveToken liveToken)
     {
         this.entityFetcher = entityFetcher
         this.liveToken = liveToken

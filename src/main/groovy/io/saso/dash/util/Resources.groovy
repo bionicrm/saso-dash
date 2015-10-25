@@ -8,7 +8,7 @@ final class Resources
 
     static String get(String path)
     {
-        def final stream = {
+        final stream = {
             if (path.startsWith('/')) {
                 Resources.getResourceAsStream(path)
             }
@@ -17,6 +17,6 @@ final class Resources
             }
         }
 
-        IOUtils.toString stream
+        return IOUtils.toString(stream())
     }
 }

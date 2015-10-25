@@ -2,7 +2,9 @@ package io.saso.dash.startup.workers
 
 import com.google.inject.Inject
 import io.saso.dash.redis.Redis
+import io.saso.dash.redis.RedisDatabase
 import io.saso.dash.startup.StartupWorker
+import redis.clients.jedis.Jedis
 
 class RedisWorker implements StartupWorker
 {
@@ -17,6 +19,8 @@ class RedisWorker implements StartupWorker
     @Override
     void work()
     {
-        redis.initialize()
+        redis.use(RedisDatabase.CONCURRENT_CONNECTIONS, { Jedis connection ->
+            connection.flushDB()
+        })
     }
 }

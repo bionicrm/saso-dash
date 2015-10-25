@@ -27,9 +27,10 @@ class DatabaseModule extends AbstractModule
     {
         bind Database to DashDatabase
         bind DBEntityFetcher to DashDBEntityFetcher
-        bind DBEntityProvider to DashDBEntityProvider
 
-        install new FactoryModuleBuilder().build(DBEntityProviderFactory)
+        install new FactoryModuleBuilder()
+                .implement(DBEntityProvider, DashDBEntityProvider)
+                .build(DBEntityProviderFactory)
 
         // entities
         bind DBAuthToken to DashDBAuthToken

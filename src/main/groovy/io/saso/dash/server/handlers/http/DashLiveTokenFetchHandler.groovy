@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.handler.codec.http.*
+import io.netty.util.ReferenceCountUtil
 import io.saso.dash.database.DBEntityFetcher
 import io.saso.dash.database.DBEntityProviderFactory
 import io.saso.dash.database.entities.DBLiveToken
@@ -41,22 +42,27 @@ class DashLiveTokenFetchHandler
     @Override
     void messageReceived(ChannelHandlerContext ctx, FullHttpRequest msg)
     {
+        msg.retain()
+
         final propagate = { ctx.fireChannelRead(msg) }
 
         final forbid = {
             HandlerUtil.sendResponseAndClose(ctx, HttpResponseStatus.FORBIDDEN)
+            msg.release()
         }
 
         final getCookieValue = { String name ->
+            String value = ''
+
             msg.headers().getAllAndConvert(HttpHeaderNames.COOKIE).each {
                 final Cookie cookie = ClientCookieDecoder.decode(it)
 
                 if (cookie.name() == name) {
-                    return URLDecoder.decode(cookie.value(), 'UTF-8')
+                    return value = URLDecoder.decode(cookie.value(), 'UTF-8')
                 }
             }
 
-            return ''
+            return value
         }
 
         THREAD_POOL.execute {

@@ -7,7 +7,7 @@ trait Service
 {
     final int pollTime = -1
 
-    abstract ServiceName name
+    abstract ServiceName getName()
 
     final Class<Service>[] subServices = []
 

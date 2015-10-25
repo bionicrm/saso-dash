@@ -13,7 +13,7 @@ class DashServiceCreator implements ServiceCreator
     }
 
     @Override
-    Set<Service> createServices()
+    List<Service> createServices()
     {
         // TODO: inject preferences, read, and create appropriate services
 
