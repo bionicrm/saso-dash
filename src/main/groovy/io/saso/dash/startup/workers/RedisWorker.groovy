@@ -2,9 +2,9 @@ package io.saso.dash.startup.workers
 
 import com.google.inject.Inject
 import io.saso.dash.redis.Redis
-import io.saso.dash.Worker
+import io.saso.dash.startup.StartupWorker
 
-class RedisWorker implements Worker
+class RedisWorker implements StartupWorker
 {
     private final Redis redis
 

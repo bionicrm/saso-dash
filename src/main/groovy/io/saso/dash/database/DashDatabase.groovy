@@ -53,12 +53,13 @@ class DashDatabase implements Database
     static
     {
         // load drivers
-        Class.forName('org.apache.commons.dbcp2.PoolingDriver')
-        Class.forName('org.postgresql.Driver')
+        Class.forName 'org.apache.commons.dbcp2.PoolingDriver'
+        Class.forName 'org.postgresql.Driver'
     }
     
     @Override
-    Connection getConnection() {
+    Connection getConnection()
+    {
         return connectionPool().borrowObject()
     }
 }

@@ -9,6 +9,7 @@ import io.saso.dash.modules.ServerModule
 import io.saso.dash.modules.ServiceModule
 import io.saso.dash.modules.TemplatingModule
 import io.saso.dash.server.Server
+import io.saso.dash.startup.StartupPipeline
 
 final injector = Guice.createInjector new AuthModule(),
         new ConfigModule(),
@@ -18,4 +19,8 @@ final injector = Guice.createInjector new AuthModule(),
         new ServiceModule(),
         new TemplatingModule()
 
-injector.getInstance Server start()
+// startup pipeline
+injector.getInstance(StartupPipeline).run()
+
+// start server
+injector.getInstance(Server).start()

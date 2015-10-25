@@ -1,17 +1,21 @@
 package io.saso.dash.server.handlers.http
 import com.google.inject.Inject
+import io.netty.channel.ChannelHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.handler.codec.http.*
 import io.saso.dash.database.DBEntityFetcher
+import io.saso.dash.database.DBEntityProvider
+import io.saso.dash.database.DBEntityProviderFactory
 import io.saso.dash.database.entities.DBLiveToken
-import io.saso.dash.server.ContextLocal
+
 import io.saso.dash.util.HandlerUtil
 import io.saso.dash.util.Resources
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+@ChannelHandler.Sharable
 class DashLiveTokenFetchHandler
         extends SimpleChannelInboundHandler<FullHttpRequest>
 {
@@ -21,11 +25,14 @@ class DashLiveTokenFetchHandler
             Resources.get('/sql/live_token.sql')
 
     private final DBEntityFetcher entityFetcher
+    private final DBEntityProviderFactory entityProviderFactory
 
     @Inject
-    DashLiveTokenFetchHandler(DBEntityFetcher entityFetcher)
+    DashLiveTokenFetchHandler(DBEntityFetcher entityFetcher,
+                              DBEntityProviderFactory entityProviderFactory)
     {
         this.entityFetcher = entityFetcher
+        this.entityProviderFactory = entityProviderFactory
     }
 
     @Override
@@ -47,8 +54,12 @@ class DashLiveTokenFetchHandler
                     // fire the next handler
                     ctx.fireChannelRead(msg)
 
-                    // fire the live token retrieval user event
-                    ctx.fireUserEventTriggered(liveToken.get())
+                    final DBEntityProvider entityProvider =
+                            entityProviderFactory.createDBEntityProvider(
+                                    liveToken.get())
+
+                    // fire the DBEntityProvider created user event
+                    ctx.fireUserEventTriggered(entityProvider)
 
                     return
                 }

@@ -5,7 +5,7 @@ import com.google.inject.Provides
 import com.google.inject.name.Named
 import io.saso.dash.startup.DashStartupPipeline
 import io.saso.dash.startup.StartupPipeline
-import io.saso.dash.Worker
+import io.saso.dash.startup.StartupWorker
 import io.saso.dash.startup.workers.RedisWorker
 
 class StartupModule extends AbstractModule
@@ -17,7 +17,7 @@ class StartupModule extends AbstractModule
     }
 
     @Provides @Named('startup workers')
-    List<Worker> provideStartupWorkers(RedisWorker redis)
+    List<StartupWorker> provideStartupWorkers(RedisWorker redis)
     {
         [redis]
     }

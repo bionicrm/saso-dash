@@ -2,23 +2,20 @@ package io.saso.dash.startup
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import io.saso.dash.Worker
 
 class DashStartupPipeline implements StartupPipeline
 {
-    private final List<Worker> workers
+    private final List<StartupWorker> workers
 
     @Inject
-    DashStartupPipeline(@Named('startup workers') List<Worker> workers)
+    DashStartupPipeline(@Named('startup workers') List<StartupWorker> workers)
     {
         this.workers = workers
     }
 
     @Override
-    void start()
+    void run()
     {
-        workers.forEach { worker ->
-            worker.work()
-        }
+        workers.each { it.work() }
     }
 }

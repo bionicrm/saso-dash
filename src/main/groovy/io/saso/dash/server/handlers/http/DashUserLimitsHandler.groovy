@@ -2,16 +2,16 @@ package io.saso.dash.server.handlers.http
 import io.netty.channel.ChannelHandlerAdapter
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http.HttpResponseStatus
-import io.saso.dash.database.entities.DBLiveToken
+import io.saso.dash.database.DBEntityProvider
 import io.saso.dash.util.HandlerUtil
 
 class DashUserLimitsHandler extends ChannelHandlerAdapter
 {
     @Override
-    void userEventTriggered(ChannelHandlerContext ctx, Object eventObj)
+    void userEventTriggered(ChannelHandlerContext ctx, eventObj)
     {
-        // if the event object is a DBLiveToken that was just fetched...
-        if (eventObj instanceof DBLiveToken) {
+        // if the event object is a DBEntityProvider that was just created...
+        if (eventObj instanceof DBEntityProvider) {
             // TODO: check concurrent users
 
             // forbid the request

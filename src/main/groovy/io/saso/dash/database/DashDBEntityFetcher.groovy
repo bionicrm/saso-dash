@@ -2,6 +2,10 @@ package io.saso.dash.database
 import com.google.inject.Inject
 import com.google.inject.Injector
 
+import java.sql.Connection
+import java.sql.PreparedStatement
+import java.sql.ResultSet
+
 class DashDBEntityFetcher implements DBEntityFetcher
 {
     private final Database db
@@ -18,12 +22,16 @@ class DashDBEntityFetcher implements DBEntityFetcher
     <T extends DBEntity> Optional<T> fetch(
             Class<T> entityClass, String sql, ...params)
     {
-        final entity = injector.getInstance(entityClass)
-        final connection = db.connection
-        final statement = connection.prepareStatement(sql)
-        def resultSet = null
+        final DBEntity entity = injector.getInstance(entityClass)
+
+        Connection connection = null
+        PreparedStatement statement = null
+        ResultSet resultSet = null
 
         try {
+            connection = db.connection
+            statement = connection.prepareStatement(sql)
+
             for (i in params.indices) {
                 statement.setObject(i + 1, params[i])
             }
@@ -41,8 +49,8 @@ class DashDBEntityFetcher implements DBEntityFetcher
         }
         finally {
             resultSet?.close()
-            statement.close()
-            connection.close()
+            statement?.close()
+            connection?.close()
         }
     }
 }

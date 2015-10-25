@@ -2,7 +2,6 @@ package io.saso.dash.services
 
 import com.google.inject.Inject
 import com.google.inject.assistedinject.Assisted
-import io.saso.dash.database.DBEntity
 import io.saso.dash.database.DBEntityProvider
 import io.saso.dash.database.DBEntityFetcher
 import io.saso.dash.database.entities.*
