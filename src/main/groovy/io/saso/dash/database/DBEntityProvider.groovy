@@ -5,7 +5,7 @@ import io.saso.dash.database.entities.DBLiveToken
 import io.saso.dash.database.entities.DBProvider
 import io.saso.dash.database.entities.DBProviderUser
 import io.saso.dash.database.entities.DBUser
-import io.saso.dash.services.Service
+import io.saso.dash.services.ServiceName
 
 interface DBEntityProvider
 {
@@ -30,7 +30,7 @@ interface DBEntityProvider
      *
      * @return the provider
      */
-    DBProvider getProvider(Service service)
+    DBProvider getProvider(ServiceName service)
 
     /**
      * Gets the ProviderUser for the specified service.
@@ -39,7 +39,7 @@ interface DBEntityProvider
      *
      * @return the provider user
      */
-    DBProviderUser getProviderUser(Service service)
+    DBProviderUser getProviderUser(ServiceName service)
 
     /**
      * Gets the AuthToken for the specified service.
@@ -48,5 +48,5 @@ interface DBEntityProvider
      *
      * @return the auth token
      */
-    DBAuthToken getAuthToken(Service service)
+    DBAuthToken getAuthToken(ServiceName service)
 }

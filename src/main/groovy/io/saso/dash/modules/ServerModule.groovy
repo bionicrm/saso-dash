@@ -10,16 +10,19 @@ import io.netty.channel.ChannelHandler
 import io.saso.dash.server.DashServer
 
 import io.saso.dash.server.Server
+import io.saso.dash.server.events.DashUpgradeRequestEvent
+import io.saso.dash.server.events.ServerEventsFactory
+import io.saso.dash.server.events.UpgradeRequestEvent
+import io.saso.dash.server.handlers.ServerHandlersFactory
 import io.saso.dash.server.handlers.http.DashLiveTokenFetchHandler
-import io.saso.dash.server.handlers.DashServerWSHandler
-
 import io.saso.dash.server.DashChannelInitializer
-import io.saso.dash.server.handlers.ServerHandlerFactory
-import io.saso.dash.server.handlers.ServerHttpHandler
-import io.saso.dash.server.handlers.ServerWSHandler
+
 import io.saso.dash.server.handlers.http.DashLiveTokenValidationHandler
 import io.saso.dash.server.handlers.http.DashRequestValidationHandler
+import io.saso.dash.server.handlers.http.DashServicesHandler
+import io.saso.dash.server.handlers.http.DashUpgradeHandler
 import io.saso.dash.server.handlers.http.DashUserLimitsHandler
+import io.saso.dash.server.handlers.ws.DashWSHandler
 
 class ServerModule extends AbstractModule
 {
@@ -30,11 +33,16 @@ class ServerModule extends AbstractModule
         bind(ChannelHandler).annotatedWith(Names.named('ch init'))
                 .to(DashChannelInitializer)
 
+        // events
         install new FactoryModuleBuilder()
-                // ServerWSHandler -> DashServerWSHandler
-                .implement(ServerWSHandler, DashServerWSHandler)
+                .implement(UpgradeRequestEvent, DashUpgradeRequestEvent)
+                .build(ServerEventsFactory)
 
-                .build(ServerHandlerFactory)
+        // handlers
+        install new FactoryModuleBuilder()
+                .implement(ChannelHandler, Names.named('ws handler'),
+                           DashWSHandler)
+                .build(ServerHandlersFactory)
     }
 
     @Provides @Named('http handlers')
@@ -42,9 +50,11 @@ class ServerModule extends AbstractModule
             DashLiveTokenFetchHandler liveTokenFetch,
             DashLiveTokenValidationHandler liveTokenValidation,
             DashRequestValidationHandler requestValidation,
+            DashServicesHandler services,
+            DashUpgradeHandler upgrade,
             DashUserLimitsHandler userLimits)
     {
         return [requestValidation, liveTokenFetch, liveTokenValidation,
-                userLimits]
+                userLimits, upgrade, services]
     }
 }

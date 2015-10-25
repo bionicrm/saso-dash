@@ -1,7 +1,7 @@
 package io.saso.dash.database
 import com.google.inject.Inject
 import io.saso.dash.database.entities.*
-import io.saso.dash.services.Service
+import io.saso.dash.services.ServiceName
 import io.saso.dash.util.Resources
 
 class DashDBEntityProvider implements DBEntityProvider
@@ -31,13 +31,13 @@ class DashDBEntityProvider implements DBEntityProvider
     }
 
     @Override
-    DBProvider getProvider(Service service)
+    DBProvider getProvider(ServiceName service)
     {
         return entityFetcher.fetch(DBProvider, SQL.Provider, service.name).get()
     }
 
     @Override
-    DBProviderUser getProviderUser(Service service)
+    DBProviderUser getProviderUser(ServiceName service)
     {
         return entityFetcher.fetch(
                 DBProviderUser, SQL.ProviderUser, liveToken.userId,
@@ -45,7 +45,7 @@ class DashDBEntityProvider implements DBEntityProvider
     }
 
     @Override
-    DBAuthToken getAuthToken(Service service)
+    DBAuthToken getAuthToken(ServiceName service)
     {
         return entityFetcher.fetch(
                 DBAuthToken, SQL.AuthToken, liveToken.userId, service.name)

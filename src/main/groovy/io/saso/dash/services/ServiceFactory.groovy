@@ -5,8 +5,8 @@ import com.google.inject.name.Named
 interface ServiceFactory
 {
     @Named('github')
-    Service createGitHubService()
+    ServiceName createGitHubService()
 
     @Named('google')
-    Service createGoogleService()
+    ServiceName createGoogleService()
 }

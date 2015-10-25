@@ -1,25 +1,18 @@
 package io.saso.dash.services
 
-enum Service
+import io.netty.channel.ChannelHandlerContext
+import io.saso.dash.database.DBEntityProvider
+
+trait Service
 {
-    GITHUB('github'),
-    GOOGLE('google')
+    final int pollTime = -1
 
-    final String name
+    abstract void start(ChannelHandlerContext ctx,
+                        DBEntityProvider entityProvider)
 
-    Service(String name)
-    {
-        this.name = name
-    }
+    abstract void poll(ChannelHandlerContext ctx,
+                       DBEntityProvider entityProvider)
 
-    /**
-     * Gets the name of this service.
-     *
-     * @return the name
-     */
-    @Override
-    String toString()
-    {
-        name
-    }
+    abstract void stop(ChannelHandlerContext ctx,
+                       DBEntityProvider entityProvider)
 }

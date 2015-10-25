@@ -2,9 +2,9 @@ package io.saso.dash.services.google
 
 import io.netty.channel.ChannelHandlerContext
 import io.saso.dash.database.DBEntityProvider
-import io.saso.dash.services.Service
+import io.saso.dash.services.ServiceName
 
-public class GoogleService : Service()
+public class GoogleService : ServiceName()
 {
     public override val pollInterval = 30
 

@@ -1,21 +1,21 @@
 package io.saso.dash.server.handlers.http
 import com.google.inject.Inject
+import com.google.inject.Singleton
 import io.netty.channel.ChannelHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.handler.codec.http.*
 import io.saso.dash.database.DBEntityFetcher
-import io.saso.dash.database.DBEntityProvider
 import io.saso.dash.database.DBEntityProviderFactory
 import io.saso.dash.database.entities.DBLiveToken
-
+import io.saso.dash.server.events.ServerEventsFactory
 import io.saso.dash.util.HandlerUtil
 import io.saso.dash.util.Resources
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-@ChannelHandler.Sharable
+@Singleton @ChannelHandler.Sharable
 class DashLiveTokenFetchHandler
         extends SimpleChannelInboundHandler<FullHttpRequest>
 {
@@ -26,61 +26,65 @@ class DashLiveTokenFetchHandler
 
     private final DBEntityFetcher entityFetcher
     private final DBEntityProviderFactory entityProviderFactory
+    private final ServerEventsFactory serverEventsFactory
 
     @Inject
     DashLiveTokenFetchHandler(DBEntityFetcher entityFetcher,
-                              DBEntityProviderFactory entityProviderFactory)
+                              DBEntityProviderFactory entityProviderFactory,
+                              ServerEventsFactory serverEventsFactory)
     {
         this.entityFetcher = entityFetcher
         this.entityProviderFactory = entityProviderFactory
+        this.serverEventsFactory = serverEventsFactory
     }
 
     @Override
     void messageReceived(ChannelHandlerContext ctx, FullHttpRequest msg)
     {
-        THREAD_POOL.execute {
-            // get the live token cookie value of the request
-            final Optional<String> liveTokenCookieValue =
-                    getCookieValue(msg.headers(), 'live_token')
+        final propagate = { ctx.fireChannelRead(msg) }
 
-            // if the cookie value was found...
-            if (liveTokenCookieValue.isPresent()) {
-                // fetch the token from the DB
-                final liveToken = entityFetcher.fetch(DBLiveToken,
-                        LIVE_TOKEN_SQL, liveTokenCookieValue.get())
+        final forbid = {
+            HandlerUtil.sendResponseAndClose(ctx, HttpResponseStatus.FORBIDDEN)
+        }
 
-                // if the DB token was found...
-                if (liveToken.isPresent()) {
-                    // fire the next handler
-                    ctx.fireChannelRead(msg)
+        final getCookieValue = { String name ->
+            msg.headers().getAllAndConvert(HttpHeaderNames.COOKIE).each {
+                final Cookie cookie = ClientCookieDecoder.decode(it)
 
-                    final DBEntityProvider entityProvider =
-                            entityProviderFactory.createDBEntityProvider(
-                                    liveToken.get())
-
-                    // fire the DBEntityProvider created user event
-                    ctx.fireUserEventTriggered(entityProvider)
-
-                    return
+                if (cookie.name() == name) {
+                    return URLDecoder.decode(cookie.value(), 'UTF-8')
                 }
             }
 
-            // forbid the request
-            HandlerUtil.sendResponseAndClose(ctx,
-                    HttpResponseStatus.FORBIDDEN)
+            return ''
         }
-    }
 
-    private Optional<String> getCookieValue(HttpHeaders headers, String name)
-    {
-        headers.getAllAndConvert(HttpHeaderNames.COOKIE).each {
-            final Cookie cookie = ClientCookieDecoder.decode(it)
+        THREAD_POOL.execute {
+            final liveTokenCookieValue = getCookieValue('live_token')
 
-            if (cookie.name() == name) {
-                return Optional.of(URLDecoder.decode(cookie.value(), 'UTF-8'))
+            if (liveTokenCookieValue.empty) {
+                forbid()
+            }
+            else {
+                final liveToken = entityFetcher.fetch(DBLiveToken,
+                        LIVE_TOKEN_SQL, liveTokenCookieValue)
+
+                if (liveToken.present) {
+                    final entityProvider = entityProviderFactory
+                            .createDBEntityProvider(liveToken.get())
+
+                    final event = serverEventsFactory
+                            .createUpgradeRequestEvent(msg, entityProvider)
+
+                    // fire event
+                    ctx.fireUserEventTriggered(event)
+
+                    propagate()
+                }
+                else {
+                    forbid()
+                }
             }
         }
-
-        return Optional.empty()
     }
 }
