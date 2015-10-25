@@ -32,8 +32,8 @@ class DashDBEntityFetcher implements DBEntityFetcher
             connection = db.connection
             statement = connection.prepareStatement(sql)
 
-            for (i in params.indices) {
-                statement.setObject(i + 1, params[i])
+            params.eachWithIndex { param, i ->
+                statement.setObject(i + 1, param)
             }
 
             resultSet = statement.executeQuery()
