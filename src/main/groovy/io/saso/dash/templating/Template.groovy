@@ -22,6 +22,6 @@ enum Template
      */
     String fetch()
     {
-        Resources.get path
+        return Resources.get(path)
     }
 }

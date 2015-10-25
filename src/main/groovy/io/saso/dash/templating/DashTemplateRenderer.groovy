@@ -19,7 +19,7 @@ class DashTemplateRenderer implements TemplateRenderer
     @Override
     String render(Template template, Map<String, Object> model)
     {
-        def final contents = {
+        final Closure<String> contents = {
             if (cacheTemplates) {
                 templates.putIfAbsent template, template.fetch()
             }
@@ -28,7 +28,7 @@ class DashTemplateRenderer implements TemplateRenderer
             }
         }
 
-        def final jtwigModel = new JtwigModelMap()
+        final JtwigModelMap jtwigModel = new JtwigModelMap()
 
         jtwigModel.add(model)
 
@@ -37,6 +37,4 @@ class DashTemplateRenderer implements TemplateRenderer
                 // replace >=2 spaces with 1 space
                 .replaceAll(~/\s{2,}/, ' ')
     }
-
-
 }

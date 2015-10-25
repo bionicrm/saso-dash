@@ -12,7 +12,6 @@ import io.netty.util.CharsetUtil
 import io.netty.util.concurrent.GenericFutureListener
 import io.saso.dash.auth.Authenticator
 import io.saso.dash.config.Config
-import io.saso.dash.redis.databases.RedisConnections
 import io.saso.dash.services.ServiceManager
 import io.saso.dash.util.ifPresent
 import io.saso.dash.util.logThrowable
