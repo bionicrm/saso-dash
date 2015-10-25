@@ -30,6 +30,8 @@ class DashChannelInitializer extends ChannelInitializer<SocketChannel>
         pipeline.addLast(new HttpServerCodec())
         pipeline.addLast(new HttpObjectAggregator(65536))
 
-        httpChannelHandlersProvider.get().each { pipeline.addLast(it) }
+        httpChannelHandlersProvider.get().each { handler ->
+            pipeline.addLast handler
+        }
     }
 }

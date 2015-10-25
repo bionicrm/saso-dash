@@ -1,7 +1,6 @@
 package io.saso.dash.server.handlers.http
 import com.google.inject.Inject
 import com.google.inject.Injector
-import com.google.inject.name.Named
 import io.netty.channel.ChannelHandlerAdapter
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
@@ -37,6 +36,9 @@ class DashServicesHandler extends ChannelHandlerAdapter
     @Override
     void userEventTriggered(ChannelHandlerContext ctx, event)
     {
+        // FIXME: not firing wtf
+        println 'DashServicesHandler#userEventTriggered'
+
         final propagate = { ctx.fireUserEventTriggered(event) }
 
         if (event instanceof UpgradeRequestEvent) {

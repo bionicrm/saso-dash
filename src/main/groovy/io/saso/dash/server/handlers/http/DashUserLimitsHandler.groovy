@@ -1,18 +1,18 @@
 package io.saso.dash.server.handlers.http
 import com.google.inject.Inject
-import com.google.inject.Singleton
-import io.netty.channel.ChannelHandler
 import io.netty.channel.ChannelHandlerAdapter
 import io.netty.channel.ChannelHandlerContext
+import io.netty.channel.ChannelPromise
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.saso.dash.redis.databases.ConcurrentConnections
 import io.saso.dash.server.events.UpgradeRequestEvent
 import io.saso.dash.util.HandlerUtil
 
-@Singleton @ChannelHandler.Sharable
 class DashUserLimitsHandler extends ChannelHandlerAdapter
 {
     private final ConcurrentConnections concurrentConnections
+
+    private int userId
 
     @Inject
     DashUserLimitsHandler(ConcurrentConnections concurrentConnections)
@@ -29,7 +29,7 @@ class DashUserLimitsHandler extends ChannelHandlerAdapter
                 HttpResponseStatus.TOO_MANY_REQUESTS) }
 
         if (event instanceof UpgradeRequestEvent) {
-            final userId = event.entityProvider.liveToken.userId
+            userId = event.entityProvider.liveToken.userId
 
             if (concurrentConnections.addConnection(userId)) {
                 propagate()
@@ -41,5 +41,16 @@ class DashUserLimitsHandler extends ChannelHandlerAdapter
         else {
             propagate()
         }
+    }
+
+    @Override
+    void close(ChannelHandlerContext ctx, ChannelPromise promise)
+    {
+        // FIXME: not firing wtf srs
+        final propagate = { ctx.close(promise) }
+
+        concurrentConnections.removeConnection(userId)
+
+        propagate()
     }
 }

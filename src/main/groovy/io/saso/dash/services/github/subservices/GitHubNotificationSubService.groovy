@@ -49,6 +49,8 @@ class GitHubNotificationSubService implements Service
                 .read(true)
                 .iterator()
 
+        println 'GitHubNotificationSubService started'
+
         future = THREAD_POOL.submit {
             while (! stop) {
                 onNotification(ctx, db, itr.next())
