@@ -1,5 +1,6 @@
 package io.saso.dash.server.handlers.http
 import com.google.inject.Inject
+import com.google.inject.Injector
 import com.google.inject.name.Named
 import io.netty.channel.ChannelHandlerAdapter
 import io.netty.channel.ChannelHandlerContext
@@ -19,16 +20,18 @@ class DashServicesHandler extends ChannelHandlerAdapter
             Executors.newSingleThreadScheduledExecutor()
 
     private final ServiceCreator serviceCreator
+    private final Injector injector
     private final Map<Service, ScheduledFuture> scheduledFutures =
             new HashMap()
 
     private DBEntityProvider entityProvider
-    private Set<Service> services
+    private List<Service> services
 
     @Inject
-    DashServicesHandler(ServiceCreator serviceCreator)
+    DashServicesHandler(ServiceCreator serviceCreator, Injector injector)
     {
         this.serviceCreator = serviceCreator
+        this.injector = injector
     }
 
     @Override
@@ -39,7 +42,17 @@ class DashServicesHandler extends ChannelHandlerAdapter
         if (event instanceof UpgradeRequestEvent) {
             entityProvider = event.entityProvider
 
-            services = serviceCreator.createServices()
+            services = serviceCreator.createServices().asList()
+
+            final List<Service> subServices = []
+
+            services.each { service ->
+                service.subServices.each { subServicesClass ->
+                    subServices += injector.getInstance(subServicesClass)
+                }
+            }
+
+            services += subServices
 
             THREAD_POOL.execute {
                 services.each { it.start(ctx, entityProvider) }

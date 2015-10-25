@@ -7,12 +7,13 @@ trait Service
 {
     final int pollTime = -1
 
-    abstract void start(ChannelHandlerContext ctx,
-                        DBEntityProvider entityProvider)
+    abstract ServiceName name
 
-    abstract void poll(ChannelHandlerContext ctx,
-                       DBEntityProvider entityProvider)
+    final Class<Service>[] subServices = []
 
-    abstract void stop(ChannelHandlerContext ctx,
-                       DBEntityProvider entityProvider)
+    void start(ChannelHandlerContext ctx, DBEntityProvider db) { /* empty */ }
+
+    void poll(ChannelHandlerContext ctx, DBEntityProvider db) { /* empty */ }
+
+    void stop(ChannelHandlerContext ctx, DBEntityProvider db) { /* empty */ }
 }
