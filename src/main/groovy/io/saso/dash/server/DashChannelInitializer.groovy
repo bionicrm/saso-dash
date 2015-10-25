@@ -1,28 +1,33 @@
 package io.saso.dash.server
 
 import com.google.inject.Provider
+import com.google.inject.name.Named
+import io.netty.channel.ChannelHandler
 import io.netty.channel.ChannelInitializer
+import io.netty.channel.ChannelPipeline
 import io.netty.channel.socket.SocketChannel
 import io.netty.handler.codec.http.HttpObjectAggregator
 import io.netty.handler.codec.http.HttpServerCodec
-import io.saso.dash.server.handlers.ServerHttpHandler
 
 class DashChannelInitializer extends ChannelInitializer<SocketChannel>
 {
-    private final Provider<ServerHttpHandler> handlerProvider
+    private final Provider<Set<ChannelHandler>> httpChannelHandlersProvider
 
-    DashChannelInitializer(Provider<ServerHttpHandler> handlerProvider)
+    DashChannelInitializer(
+            @Named('http handlers') Provider<Set<ChannelHandler>>
+                    httpChannelHandlersProvider)
     {
-        this.handlerProvider = handlerProvider
+        this.httpChannelHandlersProvider = httpChannelHandlersProvider
     }
 
     @Override
     void initChannel(SocketChannel ch)
     {
-        final pipeline = ch.pipeline()
+        final ChannelPipeline pipeline = ch.pipeline()
 
-        pipeline.addLast new HttpServerCodec()
-        pipeline.addLast 'httpaggregator', new HttpObjectAggregator(65536)
-        pipeline.addLast 'httphandler', handlerProvider.get()
+        pipeline.addLast(new HttpServerCodec())
+        pipeline.addLast(new HttpObjectAggregator(65536))
+
+        httpChannelHandlersProvider.get().each { pipeline.addLast(it) }
     }
 }

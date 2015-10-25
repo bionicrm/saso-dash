@@ -15,17 +15,15 @@ class DashLiveTokenValidationHandler extends ChannelHandlerAdapter
     @Override
     void userEventTriggered(ChannelHandlerContext ctx, eventObj)
     {
-        // if the event object is a DBEntityProvider that was just created...
         if (eventObj instanceof DBEntityProvider
                 // if the expiry date of the live token is on or before the
                 // current date...
                 && ! eventObj.liveToken.expiresAt.after(Timestamp.from(
                 Instant.now()))) {
-            // forbid the request
             HandlerUtil.sendResponseAndClose(ctx, HttpResponseStatus.FORBIDDEN)
         }
         else {
-            // propagate the event
+            // propagate
             ctx.fireUserEventTriggered(eventObj)
         }
     }

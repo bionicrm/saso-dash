@@ -15,9 +15,8 @@ class DashRequestValidationHandler
     @Override
     void messageReceived(ChannelHandlerContext ctx, FullHttpRequest msg)
     {
-        // if the request decoding is successful...
         if (msg.decoderResult().isSuccess()) {
-            // fire the next handler
+            // propagate
             ctx.fireChannelRead(msg)
         }
         else {
