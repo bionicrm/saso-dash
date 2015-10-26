@@ -73,8 +73,12 @@ class DashUpgradeHandler extends ChannelHandlerAdapter
                 pipeline.addLast serverHandlersFactory
                         .createWSHandler(handshaker)
 
+                println 'handshaking...'
+
                 handshaker.handshake(ctx.channel(), event.request).addListener {
+                    println 'done'
                     propagate()
+                    println 'done2'
                 }
             }
         }
