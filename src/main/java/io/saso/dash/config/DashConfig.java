@@ -36,12 +36,11 @@ public class DashConfig implements Config
         if (model == null) {
             try (Reader reader = new FileReader(FILE_NAME)) {
                 model = gson.fromJson(reader, ConfigModel.class);
-                logger.info("Read {}: {}", FILE_NAME, gson.toJson(model));
+                logger.info("Read {}: {}", FILE_NAME, model);
             }
             catch (FileNotFoundException e) {
                 model = new ConfigModel();
-                logger.warn("{} not found, using defaults: {}", FILE_NAME,
-                        gson.toJson(model));
+                logger.warn("{} not found, using defaults: {}", FILE_NAME, model);
             }
             catch (IOException e) {
                 logger.error(e.getMessage(), e);

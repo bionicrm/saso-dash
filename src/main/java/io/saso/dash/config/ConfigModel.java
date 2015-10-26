@@ -1,7 +1,11 @@
 package io.saso.dash.config;
 
+import com.google.gson.Gson;
+
 public final class ConfigModel
 {
+    private static final Gson gson = new Gson();
+
     public Server server = new Server();
     public DB db = new DB();
     public Redis redis = new Redis();
@@ -38,5 +42,24 @@ public final class ConfigModel
 
     public final class Limits {
         public int connectionsPerUser = 3;
+    }
+
+    /**
+     * Gets a JSON representation of this model.
+     *
+     * @return this model in JSON form
+     */
+    public String toJSON()
+    {
+        return gson.toJson(this);
+    }
+
+    /**
+     * @see #toJSON()
+     */
+    @Override
+    public String toString()
+    {
+        return toJSON();
     }
 }
