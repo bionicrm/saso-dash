@@ -12,17 +12,20 @@ public final class ConfigModel
     public Cache cache = new Cache();
     public Limits limits = new Limits();
 
-    public final class Server {
+    public final class Server
+    {
         public String wsUrl = "ws://127.0.0.1";
         public Bind bind = new Bind();
 
-        public class Bind {
+        public class Bind
+        {
             public String host = "127.0.0.1";
             public int port = 80;
         }
     }
 
-    public final class DB {
+    public final class DB
+    {
         public String host = "127.0.0.1";
         public int port = 5432;
         public String database = "postgres";
@@ -30,17 +33,20 @@ public final class ConfigModel
         public String password = "";
     }
 
-    public final class Redis {
+    public final class Redis
+    {
         public String host = "127.0.0.1";
         public int port = 6379;
         public String password = "";
     }
 
-    public final class Cache {
+    public final class Cache
+    {
         public boolean templates = false;
     }
 
-    public final class Limits {
+    public final class Limits
+    {
         public int connectionsPerUser = 3;
     }
 
