@@ -1,7 +1,10 @@
 package io.saso.dash.config;
 
 import com.google.gson.Gson;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,9 +19,18 @@ public class DashConfig implements Config
     private static final String FILE_NAME = "config.json";
 
     private static final Logger logger = LogManager.getLogger();
-    private static final Gson gson = new Gson();
+
+    private final Gson gson;
+    private final Provider<ConfigModel> modelProvider;
 
     private ConfigModel model;
+
+    @Inject
+    public DashConfig(Gson gson, @Named("new") Provider<ConfigModel> modelProvider)
+    {
+        this.gson = gson;
+        this.modelProvider = modelProvider;
+    }
 
     @Override
     public ConfigModel getModel()
@@ -34,17 +46,32 @@ public class DashConfig implements Config
     private synchronized void readConfig()
     {
         if (model == null) {
+            ConfigModel emptyModel = modelProvider.get();
+
             try (Reader reader = new FileReader(FILE_NAME)) {
-                model = gson.fromJson(reader, ConfigModel.class);
-                logger.info("Read {}: {}", FILE_NAME, model);
+                model = gson.fromJson(reader, emptyModel.getClass());
+                logger.info("Read {}: {}", FILE_NAME, modelToJson(model));
             }
             catch (FileNotFoundException e) {
-                model = new ConfigModel();
-                logger.warn("{} not found, using defaults: {}", FILE_NAME, model);
+                model = emptyModel;
+                logger.warn("{} not found, using defaults: {}", FILE_NAME,
+                        modelToJson(model));
             }
             catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
         }
+    }
+
+    /**
+     * Converts a ConfigModel to JSON form.
+     *
+     * @param model the model to convert
+     *
+     * @return the JSON
+     */
+    private String modelToJson(ConfigModel model)
+    {
+        return gson.toJson(model);
     }
 }
