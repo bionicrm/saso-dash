@@ -2,7 +2,7 @@ package io.saso.dash.server;
 
 import com.google.inject.Inject;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -44,11 +44,11 @@ public class DashServer implements Server
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(channelInitializer);
 
-            ChannelFuture f = b.bind(bindHost, bindPort).sync();
+            Channel ch = b.bind(bindHost, bindPort).sync().channel();
 
-            logger.info("Server started at {}", f.channel().localAddress());
+            logger.info("Server started at {}", ch.localAddress());
             // FIXME: not stopping unless force-killed????
-            f.channel().closeFuture().sync();
+            ch.closeFuture().sync();
         }
         catch (InterruptedException e) {
             logger.error(e.getMessage(), e);

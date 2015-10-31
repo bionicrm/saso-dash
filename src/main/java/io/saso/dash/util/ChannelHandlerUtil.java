@@ -1,5 +1,6 @@
 package io.saso.dash.util;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,9 +15,9 @@ public final class ChannelHandlerUtil
 
     public static void respondAndClose(ChannelHandlerContext ctx, HttpResponseStatus status)
     {
+        ByteBuf content = Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8);
         DefaultFullHttpResponse response =
-                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
-                        Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8));
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
 
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
