@@ -2,7 +2,7 @@ package io.saso.dash.database.entities
 
 import java.sql.ResultSet
 
-class DashDBProvider implements DBProvider
+class DashDBProvider implements DBService
 {
     final String tableName = 'providers'
 

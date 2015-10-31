@@ -57,6 +57,13 @@
             <version>5.0.0.Alpha2</version>
         </dependency>
 
+        <!-- SnakeYAML -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.16</version>
+        </dependency>
+
         <!-- Jedis -->
         <dependency>
             <groupId>redis.clients</groupId>

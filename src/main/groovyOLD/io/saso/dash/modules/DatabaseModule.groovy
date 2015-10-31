@@ -2,10 +2,10 @@ package io.saso.dash.modules
 
 import com.google.inject.AbstractModule
 import com.google.inject.assistedinject.FactoryModuleBuilder
-import io.saso.dash.database.DashDBConnectionSupplier
+import io.saso.dash.database.impl.DashDBConnector
 import io.saso.dash.database.DashDBEntityFetcher
 import io.saso.dash.database.DashDBEntityProvider
-import io.saso.dash.database.DBConnectionSupplier
+import io.saso.dash.database.DBConnector
 import io.saso.dash.database.DBEntityFetcher
 import io.saso.dash.database.DBEntityProvider
 import io.saso.dash.database.DBEntityProviderFactory
@@ -16,8 +16,8 @@ import io.saso.dash.database.entities.DashDBProvider
 import io.saso.dash.database.entities.DashDBProviderUser
 import io.saso.dash.database.entities.DashDBUser
 import io.saso.dash.database.entities.DBLiveToken
-import io.saso.dash.database.entities.DBProvider
-import io.saso.dash.database.entities.DBProviderUser
+import io.saso.dash.database.entities.DBService
+import io.saso.dash.database.entities.DBServiceUser
 import io.saso.dash.database.entities.DBUser
 
 class DatabaseModule extends AbstractModule
@@ -25,7 +25,7 @@ class DatabaseModule extends AbstractModule
     @Override
     void configure()
     {
-        bind DBConnectionSupplier to DashDBConnectionSupplier
+        bind DBConnector to DashDBConnector
         bind DBEntityFetcher to DashDBEntityFetcher
 
         install new FactoryModuleBuilder()
@@ -35,8 +35,8 @@ class DatabaseModule extends AbstractModule
         // entities
         bind DBAuthToken to DashDBAuthToken
         bind DBLiveToken to DashDBLiveToken
-        bind DBProvider to DashDBProvider
-        bind DBProviderUser to DashDBProviderUser
+        bind DBService to DashDBProvider
+        bind DBServiceUser to DashDBProviderUser
         bind DBUser to DashDBUser
     }
 }

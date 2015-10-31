@@ -1,8 +1,9 @@
-package io.saso.dash.database;
+package io.saso.dash.database.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.saso.dash.config.ConfigModel;
+import io.saso.dash.config.Config;
+import io.saso.dash.database.DBConnector;
 import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp2.PoolableConnection;
 import org.apache.commons.dbcp2.PoolableConnectionFactory;
@@ -16,19 +17,16 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Singleton
-public class DashDBConnectionSupplier implements DBConnectionSupplier
+public class DashDBConnector implements DBConnector
 {
-    private static final String DRIVER_URL = "jdbc:apache:commons:dbcp:";
-    private static final String POOL_NAME = "saso";
-
     private static final Logger logger = LogManager.getLogger();
 
-    private final ConfigModel config;
+    private final Config config;
 
     private GenericObjectPool<PoolableConnection> connectionPool;
 
     @Inject
-    public DashDBConnectionSupplier(ConfigModel config)
+    public DashDBConnector(Config config)
     {
         this.config = config;
     }
@@ -42,6 +40,7 @@ public class DashDBConnectionSupplier implements DBConnectionSupplier
         }
         catch (ClassNotFoundException e) {
             logger.error(e.getMessage(), e);
+            System.exit(-1);
         }
     }
 
@@ -65,22 +64,26 @@ public class DashDBConnectionSupplier implements DBConnectionSupplier
     {
         if (connectionPool == null) {
             String url = String.format("jdbc:postgresql://%s:%d/%s",
-                    config.db.host, config.db.port, config.db.database);
+                    config.<String>get("db.host").orElse("127.0.0.1"),
+                    config.<Integer>get("db.port").orElse(5432),
+                    config.<String>get("db.database").orElse("postgres"));
 
             DriverManagerConnectionFactory connFactory =
-                    new DriverManagerConnectionFactory(url, config.db.user,
-                            config.db.password);
+                    new DriverManagerConnectionFactory(url,
+                            config.<String>get("db.user").orElse("postgres"),
+                            config.<String>get("db.password")
+                                    .orElse("postgres"));
 
             PoolableConnectionFactory poolableConnFactory =
                     new PoolableConnectionFactory(connFactory, null);
 
             connectionPool = new GenericObjectPool<>(poolableConnFactory);
 
-            PoolingDriver driver =
-                    (PoolingDriver) DriverManager.getDriver(DRIVER_URL);
+            PoolingDriver driver = (PoolingDriver) DriverManager.getDriver(
+                    "jdbc:apache:commons:dbcp:");
 
             poolableConnFactory.setPool(connectionPool);
-            driver.registerPool(POOL_NAME, connectionPool);
+            driver.registerPool("saso", connectionPool);
         }
 
         return connectionPool;

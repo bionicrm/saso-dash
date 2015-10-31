@@ -1,11 +1,18 @@
 package io.saso.dash.config;
 
+import java.util.Optional;
+
 public interface Config
 {
     /**
-     * Gets the config model that holds information about the config.
+     * Gets a value from the config. The key is in dot notation, e.g.
+     * {@code "path.to.value"}.
      *
-     * @return the config model
+     * @param key the value's key
+     * @param <T> the desired type of the value
+     *
+     * @return an optional of the value; empty when the value is {@code null} or
+     *         not found
      */
-    ConfigModel getModel();
+    <T> Optional<T> get(String key);
 }

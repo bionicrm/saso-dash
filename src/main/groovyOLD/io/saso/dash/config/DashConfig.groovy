@@ -5,7 +5,7 @@ import org.yaml.snakeyaml.Yaml
 class DashConfig implements Config
 {
     private final Closure<Map<String, ?>> configMap = {
-        final file = new File('config.json')
+        final file = new File('config.yaml')
 
         InputStream inputStream = null
 

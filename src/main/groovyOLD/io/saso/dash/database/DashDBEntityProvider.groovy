@@ -33,16 +33,16 @@ class DashDBEntityProvider implements DBEntityProvider
     }
 
     @Override
-    DBProvider getProvider(Service service)
+    DBService getProvider(Service service)
     {
-        return entityFetcher.fetch(DBProvider, SQL.Provider, service.name).get()
+        return entityFetcher.fetch(DBService, SQL.Provider, service.name).get()
     }
 
     @Override
-    DBProviderUser getProviderUser(Service service)
+    DBServiceUser getProviderUser(Service service)
     {
         return entityFetcher.fetch(
-                DBProviderUser, SQL.ProviderUser, liveToken.userId,
+                DBServiceUser, SQL.ProviderUser, liveToken.userId,
                 service.name).get()
     }
 

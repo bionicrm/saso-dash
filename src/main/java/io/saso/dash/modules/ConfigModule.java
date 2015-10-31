@@ -1,10 +1,8 @@
 package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 import io.saso.dash.config.Config;
-import io.saso.dash.config.ConfigModel;
-import io.saso.dash.config.DashConfig;
+import io.saso.dash.config.impl.DashConfig;
 
 public class ConfigModule extends AbstractModule
 {
@@ -12,11 +10,5 @@ public class ConfigModule extends AbstractModule
     protected void configure()
     {
         bind(Config.class).to(DashConfig.class);
-    }
-
-    @Provides
-    ConfigModel provideConfigModel(Config config)
-    {
-        return config.getModel();
     }
 }

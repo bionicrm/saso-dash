@@ -3,7 +3,7 @@ package io.saso.dash.database.entities
 import java.sql.ResultSet
 import java.sql.Timestamp
 
-class DashDBProviderUser implements DBProviderUser
+class DashDBProviderUser implements DBServiceUser
 {
     final String tableName = 'provider_users'
 
