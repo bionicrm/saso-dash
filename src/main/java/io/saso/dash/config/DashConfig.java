@@ -36,15 +36,16 @@ public class DashConfig implements Config
     @Override
     public ConfigModel getModel()
     {
-        readConfig();
-        return model;
+        return readConfig();
     }
 
     /**
      * Reads the config file if necessary. Sets {@link #model}. If no config
      * file is found, an empty model will be used.
+     *
+     * @return the config model
      */
-    private synchronized void readConfig()
+    private synchronized ConfigModel readConfig()
     {
         if (model == null) {
             try (Reader reader = new FileReader(FILE_NAME)) {
@@ -60,6 +61,8 @@ public class DashConfig implements Config
                 logger.error(e.getMessage(), e);
             }
         }
+
+        return model;
     }
 
     /**

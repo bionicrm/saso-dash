@@ -7,16 +7,20 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.saso.dash.server.pipeline.RequestValidationHandler;
+import io.saso.dash.server.pipeline.handlers.RequestValidationHandler;
+import io.saso.dash.server.pipeline.handlers.UpgradingHandler;
 
 public class DashChannelInitializer extends ChannelInitializer<SocketChannel>
 {
     private final Provider<RequestValidationHandler> requestValidation;
+    private final Provider<UpgradingHandler> upgrading;
 
     @Inject
-    public DashChannelInitializer(Provider<RequestValidationHandler> requestValidation)
+    public DashChannelInitializer(Provider<RequestValidationHandler> requestValidation,
+                                  Provider<UpgradingHandler> upgrading)
     {
         this.requestValidation = requestValidation;
+        this.upgrading = upgrading;
     }
 
     @Override
@@ -27,5 +31,6 @@ public class DashChannelInitializer extends ChannelInitializer<SocketChannel>
         p.addLast(new HttpServerCodec());
         p.addLast(new HttpObjectAggregator(65536));
         p.addLast(requestValidation.get());
+        p.addLast(upgrading.get());
     }
 }
