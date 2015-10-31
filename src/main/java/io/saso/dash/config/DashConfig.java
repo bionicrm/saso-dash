@@ -46,14 +46,12 @@ public class DashConfig implements Config
     private synchronized void readConfig()
     {
         if (model == null) {
-            ConfigModel emptyModel = modelProvider.get();
-
             try (Reader reader = new FileReader(FILE_NAME)) {
-                model = gson.fromJson(reader, emptyModel.getClass());
+                model = gson.fromJson(reader, ConfigModel.class);
                 logger.info("Read {}: {}", FILE_NAME, modelToJson(model));
             }
             catch (FileNotFoundException e) {
-                model = emptyModel;
+                model = modelProvider.get();
                 logger.warn("{} not found, using defaults: {}", FILE_NAME,
                         modelToJson(model));
             }
