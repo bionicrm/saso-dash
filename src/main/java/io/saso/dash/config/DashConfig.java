@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import io.saso.dash.binding_annotations.New;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,7 +27,7 @@ public class DashConfig implements Config
     private ConfigModel model;
 
     @Inject
-    public DashConfig(Gson gson, @Named("new") Provider<ConfigModel> modelProvider)
+    public DashConfig(Gson gson, @New Provider<ConfigModel> modelProvider)
     {
         this.gson = gson;
         this.modelProvider = modelProvider;

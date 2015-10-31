@@ -2,7 +2,7 @@ package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.name.Named;
+import io.saso.dash.binding_annotations.New;
 import io.saso.dash.config.Config;
 import io.saso.dash.config.ConfigModel;
 import io.saso.dash.config.DashConfig;
@@ -21,7 +21,7 @@ public class ConfigModule extends AbstractModule
         return config.getModel();
     }
 
-    @Provides @Named("new")
+    @Provides @New
     ConfigModel provideNewConfigModel()
     {
         return new ConfigModel();
