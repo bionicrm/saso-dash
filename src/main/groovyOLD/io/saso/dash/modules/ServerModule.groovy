@@ -15,7 +15,6 @@ import io.saso.dash.server.events.ServerEventsFactory
 import io.saso.dash.server.events.UpgradeRequestEvent
 import io.saso.dash.server.handlers.ServerHandlersFactory
 import io.saso.dash.server.handlers.http.DashLiveTokenFetchHandler
-import io.saso.dash.server.DashChannelInitializer
 
 import io.saso.dash.server.handlers.http.DashLiveTokenValidationHandler
 import io.saso.dash.server.handlers.http.DashRequestValidationHandler

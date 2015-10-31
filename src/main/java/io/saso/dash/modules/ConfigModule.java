@@ -2,7 +2,6 @@ package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import io.saso.dash.binding_annotations.New;
 import io.saso.dash.config.Config;
 import io.saso.dash.config.ConfigModel;
 import io.saso.dash.config.DashConfig;
@@ -19,11 +18,5 @@ public class ConfigModule extends AbstractModule
     ConfigModel provideConfigModel(Config config)
     {
         return config.getModel();
-    }
-
-    @Provides @New
-    ConfigModel provideNewConfigModel()
-    {
-        return new ConfigModel();
     }
 }

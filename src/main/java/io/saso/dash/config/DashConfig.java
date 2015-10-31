@@ -2,10 +2,7 @@ package io.saso.dash.config;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import io.saso.dash.binding_annotations.New;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,40 +19,38 @@ public class DashConfig implements Config
     private static final Logger logger = LogManager.getLogger();
 
     private final Gson gson;
-    private final Provider<ConfigModel> modelProvider;
 
     private ConfigModel model;
 
     @Inject
-    public DashConfig(Gson gson, @New Provider<ConfigModel> modelProvider)
+    public DashConfig(Gson gson)
     {
         this.gson = gson;
-        this.modelProvider = modelProvider;
     }
 
     @Override
     public ConfigModel getModel()
     {
-        return readConfig();
+        return createModel();
     }
 
     /**
-     * Reads the config file if necessary. Sets {@link #model}. If no config
-     * file is found, an empty model will be used.
+     * Creates the config model if necessary. Returns the already created model
+     * if it exists.
      *
-     * @return the config model
+     * @return the created/existing config model
      */
-    private synchronized ConfigModel readConfig()
+    private synchronized ConfigModel createModel()
     {
         if (model == null) {
             try (Reader reader = new FileReader(FILE_NAME)) {
                 model = gson.fromJson(reader, ConfigModel.class);
-                logger.info("Read {}: {}", FILE_NAME, modelToJson(model));
+                logger.info("Read {}: {}", FILE_NAME, modelToJson());
             }
             catch (FileNotFoundException e) {
-                model = modelProvider.get();
+                model = new ConfigModel();
                 logger.warn("{} not found, using defaults: {}", FILE_NAME,
-                        modelToJson(model));
+                        modelToJson());
             }
             catch (IOException e) {
                 logger.error(e.getMessage(), e);
@@ -66,13 +61,11 @@ public class DashConfig implements Config
     }
 
     /**
-     * Converts a ConfigModel to JSON form.
+     * Converts the config model to a JSON string.
      *
-     * @param model the model to convert
-     *
-     * @return the JSON
+     * @return a JSON string
      */
-    private String modelToJson(ConfigModel model)
+    private String modelToJson()
     {
         return gson.toJson(model);
     }

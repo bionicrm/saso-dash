@@ -1,6 +1,6 @@
 {
   "server": {
-    "wsUrl": "ws://ws.saso.dev/",
+    "url": "ws://ws.saso.dev/",
     "bind": {
       "host": "127.0.0.1",
       "port": 7692

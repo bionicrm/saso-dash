@@ -7,6 +7,6 @@ public class ConcurrentConnectionsHandler implements UpgradeHandler
     @Override
     public void upgrade(ChannelHandlerContext ctx)
     {
-        
+
     }
 }

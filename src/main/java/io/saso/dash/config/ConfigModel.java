@@ -10,7 +10,7 @@ public final class ConfigModel
 
     public final class Server
     {
-        public String wsUrl = "ws://127.0.0.1";
+        public String url = "ws://127.0.0.1";
         public Bind bind = new Bind();
 
         public class Bind

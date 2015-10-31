@@ -25,7 +25,7 @@ public class DashDBConnectionSupplier implements DBConnectionSupplier
 
     private final ConfigModel config;
 
-    private GenericObjectPool<PoolableConnection> pool;
+    private GenericObjectPool<PoolableConnection> connectionPool;
 
     @Inject
     public DashDBConnectionSupplier(ConfigModel config)
@@ -48,37 +48,41 @@ public class DashDBConnectionSupplier implements DBConnectionSupplier
     @Override
     public Connection getConnection() throws Exception
     {
-        return getPool().borrowObject();
+        return createConnectionPool().borrowObject();
     }
 
     /**
-     * Gets the connection pool. Sets {@link #pool}.
+     * Creates the connection pool if necessary. Returns the already created
+     * connection pool if it exists.
      *
-     * @return the connection pool
+     * @return the created/existing connection pool
      *
      * @throws SQLException
      */
-    private synchronized GenericObjectPool<PoolableConnection> getPool()
+    private synchronized
+    GenericObjectPool<PoolableConnection> createConnectionPool()
             throws SQLException
     {
-        if (pool == null) {
+        if (connectionPool == null) {
             String url = String.format("jdbc:postgresql://%s:%d/%s",
                     config.db.host, config.db.port, config.db.database);
 
             DriverManagerConnectionFactory connFactory =
-                    new DriverManagerConnectionFactory(url, config.db.user, config.db.password);
+                    new DriverManagerConnectionFactory(url, config.db.user,
+                            config.db.password);
 
             PoolableConnectionFactory poolableConnFactory =
                     new PoolableConnectionFactory(connFactory, null);
 
-            pool = new GenericObjectPool<>(poolableConnFactory);
+            connectionPool = new GenericObjectPool<>(poolableConnFactory);
 
-            PoolingDriver driver = (PoolingDriver) DriverManager.getDriver(DRIVER_URL);
+            PoolingDriver driver =
+                    (PoolingDriver) DriverManager.getDriver(DRIVER_URL);
 
-            poolableConnFactory.setPool(pool);
-            driver.registerPool(POOL_NAME, pool);
+            poolableConnFactory.setPool(connectionPool);
+            driver.registerPool(POOL_NAME, connectionPool);
         }
 
-        return pool;
+        return connectionPool;
     }
 }

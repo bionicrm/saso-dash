@@ -5,22 +5,24 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderUtil;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.saso.dash.util.ChannelHandlerUtil;
 
 @ChannelHandler.Sharable
-public class RequestValidationHandler
+public class RequestMethodHandler
         extends SimpleChannelInboundHandler<FullHttpRequest>
 {
     @Override
     protected void messageReceived(ChannelHandlerContext ctx,
                                    FullHttpRequest msg)
     {
-        if (msg.decoderResult().isSuccess()) {
+        if (msg.method() == HttpMethod.GET) {
             ctx.fireChannelRead(msg.retain());
         }
         else {
-            ChannelHandlerUtil.respond(ctx, HttpResponseStatus.BAD_REQUEST,
+            ChannelHandlerUtil.respond(ctx,
+                    HttpResponseStatus.METHOD_NOT_ALLOWED,
                     HttpHeaderUtil.isKeepAlive(msg));
         }
     }
