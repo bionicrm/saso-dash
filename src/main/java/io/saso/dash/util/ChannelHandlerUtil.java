@@ -23,8 +23,7 @@ public final class ChannelHandlerUtil
 
         ChannelFuture f = ctx.writeAndFlush(response);
 
-        if (! keepAlive)
-        {
+        if (! keepAlive) {
             f.addListener(ChannelFutureListener.CLOSE);
         }
     }
