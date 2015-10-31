@@ -14,13 +14,13 @@ public final class ChannelHandlerUtil
 {
     private ChannelHandlerUtil() { }
 
-    public static void respond(ChannelHandlerContext ctx, HttpResponseStatus status,
-                               boolean keepAlive)
+    public static void respond(ChannelHandlerContext ctx,
+                               HttpResponseStatus status, boolean keepAlive)
     {
-        ByteBuf content = Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8);
-        DefaultFullHttpResponse response =
-                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
-
+        ByteBuf content =
+                Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8);
+        DefaultFullHttpResponse response = new DefaultFullHttpResponse(
+                HttpVersion.HTTP_1_1, status, content);
         ChannelFuture f = ctx.writeAndFlush(response);
 
         if (! keepAlive) {
