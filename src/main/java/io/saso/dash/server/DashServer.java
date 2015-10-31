@@ -47,7 +47,7 @@ public class DashServer implements Server
             Channel ch = b.bind(bindHost, bindPort).sync().channel();
 
             logger.info("Server started at {}", ch.localAddress());
-            // FIXME: not stopping unless force-killed????
+
             ch.closeFuture().sync();
         }
         catch (InterruptedException e) {
