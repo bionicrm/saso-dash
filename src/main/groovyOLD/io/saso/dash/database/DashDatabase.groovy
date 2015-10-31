@@ -13,7 +13,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 @Singleton
-class DashDatabase implements Database
+class DashDatabase implements DBConnectionSupplier
 {
     private static final String DRIVER_URL = 'jdbc:apache:commons:dbcp:'
     private static final String POOL_NAME = 'saso'

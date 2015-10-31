@@ -2,10 +2,10 @@ package io.saso.dash.modules
 
 import com.google.inject.AbstractModule
 import com.google.inject.assistedinject.FactoryModuleBuilder
-import io.saso.dash.database.DashDatabase
+import io.saso.dash.database.DashDBConnectionSupplier
 import io.saso.dash.database.DashDBEntityFetcher
 import io.saso.dash.database.DashDBEntityProvider
-import io.saso.dash.database.Database
+import io.saso.dash.database.DBConnectionSupplier
 import io.saso.dash.database.DBEntityFetcher
 import io.saso.dash.database.DBEntityProvider
 import io.saso.dash.database.DBEntityProviderFactory
@@ -25,7 +25,7 @@ class DatabaseModule extends AbstractModule
     @Override
     void configure()
     {
-        bind Database to DashDatabase
+        bind DBConnectionSupplier to DashDBConnectionSupplier
         bind DBEntityFetcher to DashDBEntityFetcher
 
         install new FactoryModuleBuilder()

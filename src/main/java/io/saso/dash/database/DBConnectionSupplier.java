@@ -2,7 +2,7 @@ package io.saso.dash.database;
 
 import java.sql.Connection;
 
-public interface Database
+public interface DBConnectionSupplier
 {
     /**
      * Gets a database connection from the connection pool.

@@ -16,7 +16,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Singleton
-public class DashDatabase implements Database
+public class DashDBConnectionSupplier implements DBConnectionSupplier
 {
     private static final String DRIVER_URL = "jdbc:apache:commons:dbcp:";
     private static final String POOL_NAME = "saso";
@@ -28,7 +28,7 @@ public class DashDatabase implements Database
     private GenericObjectPool<PoolableConnection> pool;
 
     @Inject
-    public DashDatabase(ConfigModel config)
+    public DashDBConnectionSupplier(ConfigModel config)
     {
         this.config = config;
     }
@@ -36,6 +36,7 @@ public class DashDatabase implements Database
     static
     {
         try {
+            // load drivers
             Class.forName("org.apache.commons.dbcp2.PoolingDriver");
             Class.forName("org.postgresql.Driver");
         }

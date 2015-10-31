@@ -8,11 +8,11 @@ import java.sql.ResultSet
 
 class DashDBEntityFetcher implements DBEntityFetcher
 {
-    private final Database db
+    private final DBConnectionSupplier db
     private final Injector injector
 
     @Inject
-    def DashDBEntityFetcher(Database db, Injector injector)
+    def DashDBEntityFetcher(DBConnectionSupplier db, Injector injector)
     {
         this.db = db
         this.injector = injector
