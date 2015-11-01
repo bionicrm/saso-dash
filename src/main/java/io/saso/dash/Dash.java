@@ -26,8 +26,5 @@ public class Dash
 
         // run startup
         injector.getInstance(StartupManager.class).start();
-
-        // start server
-        injector.getInstance(Server.class).start();
     }
 }

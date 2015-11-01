@@ -1,18 +1,21 @@
 package io.saso.dash.startup.impl;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import io.saso.dash.startup.StartupManager;
 import io.saso.dash.startup.StartupWorker;
 import io.saso.dash.startup.workers.RedisStartupWorker;
+
+import java.util.Arrays;
 
 public class DashStartupManager implements StartupManager
 {
     private final StartupWorker[] workers;
 
     @Inject
-    public DashStartupManager(RedisStartupWorker redis)
+    public DashStartupManager(@Named("startup workers") StartupWorker[] workers)
     {
-        workers = new StartupWorker[] { redis };
+        this.workers = workers;
     }
 
     @Override
