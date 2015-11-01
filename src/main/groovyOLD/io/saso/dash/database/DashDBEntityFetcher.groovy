@@ -6,7 +6,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-class DashDBEntityFetcher implements DBEntityFetcher
+class DashDBEntityFetcher implements DBFetcher
 {
     private final DBConnector db
     private final Injector injector

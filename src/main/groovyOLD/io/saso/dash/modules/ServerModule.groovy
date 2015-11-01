@@ -7,7 +7,7 @@ import com.google.inject.name.Named
 import com.google.inject.name.Names
 import io.netty.channel.ChannelHandler
 
-import io.saso.dash.server.DashServer
+import io.saso.dash.server.impl.DashServer
 
 import io.saso.dash.server.Server
 import io.saso.dash.server.events.DashUpgradeRequestEvent

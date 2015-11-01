@@ -47,19 +47,18 @@ public class DashDBConnector implements DBConnector
     @Override
     public Connection getConnection() throws Exception
     {
-        return createConnectionPool().borrowObject();
+        return getConnectionPool().borrowObject();
     }
 
     /**
-     * Creates the connection pool if necessary. Returns the already created
-     * connection pool if it exists.
+     * Gets the connection pool, creating it if necessary.
      *
      * @return the created/existing connection pool
      *
      * @throws SQLException
      */
     private synchronized
-    GenericObjectPool<PoolableConnection> createConnectionPool()
+    GenericObjectPool<PoolableConnection> getConnectionPool()
             throws SQLException
     {
         if (connectionPool == null) {

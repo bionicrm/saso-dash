@@ -9,17 +9,17 @@ class DashDBEntityProvider implements DBEntityProvider
 {
     private static final SQL = [
             User         : Resources.get('/sql/user.sql'),
-            Provider     : Resources.get('/sql/provider.sql'),
+            Provider     : Resources.get('/sql/find_provider.sql'),
             ProviderUser : Resources.get('/sql/provider_user.sql'),
-            AuthToken    : Resources.get('/sql/auth_token.sql')
+            AuthToken    : Resources.get('/sql/find_auth_token.sql')
     ]
 
     final DBLiveToken liveToken
 
-    private final DBEntityFetcher entityFetcher
+    private final DBFetcher entityFetcher
 
     @Inject
-    DashDBEntityProvider(DBEntityFetcher entityFetcher,
+    DashDBEntityProvider(DBFetcher entityFetcher,
                          @Assisted DBLiveToken liveToken)
     {
         this.entityFetcher = entityFetcher

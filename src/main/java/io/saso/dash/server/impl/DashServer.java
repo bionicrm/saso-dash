@@ -1,4 +1,4 @@
-package io.saso.dash.server;
+package io.saso.dash.server.impl;
 
 import com.google.inject.Inject;
 import io.netty.bootstrap.ServerBootstrap;
@@ -11,6 +11,7 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.saso.dash.config.Config;
+import io.saso.dash.server.Server;
 import io.saso.dash.server.pipeline.handlers.RequestMethodHandler;
 import io.saso.dash.server.pipeline.handlers.RequestValidationHandler;
 import io.saso.dash.server.pipeline.handlers.UpgradingHandler;

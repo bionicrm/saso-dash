@@ -6,7 +6,7 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.handler.codec.http.*
 import io.netty.util.ReferenceCountUtil
-import io.saso.dash.database.DBEntityFetcher
+import io.saso.dash.database.DBFetcher
 import io.saso.dash.database.DBEntityProviderFactory
 import io.saso.dash.database.entities.DBLiveToken
 import io.saso.dash.server.events.ServerEventsFactory
@@ -23,14 +23,14 @@ class DashLiveTokenFetchHandler
     private static final ExecutorService THREAD_POOL =
             Executors.newCachedThreadPool()
     private static final String LIVE_TOKEN_SQL =
-            Resources.get('/sql/live_token.sql')
+            Resources.get('/sql/find_live_token.sql')
 
-    private final DBEntityFetcher entityFetcher
+    private final DBFetcher entityFetcher
     private final DBEntityProviderFactory entityProviderFactory
     private final ServerEventsFactory serverEventsFactory
 
     @Inject
-    DashLiveTokenFetchHandler(DBEntityFetcher entityFetcher,
+    DashLiveTokenFetchHandler(DBFetcher entityFetcher,
                               DBEntityProviderFactory entityProviderFactory,
                               ServerEventsFactory serverEventsFactory)
     {

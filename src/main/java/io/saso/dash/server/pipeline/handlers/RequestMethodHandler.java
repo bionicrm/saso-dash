@@ -15,15 +15,15 @@ public class RequestMethodHandler
 {
     @Override
     protected void messageReceived(ChannelHandlerContext ctx,
-                                   FullHttpRequest msg)
+                                   FullHttpRequest req)
     {
-        if (msg.method() == HttpMethod.GET) {
-            ctx.fireChannelRead(msg.retain());
+        if (req.method() == HttpMethod.GET) {
+            ctx.fireChannelRead(req.retain());
         }
         else {
             ChannelHandlerUtil.respond(ctx,
                     HttpResponseStatus.METHOD_NOT_ALLOWED,
-                    HttpHeaderUtil.isKeepAlive(msg));
+                    HttpHeaderUtil.isKeepAlive(req));
         }
     }
 }

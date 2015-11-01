@@ -14,14 +14,14 @@ public class RequestValidationHandler
 {
     @Override
     protected void messageReceived(ChannelHandlerContext ctx,
-                                   FullHttpRequest msg)
+                                   FullHttpRequest req)
     {
-        if (msg.decoderResult().isSuccess()) {
-            ctx.fireChannelRead(msg.retain());
+        if (req.decoderResult().isSuccess()) {
+            ctx.fireChannelRead(req.retain());
         }
         else {
             ChannelHandlerUtil.respond(ctx, HttpResponseStatus.BAD_REQUEST,
-                    HttpHeaderUtil.isKeepAlive(msg));
+                    HttpHeaderUtil.isKeepAlive(req));
         }
     }
 }

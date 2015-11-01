@@ -6,7 +6,7 @@ import io.saso.dash.database.impl.DashDBConnector
 import io.saso.dash.database.DashDBEntityFetcher
 import io.saso.dash.database.DashDBEntityProvider
 import io.saso.dash.database.DBConnector
-import io.saso.dash.database.DBEntityFetcher
+import io.saso.dash.database.DBFetcher
 import io.saso.dash.database.DBEntityProvider
 import io.saso.dash.database.DBEntityProviderFactory
 import io.saso.dash.database.entities.DBAuthToken
@@ -26,7 +26,7 @@ class DatabaseModule extends AbstractModule
     void configure()
     {
         bind DBConnector to DashDBConnector
-        bind DBEntityFetcher to DashDBEntityFetcher
+        bind DBFetcher to DashDBEntityFetcher
 
         install new FactoryModuleBuilder()
                 .implement(DBEntityProvider, DashDBEntityProvider)
