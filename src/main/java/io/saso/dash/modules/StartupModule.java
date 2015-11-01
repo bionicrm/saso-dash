@@ -3,7 +3,6 @@ package io.saso.dash.modules;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.name.Named;
-import io.saso.dash.server.Server;
 import io.saso.dash.startup.StartupManager;
 import io.saso.dash.startup.StartupWorker;
 import io.saso.dash.startup.impl.DashStartupManager;

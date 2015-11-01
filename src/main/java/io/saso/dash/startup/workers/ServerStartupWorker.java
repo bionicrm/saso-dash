@@ -1,7 +1,6 @@
 package io.saso.dash.startup.workers;
 
 import com.google.inject.Inject;
-import io.saso.dash.redis.databases.ConcurrentConnections;
 import io.saso.dash.server.Server;
 import io.saso.dash.startup.StartupWorker;
 

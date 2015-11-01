@@ -1,8 +1,6 @@
 package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
-import io.saso.dash.config.Config;
-import io.saso.dash.config.impl.DashConfig;
 import io.saso.dash.redis.Redis;
 import io.saso.dash.redis.databases.ConcurrentConnections;
 import io.saso.dash.redis.databases.impl.DashConcurrentConnections;

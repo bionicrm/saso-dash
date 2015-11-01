@@ -16,8 +16,6 @@ import io.saso.dash.server.Server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Set;
-
 public class DashServer implements Server
 {
     private static final Logger logger = LogManager.getLogger();

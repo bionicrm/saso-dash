@@ -2,9 +2,7 @@ package io.saso.dash;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.saso.dash.config.Config;
 import io.saso.dash.modules.*;
-import io.saso.dash.server.Server;
 import io.saso.dash.startup.StartupManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
