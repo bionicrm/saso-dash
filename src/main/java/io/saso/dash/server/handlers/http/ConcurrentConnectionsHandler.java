@@ -39,15 +39,10 @@ public class ConcurrentConnectionsHandler extends SimpleChannelInboundHandler<Fu
         final int userId = liveToken.getUserId();
 
         ThreadUtil.CACHED_THREAD_POOL.execute(() -> {
-            logger.debug("Incrementing concurrent connection for user {}",
-                    userId);
-
             boolean allowed = concurrentConnections.incrementIfAllowed(userId);
 
             if (allowed) {
                 ctx.channel().closeFuture().addListener(future -> {
-                    logger.debug("Decrementing concurrent connection for " +
-                            "user {}", userId);
                     concurrentConnections.decrement(userId);
                 });
                 ctx.executor().execute(() -> ctx.fireChannelRead(req));

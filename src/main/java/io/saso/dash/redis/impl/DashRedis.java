@@ -5,14 +5,20 @@ import com.google.inject.Singleton;
 import io.saso.dash.config.Config;
 import io.saso.dash.redis.Redis;
 import io.saso.dash.redis.databases.RedisDatabase;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
 
+import java.util.concurrent.TimeUnit;
+
 @Singleton
 public class DashRedis implements Redis
 {
+    private static final Logger logger = LogManager.getLogger();
+
     private final Config config;
 
     private JedisPool connectionPool;
@@ -40,6 +46,8 @@ public class DashRedis implements Redis
     private synchronized JedisPool getConnectionPool()
     {
         if (connectionPool == null) {
+            long start = System.nanoTime();
+
             JedisPoolConfig poolConfig = new JedisPoolConfig();
             String host = config.<String>get("redis.host")
                     .orElse(Protocol.DEFAULT_HOST);
@@ -54,6 +62,10 @@ public class DashRedis implements Redis
                 connectionPool = new JedisPool(poolConfig, host, port,
                         Protocol.DEFAULT_TIMEOUT, password);
             }
+
+            long end = System.nanoTime();
+            logger.debug("Created Redis connection pool in about {}µs",
+                    TimeUnit.NANOSECONDS.toMicros(end - start));
         }
 
         return connectionPool;

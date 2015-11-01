@@ -6,11 +6,17 @@ import io.saso.dash.config.Config;
 import io.saso.dash.redis.Redis;
 import io.saso.dash.redis.databases.ConcurrentConnections;
 import io.saso.dash.redis.databases.RedisDatabase;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import redis.clients.jedis.Jedis;
+
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class DashConcurrentConnections implements ConcurrentConnections
 {
+    private static final Logger logger = LogManager.getLogger();
+
     private final Redis redis;
     private final int connectionsPerUser;
 
@@ -25,16 +31,24 @@ public class DashConcurrentConnections implements ConcurrentConnections
     @Override
     public void initialize()
     {
+        long start = System.nanoTime();
+
         try (Jedis connection = redis.getConnection(
                 RedisDatabase.CONCURRENT_CONNECTIONS))
         {
             connection.flushDB();
         }
+
+        long end = System.nanoTime();
+        logger.debug("Flushed Redis DB {} in about {}µs",
+                RedisDatabase.CONCURRENT_CONNECTIONS.name(),
+                TimeUnit.NANOSECONDS.toMicros(end - start));
     }
 
     @Override
     public synchronized boolean incrementIfAllowed(int userId)
     {
+        long start = System.nanoTime();
         String userIdStr = String.valueOf(userId);
 
         try (Jedis connection = redis.getConnection(
@@ -48,14 +62,27 @@ public class DashConcurrentConnections implements ConcurrentConnections
 
             return true;
         }
+        finally {
+            long end = System.nanoTime();
+            logger.debug("Incremented Redis concurrent connection for user " +
+                            "{} in about {}µs", userId,
+                    TimeUnit.NANOSECONDS.toMicros(end - start));
+        }
     }
 
     @Override
     public synchronized void decrement(int userId)
     {
+        long start = System.nanoTime();
+
         try (Jedis connection = redis.getConnection(
                 RedisDatabase.CONCURRENT_CONNECTIONS)) {
             connection.decr(String.valueOf(userId));
         }
+
+        long end = System.nanoTime();
+        logger.debug("Decremented Redis concurrent connection for user {} in " +
+                        "about {}µs", userId,
+                TimeUnit.NANOSECONDS.toMicros(end - start));
     }
 }

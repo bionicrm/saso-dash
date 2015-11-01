@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class DashDBFetcher implements DBFetcher
@@ -37,27 +38,38 @@ public class DashDBFetcher implements DBFetcher
     public <T extends DBEntity> Optional<T> fetch(
             Class<T> entityClass, String scriptName, Object... params)
     {
-        T entity = injector.getInstance(entityClass);
-        String sql = scriptRepository.getSQL(scriptName);
+        long start = System.nanoTime();
 
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            // set SQL parameters
-            for (int i = 0; i < params.length; i++) {
-                statement.setObject(i + 1, params[i]);
+        try {
+            T entity = injector.getInstance(entityClass);
+            String sql = scriptRepository.getSQL(scriptName);
+
+            try (Connection connection = connector.getConnection();
+                 PreparedStatement statement = connection
+                         .prepareStatement(sql)) {
+                // set SQL parameters
+                for (int i = 0; i < params.length; i++) {
+                    statement.setObject(i + 1, params[i]);
+                }
+
+                ResultSet resultSet = statement.executeQuery();
+
+                if (resultSet.next()) {
+                    entity.fill(resultSet);
+                    return Optional.of(entity);
+                }
+            }
+            catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
 
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                entity.fill(resultSet);
-                return Optional.of(entity);
-            }
+            return Optional.empty();
         }
-        catch (Exception e) {
-            logger.error(e.getMessage(), e);
+        finally {
+            long end = System.nanoTime();
+            logger.debug("Fetched {} from DB in about {}µs",
+                    entityClass.getSimpleName(),
+                    TimeUnit.NANOSECONDS.toMicros(end - start));
         }
-
-        return Optional.empty();
     }
 }

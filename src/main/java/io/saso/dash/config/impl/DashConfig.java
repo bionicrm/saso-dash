@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class DashConfig implements Config
@@ -56,6 +57,8 @@ public class DashConfig implements Config
     private synchronized Map<String, Object> getModel()
     {
         if (model == null) {
+            long start = System.nanoTime();
+
             try (Reader reader = new FileReader(FILE_NAME)) {
                 // noinspection unchecked
                 model = (Map<String, Object>) yaml.load(reader);
@@ -68,6 +71,10 @@ public class DashConfig implements Config
             catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
+
+            long end = System.nanoTime();
+            logger.debug("Loaded config in about {}µs",
+                    TimeUnit.NANOSECONDS.toMicros(end - start));
         }
 
         return model;

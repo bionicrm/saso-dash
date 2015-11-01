@@ -3,13 +3,18 @@ package io.saso.dash.database.impl;
 import com.google.inject.Singleton;
 import io.saso.dash.database.DBScriptRepository;
 import io.saso.dash.util.Resources;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class DashDBScriptRepository implements DBScriptRepository
 {
+    private static final Logger logger = LogManager.getLogger();
+
     /**
      * The number of scripts found in src/main/resources/sql. Not required to
      * be correct; it is simply used as the initial map size for the cache.
@@ -35,6 +40,15 @@ public class DashDBScriptRepository implements DBScriptRepository
      */
     private String readSQL(String scriptName)
     {
-        return Resources.get("/sql/" + scriptName + ".sql");
+        long start = System.nanoTime();
+
+        try {
+            return Resources.get("/sql/" + scriptName + ".sql");
+        }
+        finally {
+            long end = System.nanoTime();
+            logger.debug("Read {}.sql in about {}µs", scriptName,
+                    TimeUnit.NANOSECONDS.toMicros(end - start));
+        }
     }
 }
