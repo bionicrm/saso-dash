@@ -16,6 +16,5 @@ public class CloseFrameHandler
     {
         ctx.attr(ChannelHandlerAttr.WS_HANDSHAKER).get().close(ctx.channel(),
                 frame.retain());
-        ctx.fireChannelRead(frame.retain());
     }
 }
