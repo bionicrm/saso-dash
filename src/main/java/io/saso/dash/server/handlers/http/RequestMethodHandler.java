@@ -1,4 +1,4 @@
-package io.saso.dash.server.pipeline.handlers;
+package io.saso.dash.server.handlers.http;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;

@@ -1,6 +1,7 @@
 package io.saso.dash.server.impl;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -12,25 +13,24 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.saso.dash.config.Config;
 import io.saso.dash.server.Server;
-import io.saso.dash.server.pipeline.handlers.HandlerFactory;
-import io.saso.dash.server.pipeline.handlers.RequestMethodHandler;
-import io.saso.dash.server.pipeline.handlers.RequestValidationHandler;
-import io.saso.dash.server.pipeline.handlers.UpgradingHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Set;
 
 public class DashServer implements Server
 {
     private static final Logger logger = LogManager.getLogger();
 
     private final Config config;
-    private final HandlerFactory handlerFactory;
+    private final ChannelHandler[] handlers;
 
     @Inject
-    public DashServer(Config config, HandlerFactory handlerFactory)
+    public DashServer(Config config,
+                      @Named("server http handlers") ChannelHandler[] handlers)
     {
         this.config = config;
-        this.handlerFactory = handlerFactory;
+        this.handlers = handlers;
     }
 
     @Override
@@ -66,13 +66,6 @@ public class DashServer implements Server
 
     private class Initializer extends ChannelInitializer<SocketChannel>
     {
-        private final ChannelHandler requestValidationHandler =
-                handlerFactory.createValidation();
-        private final ChannelHandler requestMethodHandler =
-                handlerFactory.createRequestMethod();
-        private final ChannelHandler upgradingHandler =
-                handlerFactory.createUpgrading();
-
         @Override
         protected void initChannel(SocketChannel ch)
         {
@@ -80,9 +73,7 @@ public class DashServer implements Server
 
             p.addLast(new HttpServerCodec());
             p.addLast(new HttpObjectAggregator(65536));
-            p.addLast(requestValidationHandler);
-            p.addLast(requestMethodHandler);
-            p.addLast(upgradingHandler);
+            p.addLast(handlers);
         }
     }
 }
