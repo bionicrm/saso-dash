@@ -2,11 +2,11 @@ SELECT *
 FROM auth_tokens
 WHERE id = (
   SELECT auth_token_id
-  FROM provider_users
+  FROM service_users
   WHERE user_id = ?
-        AND provider_id = (
+        AND service_id = (
     SELECT id
-    FROM providers
+    FROM services
     WHERE name = ?
     LIMIT 1
   )

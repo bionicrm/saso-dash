@@ -1,4 +1,4 @@
 SELECT *
-FROM providers
+FROM services
 WHERE name = ?
 LIMIT 1
