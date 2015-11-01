@@ -1,20 +1,20 @@
 server:
-  url: ws://ws.saso.dev/
+  url:       ws://ws.saso.dev/
   bind:
-    host: 127.0.0.1
-    port: 7692
+    host:    127.0.0.1
+    port:    7692
 
 db:
-  host: saso.dev
-  port: 5432
-  database: app
-  user: vagrant
-  password: vagrant
+  host:      saso.dev
+  port:      5432
+  database:  app
+  user:      vagrant
+  password:  vagrant
 
 redis:
-  host: saso.dev
-  port: 6379
-  password: ~
+  host:      saso.dev
+  port:      6379
+  password:  ~
 
 cache:
   templates: false
