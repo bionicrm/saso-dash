@@ -43,6 +43,13 @@
             <version>4.0</version>
         </dependency>
 
+        <!-- Guice: AssistedInject -->
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
+            <version>4.0</version>
+        </dependency>
+
         <!-- Commons IO -->
         <dependency>
             <groupId>commons-io</groupId>

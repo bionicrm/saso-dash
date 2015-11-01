@@ -8,14 +8,16 @@ import com.google.inject.Inject;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderUtil;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.saso.dash.database.DBFetcher;
 import io.saso.dash.database.entities.DBLiveToken;
+import io.saso.dash.database.scripts.SQLScriptFactory;
 import io.saso.dash.server.CookieFinder;
 import io.saso.dash.server.pipeline.upgrading.ConcurrentConnectionsHandler;
 import io.saso.dash.server.pipeline.upgrading.UpgradeHandler;
 import io.saso.dash.util.ChannelHandlerUtil;
-import io.saso.dash.util.Resources;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,7 +30,6 @@ public class UpgradingHandler
         extends SimpleChannelInboundHandler<FullHttpRequest>
 {
     private static final Logger logger = LogManager.getLogger();
-    private static final String sql = Resources.get("/sql/find_live_token.sql");
 
     private static final
     ListeningExecutorService service = MoreExecutors.listeningDecorator(
@@ -36,15 +37,18 @@ public class UpgradingHandler
 
     private final DBFetcher entityFetcher;
     private final CookieFinder cookieFinder;
+    private final SQLScriptFactory sqlScriptFactory;
     private final UpgradeHandler[] upgradeHandlers;
 
     @Inject
     public UpgradingHandler(
             DBFetcher entityFetcher, CookieFinder cookieFinder,
+            SQLScriptFactory sqlScriptFactory,
             ConcurrentConnectionsHandler concurrentConnectionsHandler)
     {
         this.entityFetcher = entityFetcher;
         this.cookieFinder = cookieFinder;
+        this.sqlScriptFactory = sqlScriptFactory;
         upgradeHandlers = new UpgradeHandler[] { concurrentConnectionsHandler };
     }
 
@@ -70,7 +74,7 @@ public class UpgradingHandler
                     }
 
                     Optional<DBLiveToken> liveToken = entityFetcher.fetch(
-                            DBLiveToken.class, sql, token.get());
+                            sqlScriptFactory.createFindLiveToken(token.get()));
 
                     if (liveToken.isPresent()) {
                         upgradeHandlers[0].upgrade(ctx, req, liveToken.get());

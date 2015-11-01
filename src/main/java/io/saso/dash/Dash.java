@@ -4,6 +4,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.saso.dash.config.Config;
 import io.saso.dash.modules.ConfigModule;
+import io.saso.dash.modules.DatabaseModule;
+import io.saso.dash.modules.RedisModule;
 import io.saso.dash.modules.ServerModule;
 import io.saso.dash.server.Server;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +21,8 @@ public class Dash
 
         Injector injector = Guice.createInjector(
                 new ConfigModule(),
+                new DatabaseModule(),
+                new RedisModule(),
                 new ServerModule());
 
         // start server

@@ -12,6 +12,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.saso.dash.config.Config;
 import io.saso.dash.server.Server;
+import io.saso.dash.server.pipeline.handlers.HandlerFactory;
 import io.saso.dash.server.pipeline.handlers.RequestMethodHandler;
 import io.saso.dash.server.pipeline.handlers.RequestValidationHandler;
 import io.saso.dash.server.pipeline.handlers.UpgradingHandler;
@@ -23,11 +24,13 @@ public class DashServer implements Server
     private static final Logger logger = LogManager.getLogger();
 
     private final Config config;
+    private final HandlerFactory handlerFactory;
 
     @Inject
-    public DashServer(Config config)
+    public DashServer(Config config, HandlerFactory handlerFactory)
     {
         this.config = config;
+        this.handlerFactory = handlerFactory;
     }
 
     @Override
@@ -64,10 +67,11 @@ public class DashServer implements Server
     private class Initializer extends ChannelInitializer<SocketChannel>
     {
         private final ChannelHandler requestValidationHandler =
-                new RequestValidationHandler();
+                handlerFactory.createValidation();
         private final ChannelHandler requestMethodHandler =
-                new RequestMethodHandler();
-        private final ChannelHandler upgradingHandler = new UpgradingHandler();
+                handlerFactory.createRequestMethod();
+        private final ChannelHandler upgradingHandler =
+                handlerFactory.createUpgrading();
 
         @Override
         protected void initChannel(SocketChannel ch)

@@ -4,40 +4,37 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import io.saso.dash.database.DBEntity;
 import io.saso.dash.database.entities.DBAuthToken;
+import io.saso.dash.database.entities.DBLiveToken;
 import io.saso.dash.database.scripts.EntityReturnableSQLScript;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class DashFindAuthTokenSQLScript implements EntityReturnableSQLScript
+public class DashFindLiveTokenSQLScript implements EntityReturnableSQLScript
 {
-    private final int userId;
-    private final String providerName;
+    private final String token;
 
     @Inject
-    public DashFindAuthTokenSQLScript(@Assisted int userId,
-                                      @Assisted String providerName)
+    public DashFindLiveTokenSQLScript(@Assisted String token)
     {
-        this.userId = userId;
-        this.providerName = providerName;
+        this.token = token;
     }
 
     @Override
     public Class<? extends DBEntity> getEntityClass()
     {
-        return DBAuthToken.class;
+        return DBLiveToken.class;
     }
 
     @Override
     public void setParametersOn(PreparedStatement statement) throws SQLException
     {
-        statement.setInt(1, userId);
-        statement.setString(2, providerName);
+        statement.setString(1, token);
     }
 
     @Override
     public String getPath()
     {
-        return "find_auth_token.sql";
+        return "find_live_token.sql";
     }
 }
