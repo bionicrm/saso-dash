@@ -45,7 +45,6 @@ public class DashConfig implements Config
         // noinspection unchecked
         T value = (T) model.get(parts[parts.length - 1]);
 
-        // noinspection unchecked
         return Optional.ofNullable(value);
     }
 
