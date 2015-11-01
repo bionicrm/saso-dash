@@ -76,7 +76,7 @@ public class UpgradingHandler
                     }
 
                     Optional<DBLiveToken> liveToken = entityFetcher.fetch(
-                            sqlScriptFactory.createFindLiveToken(token.get()));
+                            DBLiveToken.class, "find_live_token", token.get());
 
                     if (liveToken.isPresent()) {
                         upgradeHandlers[0].upgrade(ctx, req, liveToken.get());

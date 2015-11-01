@@ -40,7 +40,6 @@ public class DashDBConnector implements DBConnector
         }
         catch (ClassNotFoundException e) {
             logger.error(e.getMessage(), e);
-            System.exit(-1);
         }
     }
 

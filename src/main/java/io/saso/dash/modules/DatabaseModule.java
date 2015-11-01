@@ -5,10 +5,12 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import io.saso.dash.database.DBConnector;
 import io.saso.dash.database.DBFetcher;
+import io.saso.dash.database.DBScriptRepository;
 import io.saso.dash.database.entities.*;
 import io.saso.dash.database.entities.impl.*;
 import io.saso.dash.database.impl.DashDBConnector;
 import io.saso.dash.database.impl.DashDBFetcher;
+import io.saso.dash.database.impl.DashDBScriptRepository;
 import io.saso.dash.database.scripts.EntityReturnableSQLScript;
 import io.saso.dash.database.scripts.SQLScriptFactory;
 import io.saso.dash.database.scripts.impl.DashFindAuthTokenSQLScript;
@@ -25,6 +27,7 @@ public class DatabaseModule extends AbstractModule
     {
         bind(DBConnector.class).to(DashDBConnector.class);
         bind(DBFetcher.class).to(DashDBFetcher.class);
+        bind(DBScriptRepository.class).to(DashDBScriptRepository.class);
 
         // entities
         bind(DBAuthToken.class).to(DashDBAuthToken.class);

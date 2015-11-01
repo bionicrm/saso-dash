@@ -20,7 +20,7 @@ class DashDBEntityFetcher implements DBFetcher
 
     @Override
     <T extends DBEntity> Optional<T> fetch(
-            Class<T> entityClass, String sql, ...params)
+            Class<T> entityClass, String scriptName, ...params)
     {
         final DBEntity entity = injector.getInstance(entityClass)
 
@@ -30,7 +30,7 @@ class DashDBEntityFetcher implements DBFetcher
 
         try {
             connection = db.connection
-            statement = connection.prepareStatement(sql)
+            statement = connection.prepareStatement(scriptName)
 
             params.eachWithIndex { param, i ->
                 statement.setObject(i + 1, param)

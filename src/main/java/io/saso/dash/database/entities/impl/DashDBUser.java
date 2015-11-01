@@ -26,12 +26,6 @@ public class DashDBUser implements DBUser
     }
 
     @Override
-    public String getTableName()
-    {
-        return "users";
-    }
-
-    @Override
     public int getId()
     {
         return id;

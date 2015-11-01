@@ -29,12 +29,6 @@ public class DashDBLiveToken implements DBLiveToken
     }
 
     @Override
-    public String getTableName()
-    {
-        return "live_tokens";
-    }
-
-    @Override
     public int getId()
     {
         return id;

@@ -23,6 +23,16 @@ public class DashConcurrentConnections implements ConcurrentConnections
     }
 
     @Override
+    public void initialize()
+    {
+        try (Jedis connection = redis.getConnection(
+                RedisDatabase.CONCURRENT_CONNECTIONS))
+        {
+            connection.flushDB();
+        }
+    }
+
+    @Override
     public synchronized boolean incrementIfAllowed(int userId)
     {
         String userIdStr = String.valueOf(userId);

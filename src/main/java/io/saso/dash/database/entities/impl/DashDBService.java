@@ -18,12 +18,6 @@ public class DashDBService implements DBService
     }
 
     @Override
-    public String getTableName()
-    {
-        return "services";
-    }
-
-    @Override
     public int getId()
     {
         return id;

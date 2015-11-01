@@ -29,6 +29,9 @@ public class ConcurrentConnectionsHandler implements UpgradeHandler
         boolean allowed =
                 concurrentConnections.incrementIfAllowed(liveToken.getUserId());
 
+        ctx.channel().closeFuture().addListener(future ->
+                concurrentConnections.decrement(liveToken.getUserId()));
+
         if (allowed) {
             next.upgrade(ctx, req, liveToken);
         }

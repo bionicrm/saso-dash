@@ -29,12 +29,6 @@ public class DashDBServiceUser implements DBServiceUser
     }
 
     @Override
-    public String getTableName()
-    {
-        return "service_users";
-    }
-
-    @Override
     public int getId()
     {
         return id;

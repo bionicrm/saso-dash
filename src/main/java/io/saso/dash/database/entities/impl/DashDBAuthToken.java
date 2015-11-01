@@ -28,12 +28,6 @@ public class DashDBAuthToken implements DBAuthToken
     }
 
     @Override
-    public String getTableName()
-    {
-        return "auth_tokens";
-    }
-
-    @Override
     public int getId()
     {
         return id;
