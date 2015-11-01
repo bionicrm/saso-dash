@@ -38,6 +38,6 @@ public class DashFindAuthTokenSQLScript implements EntityReturnableSQLScript
     @Override
     public String getPath()
     {
-        return "find_auth_token.sql";
+        return "/sql/find_auth_token.sql";
     }
 }

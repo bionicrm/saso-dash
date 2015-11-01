@@ -35,6 +35,6 @@ public class DashFindLiveTokenSQLScript implements EntityReturnableSQLScript
     @Override
     public String getPath()
     {
-        return "find_live_token.sql";
+        return "/sql/find_live_token.sql";
     }
 }

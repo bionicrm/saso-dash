@@ -29,14 +29,13 @@ public class DashConcurrentConnections implements ConcurrentConnections
 
         try (Jedis connection = redis.getConnection(
                 RedisDatabase.CONCURRENT_CONNECTIONS)) {
-            long currentConnections =
-                    Long.parseLong(connection.get(userIdStr));
+            long currentConnections = connection.incr(userIdStr);
 
-            if (currentConnections == connectionsPerUser) {
+            if (currentConnections > connectionsPerUser) {
+                connection.decr(userIdStr);
                 return false;
             }
 
-            connection.incr(userIdStr);
             return true;
         }
     }

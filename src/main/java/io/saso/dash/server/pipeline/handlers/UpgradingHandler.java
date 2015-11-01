@@ -56,6 +56,8 @@ public class UpgradingHandler
     protected void messageReceived(ChannelHandlerContext ctx,
                                    FullHttpRequest req)
     {
+        req.retain();
+
         Futures.addCallback(service.submit(() -> {
             if (upgradeHandlers.length > 0) {
                 Optional<String> token =
@@ -89,7 +91,7 @@ public class UpgradingHandler
             public void onSuccess(Boolean result)
             {
                 if (result) {
-                    ctx.fireChannelRead(req.retain());
+                    ctx.fireChannelRead(req);
                 }
                 else {
                     ChannelHandlerUtil.respond(
@@ -101,6 +103,7 @@ public class UpgradingHandler
             @Override
             public void onFailure(@Nonnull Throwable t)
             {
+                req.release();
                 throw new RuntimeException(t);
             }
         }, ctx.executor());

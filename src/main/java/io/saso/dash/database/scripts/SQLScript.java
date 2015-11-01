@@ -6,7 +6,7 @@ import java.sql.SQLException;
 public interface SQLScript
 {
     /**
-     * Gets the path to this SQL script, relative to the resource/sql directory.
+     * Gets the path to this SQL script.
      *
      * @return the path to this SQL script
      */
