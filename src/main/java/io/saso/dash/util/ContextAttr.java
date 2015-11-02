@@ -4,9 +4,9 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.util.AttributeKey;
 import io.saso.dash.database.entities.DBLiveToken;
 
-public final class ChannelHandlerAttr
+public final class ContextAttr
 {
-    private ChannelHandlerAttr() { }
+    private ContextAttr() { }
 
     public static final AttributeKey<DBLiveToken> LIVE_TOKEN =
             AttributeKey.valueOf("live token");

@@ -1,11 +1,10 @@
 package io.saso.dash.database.entities;
 
-import io.saso.dash.database.DBEntity;
-import io.saso.dash.database.DBTimestampable;
+import io.saso.dash.database.DBTimestampEntity;
 
 import java.util.Optional;
 
-public interface DBUser extends DBTimestampable, DBEntity
+public interface DBUser extends DBTimestampEntity
 {
     String getName();
 

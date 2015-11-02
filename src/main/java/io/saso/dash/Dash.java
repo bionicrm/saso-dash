@@ -20,6 +20,7 @@ public class Dash
                 new DatabaseModule(),
                 new RedisModule(),
                 new ServerModule(),
+                new ServicesModule(),
                 new StartupModule());
 
         // run startup

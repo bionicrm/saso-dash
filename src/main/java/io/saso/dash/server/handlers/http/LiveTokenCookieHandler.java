@@ -8,8 +8,8 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderUtil;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.saso.dash.server.CookieFinder;
-import io.saso.dash.util.ChannelHandlerAttr;
 import io.saso.dash.util.ChannelHandlerUtil;
+import io.saso.dash.util.ContextAttr;
 
 import java.util.Optional;
 
@@ -33,7 +33,7 @@ public class LiveTokenCookieHandler
                 cookieFinder.find("live_token", req.headers());
 
         if (tokenOptional.isPresent()) {
-            ctx.attr(ChannelHandlerAttr.TOKEN_COOKIE_VALUE).set(
+            ctx.attr(ContextAttr.TOKEN_COOKIE_VALUE).set(
                     tokenOptional.get());
             ctx.fireChannelRead(req.retain());
         }

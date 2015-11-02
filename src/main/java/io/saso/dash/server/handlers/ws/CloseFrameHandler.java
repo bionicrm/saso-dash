@@ -4,7 +4,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
-import io.saso.dash.util.ChannelHandlerAttr;
+import io.saso.dash.util.ContextAttr;
 
 @ChannelHandler.Sharable
 public class CloseFrameHandler
@@ -14,7 +14,7 @@ public class CloseFrameHandler
     protected void messageReceived(ChannelHandlerContext ctx,
                                    CloseWebSocketFrame frame)
     {
-        ctx.attr(ChannelHandlerAttr.WS_HANDSHAKER).get().close(ctx.channel(),
+        ctx.attr(ContextAttr.WS_HANDSHAKER).get().close(ctx.channel(),
                 frame.retain());
     }
 }

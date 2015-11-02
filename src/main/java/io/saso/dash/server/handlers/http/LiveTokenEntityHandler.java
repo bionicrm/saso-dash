@@ -9,8 +9,8 @@ import io.netty.handler.codec.http.HttpHeaderUtil;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.saso.dash.database.entities.DBLiveToken;
 import io.saso.dash.server.Authentication;
-import io.saso.dash.util.ChannelHandlerAttr;
 import io.saso.dash.util.ChannelHandlerUtil;
+import io.saso.dash.util.ContextAttr;
 import io.saso.dash.util.ThreadUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,14 +37,14 @@ public class LiveTokenEntityHandler
     {
         req.retain();
 
-        String token = ctx.attr(ChannelHandlerAttr.TOKEN_COOKIE_VALUE).get();
+        String token = ctx.attr(ContextAttr.TOKEN_COOKIE_VALUE).get();
 
         ThreadUtil.CACHED_THREAD_POOL.execute(() -> {
             Optional<DBLiveToken> liveTokenOptional =
                     authentication.authenticate(token);
 
             if (liveTokenOptional.isPresent()) {
-                ctx.attr(ChannelHandlerAttr.LIVE_TOKEN).set(
+                ctx.attr(ContextAttr.LIVE_TOKEN).set(
                         liveTokenOptional.get());
                 ctx.executor().execute(() -> ctx.fireChannelRead(req));
             }

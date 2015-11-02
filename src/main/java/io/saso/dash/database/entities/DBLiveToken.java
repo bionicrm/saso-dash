@@ -1,11 +1,10 @@
 package io.saso.dash.database.entities;
 
-import io.saso.dash.database.DBEntity;
-import io.saso.dash.database.DBTimestampable;
+import io.saso.dash.database.DBTimestampEntity;
 
 import java.sql.Timestamp;
 
-public interface DBLiveToken extends DBTimestampable, DBEntity
+public interface DBLiveToken extends DBTimestampEntity
 {
     int getUserId();
 

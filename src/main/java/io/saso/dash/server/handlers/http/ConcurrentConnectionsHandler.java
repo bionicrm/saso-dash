@@ -9,8 +9,8 @@ import io.netty.handler.codec.http.HttpHeaderUtil;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.saso.dash.database.entities.DBLiveToken;
 import io.saso.dash.redis.databases.ConcurrentConnections;
-import io.saso.dash.util.ChannelHandlerAttr;
 import io.saso.dash.util.ChannelHandlerUtil;
+import io.saso.dash.util.ContextAttr;
 import io.saso.dash.util.ThreadUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +35,7 @@ public class ConcurrentConnectionsHandler extends SimpleChannelInboundHandler<Fu
     {
         req.retain();
 
-        DBLiveToken liveToken = ctx.attr(ChannelHandlerAttr.LIVE_TOKEN).get();
+        DBLiveToken liveToken = ctx.attr(ContextAttr.LIVE_TOKEN).get();
         final int userId = liveToken.getUserId();
 
         ThreadUtil.CACHED_THREAD_POOL.execute(() -> {

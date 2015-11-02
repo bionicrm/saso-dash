@@ -1,9 +1,8 @@
 package io.saso.dash.database.entities;
 
-import io.saso.dash.database.DBEntity;
-import io.saso.dash.database.DBTimestampable;
+import io.saso.dash.database.DBTimestampEntity;
 
-public interface DBServiceUser extends DBTimestampable, DBEntity
+public interface DBServiceUser extends DBTimestampEntity
 {
     int getUserId();
 
