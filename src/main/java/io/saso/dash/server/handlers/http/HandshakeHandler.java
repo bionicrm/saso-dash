@@ -1,49 +1,49 @@
 package io.saso.dash.server.handlers.http;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
-import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.saso.dash.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @ChannelHandler.Sharable
-public class UpgradeHandler extends SimpleChannelInboundHandler<FullHttpRequest>
+public class HandshakeHandler extends SimpleChannelInboundHandler<FullHttpRequest>
 {
     private static final Logger logger = LogManager.getLogger();
 
-    private final ChannelHandler[] handlers;
+    private final String serverUrl;
 
     @Inject
-    public UpgradeHandler(
-            @Named("server ws handlers") ChannelHandler[] handlers)
+    public HandshakeHandler(Config config)
     {
-        this.handlers = handlers;
+        serverUrl = config.<String>get("server.url").orElse("ws://127.0.0.1");
     }
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx,
                                    FullHttpRequest req)
     {
-        ChannelPipeline p = ctx.channel().pipeline();
+        req.retain();
 
-        // remove pipeline handlers
-        while (p.last() != null) {
-            p.removeLast();
+        WebSocketServerHandshakerFactory handshakerFactory =
+                new WebSocketServerHandshakerFactory(serverUrl, null, false);
+        WebSocketServerHandshaker handshaker =
+                handshakerFactory.newHandshaker(req);
+
+        if (handshaker == null) {
+            WebSocketServerHandshakerFactory
+                    .sendUnsupportedVersionResponse(ctx.channel());
+            req.release();
         }
-
-        // add WS channel handlers
-        p.addLast(new WebSocketServerCompressionHandler());
-        p.addLast(handlers);
-
-        ctx.fireChannelRead(req.retain());
+        else {
+            handshaker.handshake(ctx.channel(), req).addListener(future ->
+                    ctx.fireChannelRead(req));
+        }
     }
 
     @Override

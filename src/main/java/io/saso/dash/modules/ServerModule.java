@@ -28,9 +28,10 @@ public class ServerModule extends AbstractModule
     ChannelHandler[] provideHttpChannelHandlers(
             RequestValidationHandler h0, RequestMethodHandler h1,
             LiveTokenCookieHandler h2, LiveTokenEntityHandler h3,
-            ConcurrentConnectionsHandler h4, UpgradeHandler h5)
+            ConcurrentConnectionsHandler h4, HandshakeHandler h5,
+            ServicesHandler h6, UpgradeHandler h7)
     {
-        return new ChannelHandler[] { h0, h1, h2, h3, h4, h5 };
+        return new ChannelHandler[] { h0, h1, h2, h3, h4, h5, h6, h7 };
     }
 
     @Provides @Named("server ws handlers")
