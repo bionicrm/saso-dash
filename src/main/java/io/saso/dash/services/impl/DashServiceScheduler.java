@@ -29,29 +29,29 @@ public class DashServiceScheduler implements ServiceScheduler
             for (Service s : services) {
                 s.start(client);
             }
+
+            for (int i = 0; i < services.length; i++) {
+                Service s = services[i];
+                int interval = s.getPollInterval();
+
+                scheduledFutures[i] =
+                        ThreadUtil.SCHEDULER.scheduleAtFixedRate(() -> {
+                            ThreadUtil.THREAD_POOL.submit(() -> {
+                                s.poll(client);
+                            });
+                        }, interval, interval, TimeUnit.SECONDS);
+            }
         });
-
-        for (int i = 0; i < services.length; i++) {
-            Service s = services[i];
-            int interval = s.getPollInterval();
-
-            scheduledFutures[i] =
-                    ThreadUtil.SCHEDULER.scheduleAtFixedRate(() -> {
-                        ThreadUtil.THREAD_POOL.submit(() -> {
-                            s.poll(client);
-                        });
-                    }, interval, interval, TimeUnit.SECONDS);
-        }
     }
 
     @Override
     public void cancel(Client client)
     {
-        ThreadUtil.THREAD_POOL.submit(() -> {
-            for (ScheduledFuture f : scheduledFutures) {
-                f.cancel(true);
-            }
+        for (ScheduledFuture f : scheduledFutures) {
+            f.cancel(true);
+        }
 
+        ThreadUtil.THREAD_POOL.submit(() -> {
             for (Service s : services) {
                 s.stop(client);
             }

@@ -14,24 +14,24 @@ public class GitHubService implements Service
     @Override
     public int getPollInterval()
     {
-        return 10;
+        return 30;
     }
 
     @Override
     public void start(Client client)
     {
-
+        // TODO: implement
     }
 
     @Override
     public void poll(Client client)
     {
-
+        // TODO: implement
     }
 
     @Override
     public void stop(Client client)
     {
-
+        // TODO: implement
     }
 }
