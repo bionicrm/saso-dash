@@ -25,21 +25,24 @@ public interface Service
     }
 
     /**
-     * Starts the service.
+     * Starts the service. This method may block as it is run in an independent
+     * thread specific to this service.
      *
      * @param client the client
      */
     default void start(Client client) { }
 
     /**
-     * Polls the service. Called as per {@link #getPollInterval()}.
+     * Polls the service. Called as per {@link #getPollInterval()}. This method
+     * may block as it is run in an independent thread specific to this service.
      *
      * @param client the client
      */
     default void poll(Client client) { }
 
     /**
-     * Stops the service.
+     * Stops the service. This method may block as it is run in an independent
+     * thread specific to this service.
      *
      * @param client the client
      */
