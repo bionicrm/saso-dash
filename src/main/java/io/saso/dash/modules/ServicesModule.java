@@ -1,8 +1,12 @@
 package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.name.Named;
+import io.saso.dash.services.services.Service;
 import io.saso.dash.services.ServiceScheduler;
 import io.saso.dash.services.impl.DashServiceScheduler;
+import io.saso.dash.services.services.impl.GitHubService;
 
 public class ServicesModule extends AbstractModule
 {
@@ -10,5 +14,11 @@ public class ServicesModule extends AbstractModule
     protected void configure()
     {
         bind(ServiceScheduler.class).to(DashServiceScheduler.class);
+    }
+
+    @Provides @Named("services")
+    Service[] provideServices(GitHubService s1)
+    {
+        return new Service[] { s1 };
     }
 }

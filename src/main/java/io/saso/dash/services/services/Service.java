@@ -1,4 +1,4 @@
-package io.saso.dash.services;
+package io.saso.dash.services.services;
 
 import io.saso.dash.server.Client;
 

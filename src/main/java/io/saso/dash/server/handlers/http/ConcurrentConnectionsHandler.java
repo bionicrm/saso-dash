@@ -38,7 +38,7 @@ public class ConcurrentConnectionsHandler extends SimpleChannelInboundHandler<Fu
         DBLiveToken liveToken = ctx.attr(ContextAttr.LIVE_TOKEN).get();
         final int userId = liveToken.getUserId();
 
-        ThreadUtil.CACHED_THREAD_POOL.execute(() -> {
+        ThreadUtil.THREAD_POOL.execute(() -> {
             boolean allowed = concurrentConnections.incrementIfAllowed(userId);
 
             if (allowed) {

@@ -6,7 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.saso.dash.database.DBFetcher;
 import io.saso.dash.database.entities.*;
 import io.saso.dash.server.Client;
-import io.saso.dash.services.Service;
+import io.saso.dash.services.services.Service;
 import io.saso.dash.util.ContextAttr;
 
 public class DashClient implements Client

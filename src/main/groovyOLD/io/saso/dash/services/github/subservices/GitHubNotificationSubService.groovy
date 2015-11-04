@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.inject.Inject
 import io.netty.channel.ChannelHandlerContext
 import io.saso.dash.database.DBEntityProvider
-import io.saso.dash.services.Service
+import io.saso.dash.services.services.Service
 import io.saso.dash.services.ServiceLocal
 import io.saso.dash.services.ServiceName
 import io.saso.dash.templating.Template

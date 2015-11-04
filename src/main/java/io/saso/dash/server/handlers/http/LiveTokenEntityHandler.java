@@ -39,7 +39,7 @@ public class LiveTokenEntityHandler
 
         String token = ctx.attr(ContextAttr.TOKEN_COOKIE_VALUE).get();
 
-        ThreadUtil.CACHED_THREAD_POOL.execute(() -> {
+        ThreadUtil.THREAD_POOL.execute(() -> {
             Optional<DBLiveToken> liveTokenOptional =
                     authentication.authenticate(token);
 

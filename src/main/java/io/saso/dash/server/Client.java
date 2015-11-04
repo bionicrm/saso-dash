@@ -2,7 +2,7 @@ package io.saso.dash.server;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.saso.dash.database.entities.*;
-import io.saso.dash.services.Service;
+import io.saso.dash.services.services.Service;
 
 public interface Client
 {
