@@ -2,7 +2,7 @@ package io.saso.dash.database.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.saso.dash.config.Config;
+import me.mazeika.uconfig.Config;
 import io.saso.dash.database.DBConnector;
 import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp2.PoolableConnection;
@@ -66,15 +66,14 @@ public class DashDBConnector implements DBConnector
             long start = System.nanoTime();
 
             String url = String.format("jdbc:postgresql://%s:%d/%s",
-                    config.<String>get("db.host").orElse("127.0.0.1"),
-                    config.<Integer>get("db.port").orElse(5432),
-                    config.<String>get("db.database").orElse("postgres"));
+                    config.getOrDefault("db.host", "127.0.0.1"),
+                    config.getOrDefault("db.port", 5432),
+                    config.getOrDefault("db.database", "postgres"));
 
             DriverManagerConnectionFactory connFactory =
                     new DriverManagerConnectionFactory(url,
-                            config.<String>get("db.user").orElse("postgres"),
-                            config.<String>get("db.password")
-                                    .orElse("postgres"));
+                            config.getOrDefault("db.user", "postgres"),
+                            config.getOrDefault("db.password", "postgres"));
 
             PoolableConnectionFactory poolableConnFactory =
                     new PoolableConnectionFactory(connFactory, null);

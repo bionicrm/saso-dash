@@ -2,7 +2,7 @@ package io.saso.dash.redis.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.saso.dash.config.Config;
+import me.mazeika.uconfig.Config;
 import io.saso.dash.redis.Redis;
 import io.saso.dash.redis.databases.RedisDatabase;
 import org.apache.logging.log4j.LogManager;
@@ -49,11 +49,10 @@ public class DashRedis implements Redis
             long start = System.nanoTime();
 
             JedisPoolConfig poolConfig = new JedisPoolConfig();
-            String host = config.<String>get("redis.host")
-                    .orElse(Protocol.DEFAULT_HOST);
-            int port = config.<Integer>get("redis.port")
-                    .orElse(Protocol.DEFAULT_PORT);
-            String password = config.<String>get("redis.password").orElse("");
+            String host =
+                    config.getOrDefault("redis.host", Protocol.DEFAULT_HOST);
+            int port = config.getOrDefault("redis.port", Protocol.DEFAULT_PORT);
+            String password = config.getOrDefault("redis.password", "");
 
             if (password.isEmpty()) {
                 connectionPool = new JedisPool(poolConfig, host, port);

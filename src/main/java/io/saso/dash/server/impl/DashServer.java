@@ -11,7 +11,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.saso.dash.config.Config;
+import me.mazeika.uconfig.Config;
 import io.saso.dash.server.Server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,8 +46,8 @@ public class DashServer implements Server
                     .childHandler(new Initializer());
 
             ChannelFuture f = b.bind(
-                    config.<String>get("server.bind.host").orElse("127.0.0.1"),
-                    config.<Integer>get("server.bind.port").orElse(80));
+                    config.getOrDefault("server.bind.host", "127.0.0.1"),
+                    config.getOrDefault("server.bind.port", 80));
             Channel ch = f.sync().channel();
 
             logger.info("Server started at {}", ch.localAddress());

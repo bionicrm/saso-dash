@@ -16,7 +16,6 @@ public class Dash
         logger.info("Starting Dash v0.1");
 
         Injector injector = Guice.createInjector(
-                new ConfigModule(),
                 new DatabaseModule(),
                 new RedisModule(),
                 new ServerModule(),

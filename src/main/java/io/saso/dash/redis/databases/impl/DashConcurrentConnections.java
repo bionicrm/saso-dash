@@ -2,10 +2,10 @@ package io.saso.dash.redis.databases.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.saso.dash.config.Config;
 import io.saso.dash.redis.Redis;
 import io.saso.dash.redis.databases.ConcurrentConnections;
 import io.saso.dash.redis.databases.RedisDatabase;
+import me.mazeika.uconfig.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import redis.clients.jedis.Jedis;
@@ -25,7 +25,7 @@ public class DashConcurrentConnections implements ConcurrentConnections
     {
         this.redis = redis;
         connectionsPerUser =
-                config.<Integer>get("limits.connections_per_user").orElse(3);
+                config.getOrDefault("limits.connections_per_user", 3);
     }
 
     @Override

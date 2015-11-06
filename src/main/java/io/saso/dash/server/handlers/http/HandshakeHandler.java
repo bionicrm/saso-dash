@@ -7,7 +7,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
-import io.saso.dash.config.Config;
+import me.mazeika.uconfig.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,7 +21,7 @@ public class HandshakeHandler extends SimpleChannelInboundHandler<FullHttpReques
     @Inject
     public HandshakeHandler(Config config)
     {
-        serverUrl = config.<String>get("server.url").orElse("ws://127.0.0.1");
+        serverUrl = config.getOrDefault("server.url", "ws://127.0.0.1");
     }
 
     @Override

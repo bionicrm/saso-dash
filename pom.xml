@@ -36,6 +36,13 @@
     </build>
 
     <dependencies>
+        <!-- uconfig -->
+        <dependency>
+            <groupId>me.mazeika.uconfig</groupId>
+            <artifactId>uconfig</artifactId>
+            <version>0.1.1</version>
+        </dependency>
+
         <!-- Guice -->
         <dependency>
             <groupId>com.google.inject</groupId>

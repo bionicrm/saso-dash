@@ -2,6 +2,7 @@ package io.saso.dash.modules;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Named;
 import io.netty.channel.ChannelHandler;
@@ -14,6 +15,7 @@ import io.saso.dash.server.impl.DashAuthentication;
 import io.saso.dash.server.impl.DashClient;
 import io.saso.dash.server.impl.DashCookieFinder;
 import io.saso.dash.server.impl.DashServer;
+import me.mazeika.uconfig.Config;
 
 public class ServerModule extends AbstractModule
 {
@@ -44,5 +46,11 @@ public class ServerModule extends AbstractModule
             PingFrameHandler h0, CloseFrameHandler h1, ServicesHandler h2)
     {
         return new ChannelHandler[] { h0, h1, h2 };
+    }
+
+    @Provides @Singleton
+    Config provideConfig()
+    {
+        return Config.create("config.yaml");
     }
 }
