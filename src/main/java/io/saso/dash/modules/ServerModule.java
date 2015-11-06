@@ -51,6 +51,6 @@ public class ServerModule extends AbstractModule
     @Provides @Singleton
     Config provideConfig()
     {
-        return Config.create("config.yaml");
+        return Config.create("config.yaml", false);
     }
 }
