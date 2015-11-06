@@ -13,7 +13,7 @@ public class Dash
 
     public static void main(String[] args)
     {
-        logger.info("Starting Dash v0.1");
+        logger.info("Starting Dash");
 
         Injector injector = Guice.createInjector(
                 new DatabaseModule(),
