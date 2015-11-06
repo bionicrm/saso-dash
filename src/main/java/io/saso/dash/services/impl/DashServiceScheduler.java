@@ -32,7 +32,7 @@ public class DashServiceScheduler implements ServiceScheduler
 
             for (int i = 0; i < services.length; i++) {
                 Service s = services[i];
-                int interval = s.getPollInterval();
+                final int interval = s.getPollInterval();
 
                 scheduledFutures[i] =
                         ThreadUtil.SCHEDULER.scheduleAtFixedRate(() -> {
