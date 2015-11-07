@@ -35,14 +35,14 @@ public class DashConcurrentConnections implements ConcurrentConnections
     @Override
     public synchronized boolean incrementIfAllowed(int userId)
     {
-        String userIdStr = String.valueOf(userId);
+        String key = getKey(userId);
 
         try (Jedis connection = redis.getConnection(
                 RedisDatabase.CONCURRENT_CONNECTIONS)) {
-            long currentConnections = connection.incr(userIdStr);
+            long currentConnections = connection.incr(key);
 
             if (currentConnections > connectionsPerUser) {
-                connection.decr(userIdStr);
+                connection.decr(key);
                 return false;
             }
 
@@ -55,7 +55,12 @@ public class DashConcurrentConnections implements ConcurrentConnections
     {
         try (Jedis connection = redis.getConnection(
                 RedisDatabase.CONCURRENT_CONNECTIONS)) {
-            connection.decr(String.valueOf(userId));
+            connection.decr(getKey(userId));
         }
+    }
+
+    private String getKey(int userId)
+    {
+        return String.valueOf(userId);
     }
 }
