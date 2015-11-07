@@ -1,4 +1,4 @@
-package io.saso.dash.server.handlers.events;
+package io.saso.dash.server.handlers;
 
 public enum  Event
 {
