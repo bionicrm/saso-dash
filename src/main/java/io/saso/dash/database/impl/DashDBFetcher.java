@@ -38,38 +38,28 @@ public class DashDBFetcher implements DBFetcher
     public <T extends DBEntity> Optional<T> fetch(
             Class<T> entityClass, String scriptName, Object... params)
     {
-        long start = System.nanoTime();
+        T entity = injector.getInstance(entityClass);
+        String sql = scriptRepository.getSQL(scriptName);
 
-        try {
-            T entity = injector.getInstance(entityClass);
-            String sql = scriptRepository.getSQL(scriptName);
-
-            try (Connection connection = connector.getConnection();
-                 PreparedStatement statement = connection
-                         .prepareStatement(sql)) {
-                // set SQL parameters
-                for (int i = 0; i < params.length; i++) {
-                    statement.setObject(i + 1, params[i]);
-                }
-
-                ResultSet resultSet = statement.executeQuery();
-
-                if (resultSet.next()) {
-                    entity.fill(resultSet);
-                    return Optional.of(entity);
-                }
-            }
-            catch (Exception e) {
-                logger.error(e.getMessage(), e);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection
+                     .prepareStatement(sql)) {
+            // set SQL parameters
+            for (int i = 0; i < params.length; i++) {
+                statement.setObject(i + 1, params[i]);
             }
 
-            return Optional.empty();
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                entity.fill(resultSet);
+                return Optional.of(entity);
+            }
         }
-        finally {
-            long end = System.nanoTime();
-            logger.debug("Fetched {} from DB in about {}µs",
-                    entityClass.getSimpleName(),
-                    TimeUnit.NANOSECONDS.toMicros(end - start));
+        catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
+
+        return Optional.empty();
     }
 }

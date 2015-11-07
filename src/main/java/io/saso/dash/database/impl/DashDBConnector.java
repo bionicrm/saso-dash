@@ -63,8 +63,6 @@ public class DashDBConnector implements DBConnector
     {
 
         if (connectionPool == null) {
-            long start = System.nanoTime();
-
             String url = String.format("jdbc:postgresql://%s:%d/%s",
                     config.getOrDefault("db.host", "127.0.0.1"),
                     config.getOrDefault("db.port", 5432),
@@ -85,10 +83,6 @@ public class DashDBConnector implements DBConnector
 
             poolableConnFactory.setPool(connectionPool);
             driver.registerPool("saso", connectionPool);
-
-            long end = System.nanoTime();
-            logger.debug("Created DB connection pool in about {}µs",
-                    TimeUnit.NANOSECONDS.toMicros(end - start));
         }
 
         return connectionPool;

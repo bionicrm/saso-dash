@@ -46,8 +46,6 @@ public class DashRedis implements Redis
     private synchronized JedisPool getConnectionPool()
     {
         if (connectionPool == null) {
-            long start = System.nanoTime();
-
             JedisPoolConfig poolConfig = new JedisPoolConfig();
             String host =
                     config.getOrDefault("redis.host", Protocol.DEFAULT_HOST);
@@ -61,10 +59,6 @@ public class DashRedis implements Redis
                 connectionPool = new JedisPool(poolConfig, host, port,
                         Protocol.DEFAULT_TIMEOUT, password);
             }
-
-            long end = System.nanoTime();
-            logger.debug("Created Redis connection pool in about {}µs",
-                    TimeUnit.NANOSECONDS.toMicros(end - start));
         }
 
         return connectionPool;
