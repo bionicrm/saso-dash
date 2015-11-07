@@ -5,8 +5,6 @@ import com.google.inject.Singleton;
 import io.saso.dash.redis.Redis;
 import io.saso.dash.redis.databases.RedisDatabase;
 import me.mazeika.uconfig.Config;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -15,8 +13,6 @@ import redis.clients.jedis.Protocol;
 @Singleton
 public class DashRedis implements Redis
 {
-    private static final Logger logger = LogManager.getLogger();
-
     private final Config config;
 
     private JedisPool connectionPool;
