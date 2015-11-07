@@ -17,8 +17,8 @@ public class ServicesModule extends AbstractModule
     }
 
     @Provides @Named("services")
-    Service[] provideServices(GitHubService s1)
+    Service[] provideServices(GitHubService s0)
     {
-        return new Service[] { s1 };
+        return new Service[] { s0 };
     }
 }
