@@ -2,6 +2,8 @@ package io.saso.dash.services.services;
 
 import io.saso.dash.server.Client;
 
+import java.io.IOException;
+
 public interface Service
 {
     /**
@@ -30,7 +32,7 @@ public interface Service
      *
      * @param client the client
      */
-    default void start(Client client) { }
+    default void start(Client client) throws Exception { }
 
     /**
      * Polls the service. Called as per {@link #getPollInterval()}. This method
@@ -38,7 +40,7 @@ public interface Service
      *
      * @param client the client
      */
-    default void poll(Client client) { }
+    default void poll(Client client) throws Exception { }
 
     /**
      * Stops the service. This method may block as it is run in an independent
@@ -46,5 +48,5 @@ public interface Service
      *
      * @param client the client
      */
-    default void stop(Client client) { }
+    default void stop(Client client) throws Exception { }
 }

@@ -2,9 +2,15 @@ package io.saso.dash.services.services.impl;
 
 import io.saso.dash.server.Client;
 import io.saso.dash.services.services.Service;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
+
+import java.io.IOException;
 
 public class GitHubService implements Service
 {
+    private GitHub gitHub;
+
     @Override
     public String getName()
     {
@@ -18,9 +24,9 @@ public class GitHubService implements Service
     }
 
     @Override
-    public void start(Client client)
+    public void start(Client client) throws Exception
     {
-        // TODO: implement
+        gitHub = GitHub.connectUsingOAuth(client.authToken(this).getAccess());
     }
 
     @Override

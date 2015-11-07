@@ -6,12 +6,16 @@ import io.saso.dash.server.Client;
 import io.saso.dash.services.ServiceScheduler;
 import io.saso.dash.services.services.Service;
 import io.saso.dash.util.ThreadUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class DashServiceScheduler implements ServiceScheduler
 {
+    private static final Logger logger = LogManager.getLogger();
+
     private final Service[] services;
     private final ScheduledFuture[] scheduledFutures;
 
@@ -27,7 +31,12 @@ public class DashServiceScheduler implements ServiceScheduler
     {
         ThreadUtil.THREAD_POOL.submit(() -> {
             for (Service s : services) {
-                s.start(client);
+                try {
+                    s.start(client);
+                }
+                catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
 
             for (int i = 0; i < services.length; i++) {
@@ -37,7 +46,12 @@ public class DashServiceScheduler implements ServiceScheduler
                 scheduledFutures[i] =
                         ThreadUtil.SCHEDULER.scheduleAtFixedRate(() -> {
                             ThreadUtil.THREAD_POOL.submit(() -> {
-                                s.poll(client);
+                                try {
+                                    s.poll(client);
+                                }
+                                catch (Exception e) {
+                                    logger.error(e.getMessage(), e);
+                                }
                             });
                         }, interval, interval, TimeUnit.SECONDS);
             }
@@ -53,7 +67,12 @@ public class DashServiceScheduler implements ServiceScheduler
 
         ThreadUtil.THREAD_POOL.submit(() -> {
             for (Service s : services) {
-                s.stop(client);
+                try {
+                    s.stop(client);
+                }
+                catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
         });
     }
