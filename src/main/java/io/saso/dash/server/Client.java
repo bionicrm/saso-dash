@@ -1,6 +1,6 @@
 package io.saso.dash.server;
 
-import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.Channel;
 import io.saso.dash.database.entities.*;
 import io.saso.dash.services.services.Service;
 
@@ -48,12 +48,12 @@ public interface Client
     DBUser user();
 
     /**
-     * @see ChannelHandlerContext#write(Object)
+     * @see Channel#write(Object)
      */
-    Client write(Object msg);
+    Client write(String msg);
 
     /**
-     * @see ChannelHandlerContext#flush()
+     * @see Channel#flush()
      */
     Client flush();
 }

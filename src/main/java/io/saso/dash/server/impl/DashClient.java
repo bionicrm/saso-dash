@@ -2,7 +2,9 @@ package io.saso.dash.server.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.saso.dash.database.DBFetcher;
 import io.saso.dash.database.entities.*;
 import io.saso.dash.server.Client;
@@ -12,14 +14,14 @@ import io.saso.dash.util.ContextAttr;
 public class DashClient implements Client
 {
     private final DBFetcher dbFetcher;
-    private final ChannelHandlerContext ctx;
+    private final Channel ch;
     private final DBLiveToken liveToken;
 
     @Inject
     public DashClient(DBFetcher dbFetcher, @Assisted ChannelHandlerContext ctx)
     {
         this.dbFetcher = dbFetcher;
-        this.ctx = ctx;
+        ch = ctx.channel();
         liveToken = ctx.attr(ContextAttr.LIVE_TOKEN).get();
     }
 
@@ -58,16 +60,16 @@ public class DashClient implements Client
     }
 
     @Override
-    public Client write(Object msg)
+    public Client write(String msg)
     {
-        ctx.write(msg);
+        ch.write(new TextWebSocketFrame(msg));
         return this;
     }
 
     @Override
     public Client flush()
     {
-        ctx.flush();
+        ch.flush();
         return this;
     }
 }

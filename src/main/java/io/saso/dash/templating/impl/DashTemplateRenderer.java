@@ -11,8 +11,6 @@ import com.lyncode.jtwig.exception.RenderException;
 import io.saso.dash.templating.TemplateRenderer;
 import io.saso.dash.util.Resources;
 import me.mazeika.uconfig.Config;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,8 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class DashTemplateRenderer implements TemplateRenderer
 {
-    private static final Logger logger = LogManager.getLogger();
-
     /**
      * The number of templates found in templates/. Not required to
      * be correct; it is simply used as the initial map size for the cache.
