@@ -7,6 +7,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
+import io.saso.dash.util.ContextAttr;
 import me.mazeika.uconfig.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +42,7 @@ public class HandshakeHandler extends SimpleChannelInboundHandler<FullHttpReques
             req.release();
         }
         else {
+            ctx.attr(ContextAttr.WS_HANDSHAKER).set(handshaker);
             handshaker.handshake(ctx.channel(), req).addListener(future ->
                     ctx.fireChannelRead(req));
         }

@@ -31,11 +31,6 @@ public class UpgradeHandler extends SimpleChannelInboundHandler<FullHttpRequest>
     {
         ChannelPipeline p = ctx.channel().pipeline();
 
-        // remove pipeline handlers
-        while (p.last() != null) {
-            p.removeLast();
-        }
-
         // add WS channel handlers
         p.addLast(new WebSocketServerCompressionHandler());
         p.addLast(handlers);
