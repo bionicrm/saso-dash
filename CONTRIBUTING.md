@@ -1,5 +1,7 @@
 # Contributing
 
+**Note:** While it's nice for contributors to follow these guidelines, mistakes here and there won't get PR's rejected; they'll be corrected later.
+
 ### Style
 
 - 80 characters per line except:
