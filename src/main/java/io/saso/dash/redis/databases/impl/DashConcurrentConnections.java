@@ -6,11 +6,7 @@ import io.saso.dash.redis.Redis;
 import io.saso.dash.redis.databases.ConcurrentConnections;
 import io.saso.dash.redis.databases.RedisDatabase;
 import me.mazeika.uconfig.Config;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import redis.clients.jedis.Jedis;
-
-import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class DashConcurrentConnections implements ConcurrentConnections

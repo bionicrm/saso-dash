@@ -2,17 +2,15 @@ package io.saso.dash.redis.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mazeika.uconfig.Config;
 import io.saso.dash.redis.Redis;
 import io.saso.dash.redis.databases.RedisDatabase;
+import me.mazeika.uconfig.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
-
-import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class DashRedis implements Redis

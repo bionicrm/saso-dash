@@ -2,8 +2,8 @@ package io.saso.dash.database.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mazeika.uconfig.Config;
 import io.saso.dash.database.DBConnector;
+import me.mazeika.uconfig.Config;
 import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp2.PoolableConnection;
 import org.apache.commons.dbcp2.PoolableConnectionFactory;
@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class DashDBConnector implements DBConnector

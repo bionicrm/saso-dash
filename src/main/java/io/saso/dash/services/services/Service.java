@@ -2,8 +2,6 @@ package io.saso.dash.services.services;
 
 import io.saso.dash.server.Client;
 
-import java.io.IOException;
-
 public interface Service
 {
     /**
