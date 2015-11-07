@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DashTemplateRenderer implements TemplateRenderer
 {
     /**
-     * The number of templates found in templates/. Not required to
+     * The number of templates found in ./templates. Not required to
      * be correct; it is simply used as the initial map size for the cache.
      */
     private static final int TEMPLATE_COUNT = 3;
@@ -31,7 +31,7 @@ public class DashTemplateRenderer implements TemplateRenderer
     @Inject
     public DashTemplateRenderer(Config config)
     {
-        cacheTemplates = config.getOrDefault("cache.templates", true);
+        cacheTemplates = config.getOrDefault("debug", false);
     }
 
     @Override

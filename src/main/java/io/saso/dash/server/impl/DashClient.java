@@ -26,6 +26,12 @@ public class DashClient implements Client
     }
 
     @Override
+    public int getId()
+    {
+        return liveToken.getUserId();
+    }
+
+    @Override
     public DBAuthToken authToken(Service service)
     {
         return dbFetcher.fetch(DBAuthToken.class, "find_auth_token",

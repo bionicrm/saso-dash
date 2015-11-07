@@ -1,3 +1,5 @@
+debug: true
+
 server:
   url:       ws://ws.saso.dev/
   bind:
@@ -15,9 +17,6 @@ redis:
   host:      saso.dev
   port:      6379
   password:  ~
-
-cache:
-  templates: false
 
 limits:
   connections_per_user: 3

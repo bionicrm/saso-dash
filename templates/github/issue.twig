@@ -2,30 +2,30 @@
     <header class="notif-header">
         <h3>
             GitHub Issue &gt;
-            <a class="notif-repo" href="{{ thread.repository.htmlUrl }}">
-                {{ thread.repository.fullName }}
+            <a class="notif-repo" href="{{ repo_url }}">
+                {{ repo_name }}
             </a>
-            &gt; issue #{{ issue.number }}
-            <span class="notif-thread-title">"{{ issue.title }}"</span>
+            &gt; issue #{{ issue_number }}
+            <span class="notif-thread-title">"{{ issue_title }}"</span>
         </h3>
     </header>
 
     <div class="notif-content">
-        <img class="notif-actor-avatar-url" src="{{ lastComment.user.avatar_url }}"/>
+        <img class="notif-actor-avatar-url" src="{{ last_comment_user_avatar_url }}"/>
         <p class="notif-content-inner">
-            <a class="notif-actor" href="{{ lastComment.user.html_url }}">@{{ lastComment.user.login }}</a>:
+            <a class="notif-actor" href="{{ last_comment_user_url }}">@{{ last_comment_user_login }}</a>:
 
             {% spaceless %}
-                {% if lastComment.body|length > 100 %}
-                    {{ lastComment.body|slice(0, 100)|striptags }}&hellip;
+                {% if last_comment_body|length > 100 %}
+                    {{ last_comment_body|slice(0, 100)|striptags }}&hellip;
                 {% else %}
-                    {{ lastComment.body|striptags }}
+                    {{ last_comment_body|striptags }}
                 {% endif %}
             {% endspaceless %}
         </p>
     </div>
 
     <div class="notif-actions">
-        <span class="notif-time">{{ thread.created_at }}</span>
+        <span class="notif-time">{{ created_at }}</span>
     </div>
 </div>

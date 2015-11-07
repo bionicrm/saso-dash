@@ -7,7 +7,15 @@ import io.saso.dash.services.Service;
 public interface Client
 {
     /**
-     * Gests the auth token from the DB for the given service.
+     * Gets the ID of the client. Equivalent to calling
+     * {@link DBLiveToken#getUserId()}.
+     *
+     * @return the ID of the client
+     */
+    int getId();
+
+    /**
+     * Gets the auth token from the DB for the given service.
      *
      * @param service the service
      *

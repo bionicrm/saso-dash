@@ -62,7 +62,11 @@ public class DashServiceScheduler implements ServiceScheduler
     public void cancel(Client client)
     {
         for (ScheduledFuture f : scheduledFutures) {
-            f.cancel(true);
+            try {
+                f.cancel(false);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
         }
 
         ThreadUtil.THREAD_POOL.submit(() -> {
