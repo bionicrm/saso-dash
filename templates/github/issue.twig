@@ -15,13 +15,11 @@
         <p class="notif-content-inner">
             <a class="notif-actor" href="{{ last_comment_user_url }}">@{{ last_comment_user_login }}</a>:
 
-            {% spaceless %}
-                {% if last_comment_body|length > 100 %}
-                    {{ last_comment_body|slice(0, 100)|striptags }}&hellip;
-                {% else %}
-                    {{ last_comment_body|striptags }}
-                {% endif %}
-            {% endspaceless %}
+            {% if last_comment_body|striptags|length > 100 %}
+                {{ last_comment_body|striptags|slice(0, 100)|trim }}...
+            {% else %}
+                {{ last_comment_body|striptags }}
+            {% endif %}
         </p>
     </div>
 
