@@ -3,7 +3,8 @@ package io.saso.dash.redis.databases;
 public enum RedisDatabase
 {
     PREFERENCES(0),
-    CONCURRENT_CONNECTIONS(1);
+    CONCURRENT_CONNECTIONS(1),
+    SERVICES(2);
 
     private final int index;
 
