@@ -1,10 +1,10 @@
-package io.saso.dash.services.services.impl;
+package io.saso.dash.services.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import io.saso.dash.server.Client;
-import io.saso.dash.services.services.Service;
+import io.saso.dash.services.Service;
 import io.saso.dash.templating.TemplateRenderer;
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.github.GHNotificationStream;
