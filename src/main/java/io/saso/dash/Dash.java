@@ -20,7 +20,8 @@ public class Dash
                 new RedisModule(),
                 new ServerModule(),
                 new ServicesModule(),
-                new StartupModule());
+                new StartupModule(),
+                new TemplatingModule());
 
         // run startup
         injector.getInstance(StartupManager.class).start();

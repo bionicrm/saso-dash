@@ -2,7 +2,10 @@ package io.saso.dash.services.services.impl;
 
 import io.saso.dash.server.Client;
 import io.saso.dash.services.services.Service;
+import org.kohsuke.github.GHThread;
 import org.kohsuke.github.GitHub;
+
+import java.util.Iterator;
 
 public class GitHubService implements Service
 {
@@ -29,7 +32,15 @@ public class GitHubService implements Service
     @Override
     public void poll(Client client)
     {
-        // TODO: implement
+        // TODO: we don't want read messages
+        Iterator<GHThread> threads = gitHub.listNotifications()
+                .nonBlocking(true).read(true).iterator();
+
+        while (threads.hasNext()) {
+            final GHThread thread = threads.next();
+
+
+        }
     }
 
     @Override
